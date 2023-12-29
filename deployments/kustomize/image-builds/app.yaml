@@ -1,0 +1,43 @@
+# ImageStream nginx-run
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    description: PHP NAAD Client Image
+  labels:
+    role: app
+  name: naad-app
+---
+# BuildConfig naad-app
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    description: Creates the NAAD application image.
+  labels:
+    role: app
+  name: naad-app
+spec:
+  failedBuildsHistoryLimit: 1
+  successfulBuildsHistoryLimit: 1
+  strategy:
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: nginx:1.25.3
+    type: Docker
+  source:
+    contextDir: openshift/templates/images/app
+    git:
+      ref: main
+      uri: https://github.com/bcgov/naad-connector
+    type: Git
+  output:
+    to:
+      kind: ImageStreamTag
+      name: naad-app:latest
+  resources:
+    limits:
+      cpu: "250m"
+      memory: 200Mi
+  runPolicy: Serial
