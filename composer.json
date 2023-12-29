@@ -1,0 +1,16 @@
+{
+    "name": "bcgov/naad-connector",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Bcgov\\NaadConnector\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Michael Haswell",
+            "email": "Michael.Haswell@gov.bc.ca"
+        }
+    ],
+    "require": {}
+}
