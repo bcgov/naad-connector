@@ -57,6 +57,6 @@ class NaadConnector {
 
     private function logger( $msg ) {
         $s = sprintf( '[%s %s] ', $this->name, date( 'm/d/Y h:i:s a', time() ) );
-        fwrite( STDOUT, $s . print_r( $msg, true ) . "\n" );
+        error_log( $s . print_r( $msg, true ) );
     }
 }
