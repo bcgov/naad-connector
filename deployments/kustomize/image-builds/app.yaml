@@ -24,10 +24,10 @@ spec:
     dockerStrategy:
       from:
         kind: DockerImage
-        name: nginx:1.25.3
+        name: php:8.3
     type: Docker
   source:
-    contextDir: openshift/templates/images/app
+    contextDir: ./
     git:
       ref: main
       uri: https://github.com/bcgov/naad-connector

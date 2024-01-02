@@ -1,3 +1,4 @@
+# Don't change the FROM, updated by the OpenShift BuildConfig.
 FROM php
 
 RUN set -ex; \
