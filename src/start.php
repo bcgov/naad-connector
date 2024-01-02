@@ -1,5 +1,7 @@
 <?php
+require_once 'vendor/autoload.php';
 
-require_once('NaadConnector.php');
+use Bcgov\NaadConnector\NaadClient;
 
-new NaadConnector( $argv[1], $argv[2] );
+$connector = new NaadClient($argv[1], $argv[2]);
+return $connector->connect();

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ruleset name="NaadConnectorStandard">
+    <description>Naad Connector coding standard.</description>
+    <rule ref="PEAR">
+        <exclude name="PEAR.Commenting.FileComment.Missing"/>
+    </rule>
+</ruleset>
