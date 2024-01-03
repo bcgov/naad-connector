@@ -14,6 +14,12 @@ docker run --rm  naad-app
 ```sh
 # Change nameplate 
 oc project 12345-tools
-oc apply  -k deployments/kustomize/image-builds -n 12345-tools
-oc start-build naad-app --follow -n 12345-tools
+oc apply -k deployments/kustomize/image-builds --namespace=12345-tools
+oc start-build naad-app --follow --namespace=12345-tools
+```
+
+### OpenShift Deploy
+```sh
+oc project 12345-tools
+oc apply -k deployments/kustomize/base --namespace=12345-tools
 ```
