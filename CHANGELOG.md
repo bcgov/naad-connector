@@ -1,6 +1,9 @@
 # Changelog
 
-## 1.0.0 
+## 1.0.0
+### January 10, 2024
+- Created NaadRssClient class to fetch and parse NAAD RSS feed ([DESCW-1777](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1777))
+
 ### January 2, 2024
 - OpenShift Deployment ([DESCW-1868](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1868))
 - Created NaadConnector class to connect to NAAD socket ([DESCW-1778](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1778))
