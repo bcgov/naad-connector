@@ -1,7 +1,7 @@
 <?php
 require_once 'vendor/autoload.php';
 
-use Bcgov\NaadConnector\NaadClient;
+use Bcgov\NaadConnector\NaadSocketClient;
 
-$connector = new NaadClient($argv[1], $argv[2]);
+$connector = new NaadSocketClient($argv[1], $argv[2]);
 return $connector->connect();

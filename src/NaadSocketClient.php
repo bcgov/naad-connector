@@ -2,7 +2,7 @@
 namespace Bcgov\NaadConnector;
 
 /**
- * NaadClient class connects to the NAAD socket and logs its output.
+ * NaadSocketClient class connects to the NAAD socket and logs its output.
  *
  * @category Client
  * @package  NaadConnector
@@ -10,7 +10,7 @@ namespace Bcgov\NaadConnector;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-class NaadClient
+class NaadSocketClient
 {
 
     /**
