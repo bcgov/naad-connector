@@ -41,6 +41,8 @@ class NaadSocketClient
      */
     protected int $port;
 
+    protected string $currentOutput = '';
+
     /**
      * Constructor for NaadClient.
      *
@@ -97,7 +99,9 @@ class NaadSocketClient
 
         $this->logger('Reading response:');
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
-            $this->handleEvent($out);
+            $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
+            $this->handleResponse($out);
+            libxml_use_internal_errors($previousUseInternalErrorsValue);
         }
 
         $this->logger('Closing socket');
@@ -107,15 +111,53 @@ class NaadSocketClient
     }
 
     /**
-     * Handles a socket event (new data received through the socket).
+     * Handles a socket response (new data received through the socket).
      *
-     * @param string $event An XML string.
+     * @param string $response A partial or complete XML string.
      *
-     * @return void
+     * @return bool
      */
-    protected function handleEvent( string $event )
+    protected function handleResponse( string $response ): bool
     {
-        $this->logger($event);
+        if (!$this->validateResponse($response)) {
+            return false;
+        }
+
+        $this->logger($this->currentOutput);
+        $this->currentOutput = '';
+        return true;
+    }
+
+    /**
+     * Combines multi-part responses and attempts to validate XML.
+     *
+     * @param string $response A partial or complete XML string.
+     *
+     * @return bool
+     */
+    protected function validateResponse( string $response ): bool
+    {
+        $this->currentOutput .= $response;
+        
+        $xml = simplexml_load_string($this->currentOutput);
+
+        // Current output is not a valid XML document.
+        if (false === $xml) {
+            /**
+             * </alert> indicates the end of an alert XML document,
+             * clear current output for the next response.
+             */
+            if (str_ends_with(trim($this->currentOutput), '</alert>')) {
+                $this->logger('Invalid XML document received.');
+                $this->currentOutput = '';
+            } else {
+                $this->logger('Invalid or partial XML document received.');
+            }
+            $this->logXmlErrors();
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -129,5 +171,17 @@ class NaadSocketClient
     {
         $s = sprintf('[%s %s] ', $this->name, date('m/d/Y h:i:s a', time()));
         error_log($s . print_r($msg, true));
+    }
+
+    /**
+     * Logs XML errors.
+     *
+     * @return void
+     */
+    protected function logXmlErrors()
+    {
+        foreach (libxml_get_errors() as $error) {
+            print_r($error->message);
+        }
     }
 }
