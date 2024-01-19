@@ -41,6 +41,11 @@ class NaadSocketClient
      */
     protected int $port;
 
+    /**
+     * The current output of the socket. Stored so that multi-part responses can be combined.
+     *
+     * @var string
+     */
     protected string $currentOutput = '';
 
     /**
