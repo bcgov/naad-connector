@@ -1,6 +1,8 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use SimpleXMLElement;
+
 /**
  * NaadSocketClient class connects to the NAAD socket and logs its output.
  *
@@ -42,7 +44,8 @@ class NaadSocketClient
     protected int $port;
 
     /**
-     * The current output of the socket. Stored so that multi-part responses can be combined.
+     * The current output of the socket. Stored so that multi-part responses can
+     * be combined.
      *
      * @var string
      */
@@ -124,11 +127,19 @@ class NaadSocketClient
      */
     protected function handleResponse( string $response ): bool
     {
-        if (!$this->validateResponse($response)) {
+        $xml = $this->validateResponse($response);
+        
+        if (!$xml) {
             return false;
         }
 
-        $this->logger($this->currentOutput);
+        $xml->registerXPathNamespace('x', 'urn:oasis:names:tc:emergency:cap:1.2');
+        if ($this->isHeartbeat($xml)) {
+            $this->logger('Heartbeat received.');
+        } else {
+            $this->logger($this->currentOutput);
+            $this->logger('A REAL ALERT!');
+        }
         $this->currentOutput = '';
         return true;
     }
@@ -138,9 +149,10 @@ class NaadSocketClient
      *
      * @param string $response A partial or complete XML string.
      *
-     * @return bool
+     * @return bool|SimpleXMLElement Returns SimpleXMLElement on success,
+     *                               false otherwise.
      */
-    protected function validateResponse( string $response ): bool
+    protected function validateResponse( string $response ): bool|SimpleXMLElement
     {
         $this->currentOutput .= $response;
         
@@ -162,7 +174,22 @@ class NaadSocketClient
             return false;
         }
 
-        return true;
+        return $xml;
+    }
+
+    /**
+     * Determines whether a given SimpleXMLElement is a NAAD heartbeat message.
+     *
+     * @param SimpleXMLElement $xml XML from NAAD socket.
+     *
+     * @return boolean True if the XML is a heartbeat message, false otherwise.
+     */
+    protected function isHeartbeat( SimpleXMLElement $xml ): bool
+    {
+        $sender = $xml->xpath(
+            '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
+        );
+        return !empty($sender);
     }
 
     /**

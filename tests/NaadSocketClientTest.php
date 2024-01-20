@@ -22,7 +22,11 @@ final class NaadSocketClientTest extends TestCase
         foreach ($xmlResponses as $response) {
             $xml = file_get_contents(self::XML_TEST_FILE_LOCATION . $response['location']);
             $result = $method->invokeArgs($client, [$xml]);
-            $this->assertSame($response['expected'], $result);
+            if (false === $response['expected']) {
+                $this->assertSame($response['expected'], $result);
+            } else {
+                $this->assertIsObject($result);
+            }
         }
     }
 
@@ -36,7 +40,7 @@ final class NaadSocketClientTest extends TestCase
             'Success - single part' => [
                 [
                     [
-                        'location' => 'single.xml',
+                        'location' => 'complete-alert.xml',
                         'expected' => true
                     ]
                 ]
@@ -76,12 +80,43 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => false
                     ],
                     [
-                        'location' => 'single.xml',
+                        'location' => 'complete-alert.xml',
                         'expected' => true
                     ],
                 ]
-            ]  
+            ],
+            'Success - Heartbeat' => [
+                [
+                    [
+                        'location' => 'heartbeat.xml',
+                        'expected' => true
+                    ],
+                ]
+            ]
         ];
+    }
+
+    /**
+     * Tests isHeartbeat function.
+     *
+     * @return void
+     */
+    public function testIsHeartbeat() {
+        $class = new ReflectionClass('Bcgov\NaadConnector\NaadSocketClient');
+        $method = $class->getMethod('isHeartbeat');
+        $client = new NaadSocketClient('test-naad', 'testing.url');
+
+        // Test that a heartbeat XML returns true.
+        $heartbeat = simplexml_load_file(self::XML_TEST_FILE_LOCATION . '/heartbeat.xml');
+        $heartbeat->registerXPathNamespace('x', 'urn:oasis:names:tc:emergency:cap:1.2');
+        $result = $method->invokeArgs($client, [$heartbeat]);
+        $this->assertTrue($result);
+
+        // Test that an alert XML returns false.
+        $alert = simplexml_load_file(self::XML_TEST_FILE_LOCATION . '/complete-alert.xml');
+        $alert->registerXPathNamespace('x', 'urn:oasis:names:tc:emergency:cap:1.2');
+        $result = $method->invokeArgs($client, [$alert]);
+        $this->assertFalse($result);
     }
 }
 
