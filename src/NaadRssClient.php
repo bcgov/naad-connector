@@ -46,7 +46,9 @@ class NaadRssClient
      */
     public function fetch(): int
     {
+        // Enables error reporting for XML functions (used by libxml_get_errors()).
         $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
+
         $feed = simplexml_load_file($this->address);
         if (!$feed) {
             print_r('Could not fetch RSS feed.');
@@ -62,7 +64,8 @@ class NaadRssClient
         }
 
         $this->feed = $feed;
-        
+
+        // Sets XML error reporting back to its original value.
         libxml_use_internal_errors($previousUseInternalErrorsValue);
         return 1;
     }

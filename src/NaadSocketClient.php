@@ -1,6 +1,8 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use SimpleXMLElement;
+
 /**
  * NaadSocketClient class connects to the NAAD socket and logs its output.
  *
@@ -16,9 +18,18 @@ class NaadSocketClient
     /**
      * The number of bytes to read at once from the socket stream.
      *
-     * @var integer
+     * @var int
      */
-    protected static $MAX_MESSAGE_SIZE = 5000000;
+    protected static int $MAX_MESSAGE_SIZE = 5000000;
+
+    /**
+     * The expected XML namespace of alerts, referring to the CAP 1.2 schema.
+     *
+     * @link https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2-os.html
+     *
+     * @var string
+     */
+    protected static string $XML_NAMESPACE = 'urn:oasis:names:tc:emergency:cap:1.2';
 
     /**
      * The name of the NAAD connection instance.
@@ -42,7 +53,8 @@ class NaadSocketClient
     protected int $port;
 
     /**
-     * The current output of the socket. Stored so that multi-part responses can be combined.
+     * The current output of the socket. Stored so that multi-part responses can
+     * be combined.
      *
      * @var string
      */
@@ -69,7 +81,7 @@ class NaadSocketClient
      */
     public function connect(): int
     {
-        /* Create a TCP/IP socket. */
+        // Create a TCP/IP socket.
         $this->logger('Creating socket');
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false ) {
@@ -104,8 +116,12 @@ class NaadSocketClient
 
         $this->logger('Reading response:');
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
+            // Enables error reporting for XML functions (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
+            
             $this->handleResponse($out);
+
+            // Sets XML error reporting back to its original value.
             libxml_use_internal_errors($previousUseInternalErrorsValue);
         }
 
@@ -124,11 +140,19 @@ class NaadSocketClient
      */
     protected function handleResponse( string $response ): bool
     {
-        if (!$this->validateResponse($response)) {
+        $xml = $this->validateResponse($response);
+        
+        if (!$xml) {
             return false;
         }
 
-        $this->logger($this->currentOutput);
+        $xml->registerXPathNamespace('x', self::$XML_NAMESPACE);
+
+        if ($this->isHeartbeat($xml)) {
+            $this->logger('Heartbeat received.');
+        } else {
+            $this->logger($this->currentOutput);
+        }
         $this->currentOutput = '';
         return true;
     }
@@ -138,9 +162,10 @@ class NaadSocketClient
      *
      * @param string $response A partial or complete XML string.
      *
-     * @return bool
+     * @return bool|SimpleXMLElement Returns SimpleXMLElement on success,
+     *                               false otherwise.
      */
-    protected function validateResponse( string $response ): bool
+    protected function validateResponse( string $response ): bool|SimpleXMLElement
     {
         $this->currentOutput .= $response;
         
@@ -162,7 +187,36 @@ class NaadSocketClient
             return false;
         }
 
-        return true;
+        // If XML does not have the correct namespace, return false.
+        $namespaces = $xml->getNamespaces();
+        $capNamespace = $namespaces[""];
+        if (self::$XML_NAMESPACE !== $capNamespace) {
+            $this->logger(
+                sprintf(
+                    "Unexpected namespace '$capNamespace'. " .
+                    "Expecting namespace '%s'.",
+                    self::$XML_NAMESPACE
+                )
+            );
+            return false;
+        }
+
+        return $xml;
+    }
+
+    /**
+     * Determines whether a given SimpleXMLElement is a NAAD heartbeat message.
+     *
+     * @param SimpleXMLElement $xml XML from NAAD socket.
+     *
+     * @return boolean True if the XML is a heartbeat message, false otherwise.
+     */
+    protected function isHeartbeat( SimpleXMLElement $xml ): bool
+    {
+        $sender = $xml->xpath(
+            '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
+        );
+        return !empty($sender);
     }
 
     /**

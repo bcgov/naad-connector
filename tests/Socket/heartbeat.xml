@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert
+	xmlns="urn:oasis:names:tc:emergency:cap:1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:emergency:cap:1.2 http://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd">
+	<identifier>55E7573887B94E0285E3C4F2A863944F</identifier>
+	<sender>NAADS-Heartbeat</sender>
+	<sent>2024-01-17T17:12:39-00:00</sent>
+	<status>System</status>
+	<msgType>Alert</msgType>
+	<source>NAADS-1</source>
+	<scope>Public</scope>
+	<code>profile:CAP-CP:0.4</code>
+	<references>cap-pac@canada.ca,urn:oid:2.49.0.1.124.3391214003.2024,2024-01-17T16:05:28-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.3512422613.2024,2024-01-17T16:08:14-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.3964945571.2024,2024-01-17T16:09:58-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1622604259.2024,2024-01-17T16:11:16-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.3435285268.2024,2024-01-17T16:12:54-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1125903689.2024,2024-01-17T16:18:15-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.2342270872.2024,2024-01-17T16:18:31-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.2295917138.2024,2024-01-17T16:19:52-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1754997450.2024,2024-01-17T16:20:32-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.3372133859.2024,2024-01-17T16:23:54-00:00</references>
+</alert>
