@@ -1,6 +1,9 @@
 # Changelog
 
 ## 1.0.0
+### January 19, 2024
+- Added multi-part message handling for when alert text is too long to be read in a single socket_read() ([DESCW-1869](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1869))
+
 ### January 10, 2024
 - Created NaadRssClient class to fetch and parse NAAD RSS feed ([DESCW-1777](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1777))
 

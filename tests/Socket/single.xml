@@ -1,0 +1,453 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<alert
+	xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+	<identifier>urn:oid:2.49.0.1.124.2923211009.2024</identifier>
+	<sender>cap-pac@canada.ca</sender>
+	<sent>2024-01-19T00:31:20-00:00</sent>
+	<status>Actual</status>
+	<msgType>Update</msgType>
+	<source>Env. Can. - Can. Met. Ctr. â€“ MontrÃ©al</source>
+	<scope>Public</scope>
+	<code>profile:CAP-CP:0.4</code>
+	<code>layer:SOREM:1.0</code>
+	<code>layer:EC-MSC-SMC:1.0</code>
+	<code>layer:EC-MSC-SMC:1.1</code>
+	<code>layer:SOREM:2.0</code>
+	<note>Service Notice - August 2023: The Environment and Climate Change Canada (ECCC) CAP Service undergoes changes from time to time as the business of alerting evolves. For 2023, there are no more planned changes, however for 2024, changes are expected to include... 1) expansion of the Storm Surge Program to include most of Canada, 2) the use of threat based dynamic polygons for convective weather threats, and 3) other minor improvements and corrections. For more information on these changes, you are invited to subscribe to the following mailing list: http://lists.cmc.ec.gc.ca/mailman/listinfo/dd_info | Notification de service - aoÃ»t 2023: Le service du PAC dâ€™Environnement et Changement climatique Canada (ECCC) subit pÃ©riodiquement des changements Ã  mesure que le systÃ¨me dâ€™alerte Ã©volue. Pour 2023, il nâ€™y a pas dâ€™autres changements prÃ©vus. Cependant, pour 2024, il y aura des changements incluant... 1) une expansion du programme d'onde de tempÃªte afin de couvrir la majeure partie du Canada, 2) lâ€™utilisation de polygones de menace dynamiques pour les menaces convectives mÃ©tÃ©orologiques, et 3) dâ€™autres amÃ©liorations et corrections mineures. Pour plus dâ€™informations sur ces changements, vous Ãªtes invitÃ©s Ã  vous inscrire Ã  la liste de diffusion suivante: http://lists.cmc.ec.gc.ca/mailman/listinfo/dd_info</note>
+	<references>cap-pac@canada.ca,urn:oid:2.49.0.1.124.1571197866.2024,2024-01-16T09:28:36-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.2842158720.2024,2024-01-16T14:40:15-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1855959790.2024,2024-01-16T19:40:46-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.3686728659.2024,2024-01-17T03:05:11-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.2845129978.2024,2024-01-17T09:06:16-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1631081626.2024,2024-01-17T14:55:36-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.0914695095.2024,2024-01-17T20:03:32-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.2438131808.2024,2024-01-18T03:29:26-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1816388496.2024,2024-01-18T08:55:08-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.1318996317.2024,2024-01-18T14:41:03-00:00 cap-pac@canada.ca,urn:oid:2.49.0.1.124.0347981961.2024,2024-01-18T19:50:56-00:00</references>
+	<info>
+		<language>en-CA</language>
+		<category>Met</category>
+		<event>winter storm</event>
+		<responseType>Monitor</responseType>
+		<urgency>Expected</urgency>
+		<severity>Moderate</severity>
+		<certainty>Likely</certainty>
+		<audience>general public</audience>
+		<eventCode>
+			<valueName>profile:CAP-CP:Event:0.4</valueName>
+			<value>winterStorm</value>
+		</eventCode>
+		<eventCode>
+			<valueName>SAME</valueName>
+			<value>WSW</value>
+		</eventCode>
+		<effective>2024-01-19T00:31:20-00:00</effective>
+		<expires>2024-01-19T16:28:14-00:00</expires>
+		<senderName>Environment Canada</senderName>
+		<headline>winter storm warning in effect</headline>
+		<description>
+A significant and long duration winter storm continues.
+
+Locations: coastal Labrador from Rigolet to Nain.
+
+Additional snowfall: 
+
+Nain to Makkovik: 12 to 24 cm.
+Rigolet: 4 to 8 cm.
+
+Maximum wind gusts: 
+
+Nain to Makkovik: North to northwesterly 80 to 100 km/h.
+Rigolet: Westerly 80 km/h.
+
+Time span: continuing through Friday evening.
+
+Similar storms in the past have caused:
+- school closures and cancellations of scheduled activities
+- disruptions to public services
+
+Remarks: Snow, heavy at times, will continue, combining with strong winds and cold temperatures to cause reduced visibility in widespread blowing snow. Conditions are expected to improve tonight as temperatures rise to near zero and blowing snow tapers off.  
+
+Snow and strong winds are expected to continue for Friday, though blowing snow may be more localized after the previously warm temperatures.
+
+###
+
+Visibility will be suddenly reduced to near zero at times in heavy snow and blowing snow.
+
+Winter storm warnings are issued when multiple types of severe winter weather are expected to occur together.
+
+Please continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to NLstorm@ec.gc.ca or tweet reports using #NLwx.
+</description>
+		<instruction>
+Consider postponing non-essential travel until conditions improve.
+</instruction>
+		<web>https://weather.gc.ca/</web>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Type</valueName>
+			<value>warning</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Broadcast_Intrusive</valueName>
+			<value>no</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:SOREM:1.0:Broadcast_Immediately</valueName>
+			<value>No</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Parent_URI</valueName>
+			<value>msc/alert/environment/hazard/alert-3.0-ascii/consolidated-xml-2.0/20240119002814519/WW_17_77_CWHX/WSW/744556441356445494202401160507_WW_17_77_CWHX/actual/en_proper_complete_c-fr_proper_complete_c/NinJo</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:CAP_count</valueName>
+			<value>A:2938 M:15358 C:16552</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Location_Status</valueName>
+			<value>active</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Name</valueName>
+			<value>winter storm warning</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Coverage</valueName>
+			<value>Labrador</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Designation_Code</valueName>
+			<value>WW_17_77_CWHX</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:SOREM:2.0:WirelessImmediate</valueName>
+			<value>No</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Alert_Location_Status</valueName>
+			<value>active</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Newly_Active_Areas</valueName>
+			<value />
+		</parameter>
+		<area>
+			<areaDesc>Rigolet and vicinity</areaDesc>
+			<polygon>54.7317,-58.0061 54.7766,-57.8299 54.7584,-56.7055 54.136,-57.0958 54.1207,-57.3704 53.72,-58.3667 53.9346,-58.8483 54.0182,-58.8814 54.0269,-59.0361 54.19,-59.3729 54.7317,-58.0061</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027400</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010020</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011005</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011010</value>
+			</geocode>
+		</area>
+		<area>
+			<areaDesc>Postville - Makkovik</areaDesc>
+			<polygon>55.0701,-60.2298 55.1369,-60.1066 55.2374,-60.0305 55.4317,-59.6967 54.9831,-57.7187 54.7766,-57.8299 54.7317,-58.0061 54.19,-59.3729 54.79,-60.5775 54.9828,-60.3074 54.9832,-60.3072 55.0701,-60.2298</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027500</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011005</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011015</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011020</value>
+			</geocode>
+		</area>
+		<area>
+			<areaDesc>Hopedale and vicinity</areaDesc>
+			<polygon>55.378,-61.891 55.8392,-61.0935 55.8603,-61.0222 55.8597,-60.8884 55.8846,-60.8571 55.9491,-60.8874 55.9666,-60.798 55.9314,-60.5146 55.906,-60.2928 55.4317,-59.6967 55.2374,-60.0305 55.1369,-60.1066 55.0701,-60.2298 54.9832,-60.3072 54.9828,-60.3074 54.79,-60.5775 55.378,-61.891</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027600</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010042</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011005</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011030</value>
+			</geocode>
+		</area>
+		<area>
+			<areaDesc>Nain and vicinity</areaDesc>
+			<polygon>56.6786,-60.7945 55.9314,-60.5146 55.9666,-60.798 55.9491,-60.8874 55.8846,-60.8571 55.8597,-60.8884 55.8603,-61.0222 55.8392,-61.0935 55.378,-61.891 55.8296,-63.0037 56.0019,-63.0038 56.7494,-63.0043 56.7524,-62.4923 56.6166,-61.8607 56.5708,-61.1044 56.6786,-60.7945</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027700</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010042</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010801</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011035</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011040</value>
+			</geocode>
+		</area>
+	</info>
+	<info>
+		<language>fr-CA</language>
+		<category>Met</category>
+		<event>tempÃªte hivernale</event>
+		<responseType>Monitor</responseType>
+		<urgency>Expected</urgency>
+		<severity>Moderate</severity>
+		<certainty>Likely</certainty>
+		<audience>grand public</audience>
+		<eventCode>
+			<valueName>profile:CAP-CP:Event:0.4</valueName>
+			<value>winterStorm</value>
+		</eventCode>
+		<eventCode>
+			<valueName>SAME</valueName>
+			<value>WSW</value>
+		</eventCode>
+		<effective>2024-01-19T00:31:20-00:00</effective>
+		<expires>2024-01-19T16:28:14-00:00</expires>
+		<senderName>Environnement Canada</senderName>
+		<headline>avertissement de tempÃªte hivernale en vigueur</headline>
+		<description>
+Une longue et importante tempÃªte hivernale se poursuit.
+
+RÃ©gions : la cÃ´te du Labrador de Rigolet Ã  Nain.
+
+Accumulation de neige supplÃ©mentaire :
+
+De Nain Ã  Makkovik : de 12 Ã  24 cm.
+Rigolet : de 4 Ã  8 cm.
+
+Rafales maximales :
+
+De Nain Ã  Makkovik : de nord Ã  nord-ouest de 80 Ã  100 km/h.
+Rigolet : de l'ouest Ã  80 km/h.
+
+PÃ©riode : jusqu'Ã  vendredi soir.
+
+Par le passÃ©, des tempÃªtes comparables ont entraÃ®nÃ© :
+- des fermetures d'Ã©coles et l'annulation d'activitÃ©s prÃ©vues
+- des perturbations des services publics
+
+Remarques : la neige parfois forte persistera; l'effet conjoint des vents forts et des tempÃ©ratures basses rÃ©duira la visibilitÃ© dans la poudrerie gÃ©nÃ©ralisÃ©e. Les conditions devraient s'amÃ©liorer ce soir ou cette nuit Ã  mesure que les tempÃ©ratures remonteront prÃ¨s du point de congÃ©lation et que la poudrerie s'estompera peu Ã  peu.
+
+La neige et les vents forts devraient persister vendredi, mais la poudrerie pourrait Ãªtre plus localisÃ©e Ã  la suite du temps plus doux.
+
+###
+
+La visibilitÃ© sera soudainement rÃ©duite Ã  presque nulle par moments sous la forte neige et dans la poudrerie.
+
+Un avertissement de tempÃªte hivernale est Ã©mis lorsque l'on prÃ©voit plusieurs conditions de mauvais temps hivernal simultanÃ©ment.
+
+Veuillez continuer Ã  surveiller les alertes et les prÃ©visions Ã©mises par Environnement Canada. Pour signaler du temps violent, envoyez un courriel Ã  meteoNL@ec.gc.ca ou publiez un gazouillis en utilisant le mot-clic #NLMeteo.
+</description>
+		<instruction>
+Ã‰valuez la possibilitÃ© de retarder tout dÃ©placement non essentiel jusqu'Ã  ce que les conditions s'amÃ©liorent.
+</instruction>
+		<web>https://meteo.gc.ca/</web>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Type</valueName>
+			<value>warning</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Broadcast_Intrusive</valueName>
+			<value>no</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:SOREM:1.0:Broadcast_Immediately</valueName>
+			<value>No</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Parent_URI</valueName>
+			<value>msc/alert/environment/hazard/alert-3.0-ascii/consolidated-xml-2.0/20240119002814519/WW_17_77_CWHX/WSW/744556441356445494202401160507_WW_17_77_CWHX/actual/en_proper_complete_c-fr_proper_complete_c/NinJo</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:CAP_count</valueName>
+			<value>A:2938 M:15358 C:16552</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Location_Status</valueName>
+			<value>active</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Name</valueName>
+			<value>avertissement de tempÃªte hivernale</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.0:Alert_Coverage</valueName>
+			<value>Labrador</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Designation_Code</valueName>
+			<value>WW_17_77_CWHX</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:SOREM:2.0:WirelessImmediate</valueName>
+			<value>No</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Alert_Location_Status</valueName>
+			<value>active</value>
+		</parameter>
+		<parameter>
+			<valueName>layer:EC-MSC-SMC:1.1:Newly_Active_Areas</valueName>
+			<value />
+		</parameter>
+		<area>
+			<areaDesc>Rigolet et les environs</areaDesc>
+			<polygon>54.7317,-58.0061 54.7766,-57.8299 54.7584,-56.7055 54.136,-57.0958 54.1207,-57.3704 53.72,-58.3667 53.9346,-58.8483 54.0182,-58.8814 54.0269,-59.0361 54.19,-59.3729 54.7317,-58.0061</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027400</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010020</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011005</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011010</value>
+			</geocode>
+		</area>
+		<area>
+			<areaDesc>Postville - Makkovik</areaDesc>
+			<polygon>55.0701,-60.2298 55.1369,-60.1066 55.2374,-60.0305 55.4317,-59.6967 54.9831,-57.7187 54.7766,-57.8299 54.7317,-58.0061 54.19,-59.3729 54.79,-60.5775 54.9828,-60.3074 54.9832,-60.3072 55.0701,-60.2298</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027500</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011005</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011015</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011020</value>
+			</geocode>
+		</area>
+		<area>
+			<areaDesc>Hopedale et les environs</areaDesc>
+			<polygon>55.378,-61.891 55.8392,-61.0935 55.8603,-61.0222 55.8597,-60.8884 55.8846,-60.8571 55.9491,-60.8874 55.9666,-60.798 55.9314,-60.5146 55.906,-60.2928 55.4317,-59.6967 55.2374,-60.0305 55.1369,-60.1066 55.0701,-60.2298 54.9832,-60.3072 54.9828,-60.3074 54.79,-60.5775 55.378,-61.891</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027600</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010042</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011005</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011030</value>
+			</geocode>
+		</area>
+		<area>
+			<areaDesc>Nain et les environs</areaDesc>
+			<polygon>56.6786,-60.7945 55.9314,-60.5146 55.9666,-60.798 55.9491,-60.8874 55.8846,-60.8571 55.8597,-60.8884 55.8603,-61.0222 55.8392,-61.0935 55.378,-61.891 55.8296,-63.0037 56.0019,-63.0038 56.7494,-63.0043 56.7524,-62.4923 56.6166,-61.8607 56.5708,-61.1044 56.6786,-60.7945</polygon>
+			<geocode>
+				<valueName>layer:EC-MSC-SMC:1.0:CLC</valueName>
+				<value>027700</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010042</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1010801</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011035</value>
+			</geocode>
+			<geocode>
+				<valueName>profile:CAP-CP:Location:0.3</valueName>
+				<value>1011040</value>
+			</geocode>
+		</area>
+	</info>
+	<Signature Id="NAADS Signature"
+		xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<SignedInfo>
+			<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+			<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+			<Reference URI="">
+				<Transforms>
+					<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+				</Transforms>
+				<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+				<DigestValue>abG2H4oKoDI5xlo9pia6kZ0sv0Dkqp0j5igeZcS8t/k=</DigestValue>
+			</Reference>
+		</SignedInfo>
+		<SignatureValue></SignatureValue>
+		<KeyInfo>
+			<X509Data>
+				<X509Certificate></X509Certificate>
+			</X509Data>
+		</KeyInfo>
+		<Object
+			xmlns="">
+			<SignatureProperties>
+				<SignatureProperty Id="NAADS-DSS1" Target="https://dss1.naad-adna.pelmorex.com">
+					<xc:value
+						xmlns:xc="http://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd" />
+					</SignatureProperty>
+					<SignatureProperty Id="NAADS-DSS2" Target="https://dss2.naad-adna.pelmorex.com">
+						<xc:value
+							xmlns:xc="http://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd" />
+						</SignatureProperty>
+					</SignatureProperties>
+				</Object>
+			</Signature>
+			<Signature
+				xmlns="http://www.w3.org/2000/09/xmldsig#" Id="Environment Canada">
+				<SignedInfo>
+					<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+					<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+					<Reference URI="">
+						<Transforms>
+							<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+						</Transforms>
+						<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+						<DigestValue>abG2H4oKoDI5xlo9pia6kZ0sv0Dkqp0j5igeZcS8t/k=</DigestValue>
+					</Reference>
+				</SignedInfo>
+				<SignatureValue>test</SignatureValue>
+				<KeyInfo>
+					<X509Data>
+						<X509Certificate>test</X509Certificate>
+					</X509Data>
+				</KeyInfo>
+			</Signature>
+		</alert>
