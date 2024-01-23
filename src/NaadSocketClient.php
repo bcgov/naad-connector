@@ -18,9 +18,18 @@ class NaadSocketClient
     /**
      * The number of bytes to read at once from the socket stream.
      *
-     * @var integer
+     * @var int
      */
-    protected static $MAX_MESSAGE_SIZE = 5000000;
+    protected static int $MAX_MESSAGE_SIZE = 5000000;
+
+    /**
+     * The expected XML namespace of alerts, referring to the CAP 1.2 schema.
+     *
+     * @link https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2-os.html
+     *
+     * @var string
+     */
+    protected static string $XML_NAMESPACE = 'urn:oasis:names:tc:emergency:cap:1.2';
 
     /**
      * The name of the NAAD connection instance.
@@ -137,12 +146,12 @@ class NaadSocketClient
             return false;
         }
 
-        $xml->registerXPathNamespace('x', 'urn:oasis:names:tc:emergency:cap:1.2');
+        $xml->registerXPathNamespace('x', self::$XML_NAMESPACE);
+
         if ($this->isHeartbeat($xml)) {
             $this->logger('Heartbeat received.');
         } else {
             $this->logger($this->currentOutput);
-            $this->logger('A REAL ALERT!');
         }
         $this->currentOutput = '';
         return true;
@@ -175,6 +184,20 @@ class NaadSocketClient
                 $this->logger('Invalid or partial XML document received.');
             }
             $this->logXmlErrors();
+            return false;
+        }
+
+        // If XML does not have the correct namespace, return false.
+        $namespaces = $xml->getNamespaces();
+        $capNamespace = $namespaces[""];
+        if (self::$XML_NAMESPACE !== $capNamespace) {
+            $this->logger(
+                sprintf(
+                    "Unexpected namespace '$capNamespace'. " .
+                    "Expecting namespace '%s'.",
+                    self::$XML_NAMESPACE
+                )
+            );
             return false;
         }
 
