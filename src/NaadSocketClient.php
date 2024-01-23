@@ -72,7 +72,7 @@ class NaadSocketClient
      */
     public function connect(): int
     {
-        /* Create a TCP/IP socket. */
+        // Create a TCP/IP socket.
         $this->logger('Creating socket');
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false ) {
@@ -107,8 +107,12 @@ class NaadSocketClient
 
         $this->logger('Reading response:');
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
+            // Enables error reporting for XML functions (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
+            
             $this->handleResponse($out);
+
+            // Sets XML error reporting back to its original value.
             libxml_use_internal_errors($previousUseInternalErrorsValue);
         }
 
