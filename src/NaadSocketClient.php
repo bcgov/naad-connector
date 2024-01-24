@@ -46,6 +46,13 @@ class NaadSocketClient
     protected string $address;
 
     /**
+     * An instance of DestinationClient.
+     *
+     * @var DestinationClient
+     */
+    protected DestinationClient $destinationClient;
+
+    /**
      * The port of the NAAD socket to connect to.
      *
      * @var integer
@@ -63,14 +70,25 @@ class NaadSocketClient
     /**
      * Constructor for NaadClient.
      *
-     * @param string  $name The name of the NAAD connection instance.
-     * @param string  $url  The URL of the NAAD socket to connect to.
-     * @param integer $port The port of the NAAD socket to connect to.
+     * @param string            $name              The name of the NAAD connection
+     *                                             instance.
+     * @param string            $socketUrl         The URL of the NAAD socket to
+     *                                             connect to.
+     * @param DestinationClient $destinationClient An instance of DestinationClient
+     *                                             to handle making requests to a
+     *                                             destination.
+     * @param integer           $port              The port of the NAAD socket to
+     *                                             connect to.
      */
-    public function __construct( string $name, string $url, int $port = 8080 )
-    {
+    public function __construct(
+        string $name,
+        string $socketUrl,
+        DestinationClient $destinationClient,
+        int $port = 8080
+    ) {
         $this->name = $name;
-        $this->address = $url;
+        $this->address = $socketUrl;
+        $this->destinationClient = $destinationClient;
         $this->port = $port;
     }
 
@@ -116,7 +134,7 @@ class NaadSocketClient
 
         $this->logger('Reading response:');
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
-            // Enables error reporting for XML functions (used by libxml_get_errors()).
+            // Enables error XML error reporting (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
             
             $this->handleResponse($out);
@@ -151,7 +169,8 @@ class NaadSocketClient
         if ($this->isHeartbeat($xml)) {
             $this->logger('Heartbeat received.');
         } else {
-            $this->logger($this->currentOutput);
+            $result = $this->destinationClient->sendRequest($this->currentOutput);
+            $this->logger($result);
         }
         $this->currentOutput = '';
         return true;
