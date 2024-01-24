@@ -17,5 +17,8 @@ RUN /usr/local/bin/composer dump-autoload
 
 ENV NAAD_NAME=NAAD-1
 ENV NAAD_URL=streaming1.naad-adna.pelmorex.com
+ENV DESTINATION_URL=https://localhost/wp-json/naad/v1/alert
+ENV DESTINATION_USER=naadbot
+ENV DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
 
 ENTRYPOINT ["/home/entrypoint.sh"]
