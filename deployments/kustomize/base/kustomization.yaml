@@ -7,4 +7,17 @@ resources:
 commonLabels:
   app: naad-app
   env: default
+configMapGenerator:
+  - name: config
+    literals:
+    - NAAD_NAME=NAAD-1
+    - NAAD_URL=streaming2.naad-adna.pelmorex.com
+    - DESTINATION_URL=https://localhost/wp-json/naad/v1/alert
+    - DESTINATION_USER=naadbot
+
+secretGenerator:
+  - name: secrets
+    type: Opaque
+    literals:
+    - DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
 
