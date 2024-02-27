@@ -8,24 +8,23 @@ metadata:
     app.kubernetes.io/part-of: naad-connector
     app.openshift.io/runtime: php
     app.kubernetes.io/component: socket
-    
 spec:
   replicas: 1
   template:
     spec:
       containers:
         - name: naad-app
-          image: image-registry.openshift-image-registry.svc:5000/e9b785-tools/naad-app:latest
+          image: bcgovgdx/naad-app
           imagePullPolicy: Always
-          env:
-            - name: NAAD_NAME
-              value: NAAD-1
-            - name: NAAD_URL
-              value: "streaming1.naad-adna.pelmorex.com"
+          envFrom:
+          - configMapRef:
+              name: config
+          - secretRef:
+              name: secrets
           resources:
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: 500m
+              memory: 500Mi
             limits:
               cpu: 1
-              memory: 2Gi
+              memory: 1Gi
