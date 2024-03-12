@@ -1,6 +1,9 @@
 # Changelog
 
 ## 1.0.0
+### March 11, 2024
+- Add monolog as the logging channel for Naad socket client ([DESCW-1901](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1901))
+
 ### January 19, 2024
 - Added function to determine when a socket response is a heartbeat or an alert ([DESCW-1870](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1870))
 - Added multi-part message handling for when alert text is too long to be read in a single socket_read() ([DESCW-1869](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1869))

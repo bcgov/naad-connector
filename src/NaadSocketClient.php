@@ -1,6 +1,8 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use Monolog\Logger;
+
 use SimpleXMLElement;
 
 /**
@@ -68,6 +70,13 @@ class NaadSocketClient
     protected string $currentOutput = '';
 
     /**
+     * The monolog channel for saving to stream or file.
+     *
+     * @var Logger
+     */
+    protected Logger $logger;
+
+    /**
      * Constructor for NaadClient.
      *
      * @param string            $name              The name of the NAAD connection
@@ -77,6 +86,7 @@ class NaadSocketClient
      * @param DestinationClient $destinationClient An instance of DestinationClient
      *                                             to handle making requests to a
      *                                             destination.
+     * @param Logger            $logger            A monolog logging channel.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */
@@ -84,11 +94,13 @@ class NaadSocketClient
         string $name,
         string $socketUrl,
         DestinationClient $destinationClient,
-        int $port = 8080
+        Logger $logger,
+        int $port = 8080,
     ) {
         $this->name = $name;
         $this->address = $socketUrl;
         $this->destinationClient = $destinationClient;
+        $this->logger = $logger;
         $this->port = $port;
     }
 
@@ -100,39 +112,45 @@ class NaadSocketClient
     public function connect(): int
     {
         // Create a TCP/IP socket.
-        $this->logger('Creating socket');
+        $this->logger->info('Creating socket');
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false ) {
-            $this->logger(
-                sprintf(
-                    'socket_create() failed: reason: %s',
-                    socket_strerror(socket_last_error())
-                )
+            $this->logger->error(
+                'socket_create() failed: reason: {error}',
+                [
+                    'error'=>socket_strerror(socket_last_error()),
+                ]
             );
             return 2;
         } else {
-            $this->logger('OK.');
+            $this->logger->info('OK.');
         }
 
         $address = $this->address;
         $port = $this->port;
 
-        $this->logger("Attempting to connect to '$address' on port '$port'...");
+        $this->logger->info(
+            "Attempting to connect to '{address}' on port '{port}'...",
+            [
+                'address'=> $address, 'port' =>$port,
+            ]
+        );
         $result = socket_connect($socket, $address, $port);
         if ($result === false ) {
-            $this->logger(
-                sprintf(
-                    "socket_connect() failed.\nReason: (%s) %s",
-                    $result,
-                    socket_strerror(socket_last_error($socket))
-                )
+            $error = socket_strerror(socket_last_error($socket));
+            $this->logger->error(
+                "socket_connect() failed.\nReason: ({result}) {error}",
+                [
+                    'result'=> $result,
+                    'error'=> $error
+                ]
             );
             return 3;
         } else {
-            $this->logger('OK.');
+            $this->logger->info('OK.');
         }
 
-        $this->logger('Reading response:');
+        $this->logger->info('Reading response:');
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
             // Enables error XML error reporting (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
@@ -143,9 +161,9 @@ class NaadSocketClient
             libxml_use_internal_errors($previousUseInternalErrorsValue);
         }
 
-        $this->logger('Closing socket');
+        $this->logger->info('Closing socket');
         socket_close($socket);
-        $this->logger('OK.');
+        $this->logger->info('OK.');
         return 1;
     }
 
@@ -167,10 +185,15 @@ class NaadSocketClient
         $xml->registerXPathNamespace('x', self::$XML_NAMESPACE);
 
         if ($this->isHeartbeat($xml)) {
-            $this->logger('Heartbeat received.');
+            $this->logger->info('Heartbeat received.');
         } else {
             $result = $this->destinationClient->sendRequest($this->currentOutput);
-            $this->logger($result);
+            $this->logger->info(
+                "{result}",
+                [
+                    'result'=>$result
+                ]
+            );
         }
         $this->currentOutput = '';
         return true;
@@ -197,10 +220,10 @@ class NaadSocketClient
              * clear current output for the next response.
              */
             if (str_ends_with(trim($this->currentOutput), '</alert>')) {
-                $this->logger('Invalid XML document received.');
+                $this->logger->info('Invalid XML document received.');
                 $this->currentOutput = '';
             } else {
-                $this->logger('Invalid or partial XML document received.');
+                $this->logger->info('Invalid or partial XML document received.');
             }
             $this->logXmlErrors();
             return false;
@@ -210,12 +233,13 @@ class NaadSocketClient
         $namespaces = $xml->getNamespaces();
         $capNamespace = $namespaces[""];
         if (self::$XML_NAMESPACE !== $capNamespace) {
-            $this->logger(
-                sprintf(
-                    "Unexpected namespace '$capNamespace'. " .
-                    "Expecting namespace '%s'.",
-                    self::$XML_NAMESPACE
-                )
+            $this->logger->info(
+                "Unexpected namespace '{capNamespace}'.
+                Expecting namespace '{xmlNamespace}'.",
+                [
+                    'capNamespace'=>$capNamespace,
+                    'xmlNamespace'=>self::$XML_NAMESPACE 
+                ]
             );
             return false;
         }
@@ -239,19 +263,6 @@ class NaadSocketClient
     }
 
     /**
-     * Logs a message.
-     *
-     * @param string $msg The message to log.
-     *
-     * @return void
-     */
-    protected function logger( string $msg )
-    {
-        $s = sprintf('[%s %s] ', $this->name, date('m/d/Y h:i:s a', time()));
-        error_log($s . print_r($msg, true));
-    }
-
-    /**
      * Logs XML errors.
      *
      * @return void
@@ -259,7 +270,7 @@ class NaadSocketClient
     protected function logXmlErrors()
     {
         foreach (libxml_get_errors() as $error) {
-            print_r($error->message);
+            $this->logger->info($error->message);
         }
     }
 }
