@@ -1,6 +1,7 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use Monolog\Logger;
 use SimpleXMLElement;
 
 /**
@@ -30,6 +31,13 @@ class NaadRssClient
     protected SimpleXMLElement $feed;
 
     /**
+     * The monolog channel for saving to stream or file.
+     *
+     * @var Logger
+     */
+    protected Logger $logger;
+
+    /**
      * Constructor for NaadRssClient.
      *
      * @param string $url The URL of the NAAD RSS feed to fetch.
@@ -37,6 +45,8 @@ class NaadRssClient
     public function __construct( string $url )
     {
         $this->address = $url;
+        $customLogger = new CustomLogger('NaadRssClient', 'info');
+        $this->logger = $customLogger->getLogger();
     }
 
     /**
@@ -99,7 +109,7 @@ class NaadRssClient
     protected function logXmlErrors()
     {
         foreach (libxml_get_errors() as $error) {
-            print_r($error->message);
+            $this->logger->info($error->message);
         }
     }
 }

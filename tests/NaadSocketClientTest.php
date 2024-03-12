@@ -3,7 +3,6 @@
 use Bcgov\NaadConnector\DestinationClient;
 use PHPUnit\Framework\TestCase;
 use Bcgov\NaadConnector\NaadSocketClient;
-use Monolog\Logger;
 
 final class NaadSocketClientTest extends TestCase
 {
@@ -20,7 +19,7 @@ final class NaadSocketClientTest extends TestCase
     public function testValidateResponse(array $xmlResponses) {
         $class = new ReflectionClass('Bcgov\NaadConnector\NaadSocketClient');
         $method = $class->getMethod('validateResponse');
-        $client = new NaadSocketClient('test-naad', 'testing.url', new DestinationClient('testing.url', 'user', 'pass'), new Logger('test'));
+        $client = new NaadSocketClient('test-naad', 'testing.url', new DestinationClient('testing.url', 'user', 'pass'));
 
         foreach ($xmlResponses as $response) {
             $xml = file_get_contents(self::XML_TEST_FILE_LOCATION . $response['location']);
@@ -115,7 +114,7 @@ final class NaadSocketClientTest extends TestCase
     public function testIsHeartbeat() {
         $class = new ReflectionClass('Bcgov\NaadConnector\NaadSocketClient');
         $method = $class->getMethod('isHeartbeat');
-        $client = new NaadSocketClient('test-naad', 'testing.url', new DestinationClient('testing.url', 'user', 'pass'), new Logger('test'));
+        $client = new NaadSocketClient('test-naad', 'testing.url', new DestinationClient('testing.url', 'user', 'pass'));
 
         // Test that a heartbeat XML returns true.
         $heartbeat = simplexml_load_file(self::XML_TEST_FILE_LOCATION . '/heartbeat.xml');

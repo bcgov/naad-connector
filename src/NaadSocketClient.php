@@ -2,7 +2,6 @@
 namespace Bcgov\NaadConnector;
 
 use Monolog\Logger;
-
 use SimpleXMLElement;
 
 /**
@@ -86,7 +85,6 @@ class NaadSocketClient
      * @param DestinationClient $destinationClient An instance of DestinationClient
      *                                             to handle making requests to a
      *                                             destination.
-     * @param Logger            $logger            A monolog logging channel.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */
@@ -94,14 +92,14 @@ class NaadSocketClient
         string $name,
         string $socketUrl,
         DestinationClient $destinationClient,
-        Logger $logger,
         int $port = 8080,
     ) {
         $this->name = $name;
         $this->address = $socketUrl;
         $this->destinationClient = $destinationClient;
-        $this->logger = $logger;
         $this->port = $port;
+        $customLogger = new CustomLogger('NaadSocketClient', 'info');
+        $this->logger = $customLogger->getLogger();
     }
 
     /**
