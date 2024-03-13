@@ -18,30 +18,25 @@ use Monolog\Processor\PsrLogMessageProcessor;
 class CustomLogger
 {
     /**
-     * The Monolog logger instance.
-     *
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * Logger constructor.
-     *
+     * Return a Monolog Logger.
+     * 
      * @param string $channelName The name of the logging channel.
      * @param string $level       The minimum logging level to record.
+     * 
+     * @return Logger
      */
-    public function __construct(
+    public static function getLogger(
         string $channelName = 'monolog',
         string $level = 'info'
     ) {
         // Set up a monolog channel.
-        $this->logger = new Logger($channelName);
+        $logger = new Logger($channelName);
 
         // Processes a record's message according to PSR-3 rules.
         $processor = new PsrLogMessageProcessor();
-        $this->logger->pushProcessor($processor);
+        $logger->pushProcessor($processor);
 
-        $logLevel = $this->_convertLogLevel($level);
+        $logLevel = self::_convertLogLevel($level);
 
         // Store records to stdout.
         $stream = new StreamHandler('php://stdout', $logLevel);
@@ -50,17 +45,9 @@ class CustomLogger
         // For example, JSON formatter: $stream->setFormatter(new JsonFormatter());
         // Don't forget to include `use Monolog\Formatter\JsonFormatter` if you do.
 
-        $this->logger->pushHandler($stream);
-    }
-
-    /**
-     * Return a Monolog Logger.
-     *
-     * @return Logger
-     */
-    public function getLogger()
-    {
-        return $this->logger;
+        $logger->pushHandler($stream);
+        
+        return $logger;
     }
 
     /**
@@ -70,7 +57,7 @@ class CustomLogger
      * 
      * @return int
      */
-    private function _convertLogLevel($loggingLevel)
+    private static function _convertLogLevel($loggingLevel)
     {
         $normalizedLevel = strtolower($loggingLevel);
 

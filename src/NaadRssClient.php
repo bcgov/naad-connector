@@ -45,8 +45,7 @@ class NaadRssClient
     public function __construct( string $url )
     {
         $this->address = $url;
-        $customLogger = new CustomLogger('NaadRssClient', 'info');
-        $this->logger = $customLogger->getLogger();
+        $this->logger = CustomLogger::getLogger('NaadRssClient', 'info');
     }
 
     /**
