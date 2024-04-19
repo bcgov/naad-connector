@@ -23,8 +23,8 @@ spec:
               name: secrets
           resources:
             requests:
-              cpu: 500m
+              cpu: 100m
               memory: 500Mi
             limits:
-              cpu: 1
+              cpu: 500m
               memory: 1Gi

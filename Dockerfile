@@ -1,5 +1,5 @@
 # Don't change the FROM, updated by the OpenShift BuildConfig.
-FROM php
+FROM php:8.3
 RUN set -ex; apt update && apt install -y libzip-dev;
 RUN set -ex; \
   docker-php-ext-configure zip; \
