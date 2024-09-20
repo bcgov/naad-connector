@@ -29,7 +29,7 @@ class CustomLogger
     public static function getLogger(
         string $channelName = 'monolog',
         string $level = 'info',
-        string $logFilePath = './app.log'
+        string $logFilePath = './naad-socket.log'
     ) {
         // Set up a monolog channel.
         $logger = new Logger($channelName);
