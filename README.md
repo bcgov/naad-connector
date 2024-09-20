@@ -4,10 +4,21 @@ A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD
 ## Usage
 
 ### Local
+
+#### Docker deployment
 To build and run via Docker:
 ```sh
-docker build -t naad-app .
-docker run --rm  naad-app
+docker build -t bcgovgdx/naad-app .
+docker run --rm  bcgovgdx/naad-app
+```
+
+#### Docker Desktop Kubernetes deployment
+To build and run in Kubernetes via Docker Desktop:
+Note: Kubernetes must be enabled in Docker Desktop.
+```sh
+kubectl config use-context docker-desktop
+docker build -t bcgovgdx/naad-app .
+kubectl apply -k deployments/kustomize/base/
 ```
 
 ### OpenShift Build

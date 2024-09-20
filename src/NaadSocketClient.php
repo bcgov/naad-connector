@@ -85,6 +85,7 @@ class NaadSocketClient
      * @param DestinationClient $destinationClient An instance of DestinationClient
      *                                             to handle making requests to a
      *                                             destination.
+     * @param Logger            $logger            An instance of Monolog/Logger.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */
@@ -92,13 +93,14 @@ class NaadSocketClient
         string $name,
         string $socketUrl,
         DestinationClient $destinationClient,
+        Logger $logger,
         int $port = 8080,
     ) {
         $this->name = $name;
         $this->address = $socketUrl;
         $this->destinationClient = $destinationClient;
+        $this->logger = $logger;
         $this->port = $port;
-        $this->logger = CustomLogger::getLogger('NaadSocketClient', 'info');
     }
 
     /**

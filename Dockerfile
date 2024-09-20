@@ -21,6 +21,7 @@ ENV NAAD_NAME=NAAD-1
 ENV NAAD_URL=streaming1.naad-adna.pelmorex.com
 ENV DESTINATION_URL=https://localhost/wp-json/naad/v1/alert
 ENV DESTINATION_USER=naadbot
-ENV DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
+ENV DESTINATION_PASSWORD="AAAA AAAA AAAA AAAA"
+ENV LOG_FILE_PATH="/var/www/html/naad-socket.log"
 
 ENTRYPOINT ["/home/entrypoint.sh"]

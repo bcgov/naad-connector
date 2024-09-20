@@ -22,12 +22,14 @@ class CustomLogger
      * 
      * @param string $channelName The name of the logging channel.
      * @param string $level       The minimum logging level to record.
+     * @param string $logFilePath The path to the log file to write to.
      * 
      * @return Logger
      */
     public static function getLogger(
         string $channelName = 'monolog',
-        string $level = 'info'
+        string $level = 'info',
+        string $logFilePath = './naad-socket.log'
     ) {
         // Set up a monolog channel.
         $logger = new Logger($channelName);
@@ -46,6 +48,10 @@ class CustomLogger
         // Don't forget to include `use Monolog\Formatter\JsonFormatter` if you do.
 
         $logger->pushHandler($stream);
+
+        // Log to file.
+        $file = new StreamHandler($logFilePath, $logLevel);
+        $logger->pushHandler($file);
         
         return $logger;
     }
@@ -62,16 +68,16 @@ class CustomLogger
         $normalizedLevel = strtolower($loggingLevel);
 
         $logLevels = [
-            'emergency' => Logger::EMERGENCY,
-            'alert'     => Logger::ALERT,
-            'critical'  => Logger::CRITICAL,
-            'error'     => Logger::ERROR,
-            'warning'   => Logger::WARNING,
-            'notice'    => Logger::NOTICE,
-            'info'      => Logger::INFO,
-            'debug'     => Logger::DEBUG,
+            'emergency' => Level::Emergency,
+            'alert'     => Level::Alert,
+            'critical'  => Level::Critical,
+            'error'     => Level::Error,
+            'warning'   => Level::Warning,
+            'notice'    => Level::Notice,
+            'info'      => Level::Info,
+            'debug'     => Level::Debug,
         ];
 
-        return $logLevels[$normalizedLevel] ?? Logger::INFO;
+        return $logLevels[$normalizedLevel] ?? Level::Info;
     }
 }
