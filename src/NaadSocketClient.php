@@ -85,6 +85,7 @@ class NaadSocketClient
      * @param DestinationClient $destinationClient An instance of DestinationClient
      *                                             to handle making requests to a
      *                                             destination.
+     * @param Logger            $logger            An instance of Monolog/Logger.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */

@@ -22,6 +22,7 @@ class CustomLogger
      * 
      * @param string $channelName The name of the logging channel.
      * @param string $level       The minimum logging level to record.
+     * @param string $logFilePath The path to the log file to write to.
      * 
      * @return Logger
      */
