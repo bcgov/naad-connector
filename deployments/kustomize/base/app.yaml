@@ -15,7 +15,7 @@ spec:
       containers:
         - name: naad-app
           image: bcgovgdx/naad-app
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           envFrom:
           - configMapRef:
               name: config
@@ -28,3 +28,9 @@ spec:
             limits:
               cpu: 500m
               memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+              - /var/www/html/liveness.sh
+            initialDelaySeconds: 60
+            periodSeconds: 60

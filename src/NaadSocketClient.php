@@ -92,13 +92,14 @@ class NaadSocketClient
         string $name,
         string $socketUrl,
         DestinationClient $destinationClient,
+        Logger $logger,
         int $port = 8080,
     ) {
         $this->name = $name;
         $this->address = $socketUrl;
         $this->destinationClient = $destinationClient;
+        $this->logger = $logger;
         $this->port = $port;
-        $this->logger = CustomLogger::getLogger('NaadSocketClient', 'info');
     }
 
     /**
