@@ -20,7 +20,3 @@ secretGenerator:
     type: Opaque
     literals:
     - DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
-
-images:
-  - name: bcgovgdx/naad-app
-    newName: naad-app
