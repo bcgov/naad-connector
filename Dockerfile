@@ -3,7 +3,7 @@ FROM php:8.3
 RUN set -ex; apt update && apt install -y libzip-dev;
 RUN set -ex; \
   docker-php-ext-configure zip; \
-  docker-php-ext-install sockets zip; \
+  docker-php-ext-install sockets zip pdo pdo_mysql; \
   docker-php-ext-enable sockets; 
 
 COPY ./ /var/www/html/

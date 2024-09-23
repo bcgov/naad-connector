@@ -20,7 +20,7 @@ spec:
           - configMapRef:
               name: config
           - secretRef:
-              name: secrets
+              name: naad-secrets
           resources:
             requests:
               cpu: 100m
