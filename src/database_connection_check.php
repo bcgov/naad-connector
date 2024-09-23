@@ -17,11 +17,9 @@ $connection = DriverManager::getConnection(
     'driver'   => 'pdo_mysql',
     // TODO: Create non-root user and replace with env variable.
     'user'     => 'root',
-    // TODO: Replace with env variable.
-    'password' => '$z8ez=^)|YPPD]9NsJ*!.IWOpD.lgK(yH\k9J777g8(i3OJW[',
-    // TODO: Replace with env variable.
-    'host'     => 'naad-mariadb',
-    'port'     => 3306,
+    'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
+    'host'     => $_ENV['NAAD_MARIADB_SERVICE_HOST'],
+    'port'     => $_ENV['NAAD_MARIADB_SERVICE_PORT'],
     ]
 );
 
@@ -30,6 +28,6 @@ $entityManager = new EntityManager($connection, $config);
 
 // Should print the MariaDB version (11.5.2)
 $version = $connection->getServerVersion();
-error_log($version);
+print_r($version);
 
 return 0;
