@@ -5,10 +5,10 @@ resources:
 
 # Updates the labels for all containers.
 commonLabels:
-  app: naad-app
-  env: default
+  app.kubernetes.io/component: socket
+  app.kubernetes.io/part-of: naad-connector
 configMapGenerator:
-  - name: config
+  - name: naad-config
     literals:
     - NAAD_NAME=NAAD-1
     - NAAD_URL=streaming1.naad-adna.pelmorex.com

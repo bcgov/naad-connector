@@ -1,13 +1,11 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: naad-app-deployment
+  name: naad-socket
   labels:
-    app.kubernetes.io/name: naad-app
+    app.kubernetes.io/name: naad-socket
     app.kubernetes.io/instance: naad-1
-    app.kubernetes.io/part-of: naad-connector
     app.openshift.io/runtime: php
-    app.kubernetes.io/component: socket
 spec:
   replicas: 1
   template:
@@ -18,7 +16,7 @@ spec:
           imagePullPolicy: IfNotPresent
           envFrom:
           - configMapRef:
-              name: config
+              name: naad-config
           - secretRef:
               name: naad-secrets
           - secretRef:

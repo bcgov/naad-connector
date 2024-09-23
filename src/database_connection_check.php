@@ -18,8 +18,8 @@ $connection = DriverManager::getConnection(
     // TODO: Create non-root user and replace with env variable.
     'user'     => 'root',
     'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
-    'host'     => $_ENV['NAAD_MARIADB_SERVICE_HOST'],
-    'port'     => $_ENV['NAAD_MARIADB_SERVICE_PORT'],
+    'host'     => $_ENV['MARIADB_SERVICE_HOST'],
+    'port'     => $_ENV['MARIADB_SERVICE_PORT'],
     ]
 );
 
