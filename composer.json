@@ -40,6 +40,9 @@
         "process-timeout": 0
     },
     "require": {
-        "monolog/monolog": "^3.5"
+        "monolog/monolog": "^3.5",
+        "doctrine/dbal": "^4.1",
+        "doctrine/orm": "^3.2",
+        "symfony/cache": "^7.1"
     }
 }

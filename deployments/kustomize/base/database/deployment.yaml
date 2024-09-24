@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+  labels:
+    app.kubernetes.io/version:	11.5.2
+spec:
+  replicas: 1
+  template:
+    spec:
+      volumes:
+      - name: database-volume
+        persistentVolumeClaim:
+          claimName: mariadb
+      containers:
+      - name: mariadb
+        image: mariadb:11.5.2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3306
+        envFrom:
+        - configMapRef:
+            name: database-config
+        - secretRef:
+            name: database-secrets
+        volumeMounts:
+        - name: database-volume
+          mountPath: /var/lib/mysql

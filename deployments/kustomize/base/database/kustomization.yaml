@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment.yaml
+- services.yaml
+- volume.yaml
+
+# Updates the labels for all containers.
+commonLabels:
+  app.kubernetes.io/instance:	mariadb
+  app.kubernetes.io/component: database
+  app.kubernetes.io/part-of: naad-connector
+configMapGenerator:
+  - name: database-config
+    literals:
+    - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD="0" # If it is 1 and root_password is set, root_password takes precedence.
+
+secretGenerator:
+  - name: database-secrets
+    type: Opaque
+    literals:
+    - MARIADB_ROOT_PASSWORD="rootpassword"
