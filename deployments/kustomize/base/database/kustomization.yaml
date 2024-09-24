@@ -19,4 +19,4 @@ secretGenerator:
   - name: database-secrets
     type: Opaque
     literals:
-    - MARIADB_ROOT_PASSWORD="$z8ez=^)|YPPD]9NsJ*!.IWOpD.lgK(yH\k9J777g8(i3OJW["
+    - MARIADB_ROOT_PASSWORD="rootpassword"
