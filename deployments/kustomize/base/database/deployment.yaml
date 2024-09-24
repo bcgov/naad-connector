@@ -11,7 +11,7 @@ spec:
       volumes:
       - name: database-volume
         persistentVolumeClaim:
-          claimName: mariadb-pvc
+          claimName: mariadb
       containers:
       - name: mariadb
         image: mariadb:11.5.2

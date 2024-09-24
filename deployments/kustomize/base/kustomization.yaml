@@ -4,5 +4,9 @@ resources:
 - app
 - database
 
+commonLabels:
+  app: naad-app
+  env: default
+
 # Overrides the namespace
 namespace: default
