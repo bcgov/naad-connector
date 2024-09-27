@@ -11,7 +11,7 @@ final class Version20240927161116 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Create the alerts table';
     }
 
     public function up(Schema $schema): void

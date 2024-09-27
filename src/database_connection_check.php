@@ -12,7 +12,8 @@ $config = ORMSetup::createAttributeMetadataConfiguration(
 );
 
 // Configuring the database connection.
-$connection = DriverManager::getConnection([
+$connection = DriverManager::getConnection(
+    [
     // TODO: Create non-root user and replace with env variable.
     'user'     => 'root', 
     'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
@@ -20,7 +21,8 @@ $connection = DriverManager::getConnection([
     'port'     => $_ENV['MARIADB_SERVICE_PORT'],
     'dbname'   => $_ENV['DATABASE_NAME'],
     'driver'   => 'pdo_mysql',
-]);
+    ]
+);
 
 // Obtaining the Entity Manager.
 $entityManager = new EntityManager($connection, $config);
