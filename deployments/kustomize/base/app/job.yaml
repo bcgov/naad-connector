@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-migration
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: naad-database-migration
+          image: bcgovgdx/naad-app
+          imagePullPolicy: IfNotPresent
+          envFrom:
+          - configMapRef:
+              name: naad-config
+          - secretRef:
+              name: naad-secrets
+          - secretRef:
+              name: database-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          command: ['vendor/bin/doctrine-migrations', 'migrate']
+  backoffLimit: 100

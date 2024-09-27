@@ -14,6 +14,7 @@ configMapGenerator:
   - name: database-config
     literals:
     - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD="0" # If it is 1 and root_password is set, root_password takes precedence.
+    - MARIADB_DATABASE="naad_connector"
 
 secretGenerator:
   - name: database-secrets
