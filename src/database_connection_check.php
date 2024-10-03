@@ -14,12 +14,13 @@ $config = ORMSetup::createAttributeMetadataConfiguration(
 // Configuring the database connection.
 $connection = DriverManager::getConnection(
     [
-    'driver'   => 'pdo_mysql',
     // TODO: Create non-root user and replace with env variable.
-    'user'     => 'root',
+    'user'     => 'root', 
     'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
     'host'     => $_ENV['MARIADB_SERVICE_HOST'],
     'port'     => $_ENV['MARIADB_SERVICE_PORT'],
+    'dbname'   => $_ENV['DATABASE_NAME'],
+    'driver'   => 'pdo_mysql',
     ]
 );
 
