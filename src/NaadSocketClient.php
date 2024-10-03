@@ -1,8 +1,11 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use Bcgov\NaadConnector\Database;
+use Bcgov\NaadConnector\Entity\Alert;
 use Monolog\Logger;
 use SimpleXMLElement;
+use Exception;
 
 /**
  * NaadSocketClient class connects to the NAAD socket and logs its output.
@@ -186,6 +189,7 @@ class NaadSocketClient
         if ($this->isHeartbeat($xml)) {
             $this->logger->info('Heartbeat received.');
         } else {
+            $this->insertAlert($xml);
             $result = $this->destinationClient->sendRequest($this->currentOutput);
             $this->logger->info(
                 "{result}",
@@ -196,6 +200,31 @@ class NaadSocketClient
         }
         $this->currentOutput = '';
         return true;
+    }
+
+    /**
+     * Inserts an Alert into the database.
+     *
+     * @param SimpleXMLElement $xml XML of the Alert.
+     *
+     * @return void
+     */
+    protected function insertAlert(SimpleXMLElement $xml)
+    {
+        $alert = Alert::fromXml($xml);
+        try {
+            $entityManager = Database::getEntityManager();
+            $entityManager->persist($alert);
+            $entityManager->flush();
+        } catch(Exception $e) {
+            $this->logger->critical($e->getMessage());
+            $this->logger->critical(
+                'Could not connect to database or insert Alert ({id}).',
+                ['id' => $alert->getId()]
+            );
+            exit(1);
+        }
+        $this->logger->info('Inserted Alert ({id}).', ['id' => $alert->getId()]);
     }
 
     /**
@@ -268,6 +297,7 @@ class NaadSocketClient
      */
     protected function logXmlErrors()
     {
+        $this->logger->info($this->currentOutput);
         foreach (libxml_get_errors() as $error) {
             $this->logger->info($error->message);
         }

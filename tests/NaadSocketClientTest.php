@@ -1,9 +1,11 @@
 <?php
 
 use Bcgov\NaadConnector\CustomLogger;
+use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\DestinationClient;
 use PHPUnit\Framework\TestCase;
 use Bcgov\NaadConnector\NaadSocketClient;
+use Doctrine\ORM\EntityManager;
 
 final class NaadSocketClientTest extends TestCase
 {
@@ -130,6 +132,35 @@ final class NaadSocketClientTest extends TestCase
         $alert->registerXPathNamespace('x', 'urn:oasis:names:tc:emergency:cap:1.2');
         $result = $method->invokeArgs($client, [$alert]);
         $this->assertFalse($result);
+    }
+
+    /**
+     * Undocumented function
+     * @group failing
+     * @return void
+     */
+    public function testHandleResponse() {
+        $emStub = $this->createStub(EntityManager::class);
+        $emStub->method('persist')->willThrowException(new Exception('test'));
+        $emStub->method('flush');
+        $database = $this->createStub(Database::class);
+        print_r($database);
+        $database->method('getEntityManager')
+            ->willReturn($emStub);
+
+
+        $logger = CustomLogger::getLogger('monolog', 'emergency');
+        $client = new NaadSocketClient('test-naad', 'testing.url', new DestinationClient('testing.url', 'user', 'pass'), $logger);
+        $class = new ReflectionClass('Bcgov\NaadConnector\NaadSocketClient');
+        $method = $class->getMethod('handleResponse');
+
+        $response = '';
+        $result = $method->invokeArgs($client, [$response]);
+        $this->assertFalse($result);
+
+        $response = file_get_contents(self::XML_TEST_FILE_LOCATION . '/complete-alert.xml');
+        $result = $method->invokeArgs($client, [$response]);
+        $this->assertTrue($result);
     }
 }
 
