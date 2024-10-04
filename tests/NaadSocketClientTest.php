@@ -135,7 +135,9 @@ final class NaadSocketClientTest extends TestCase
     }
 
     /**
-     * Undocumented function
+     * Tests handleResponse function.
+     * TODO: figure out how to mock database for testing.
+     *
      * @return void
      */
     public function testHandleResponse() {

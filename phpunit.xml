@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <php>
+        <env name="MARIADB_ROOT_PASSWORD" value="none" />
+        <env name="MARIADB_SERVICE_HOST" value="" />
+        <env name="MARIADB_SERVICE_PORT" value="0" />
+        <env name="DATABASE_NAME" value="test_database" />
+    </php>
+</phpunit>
