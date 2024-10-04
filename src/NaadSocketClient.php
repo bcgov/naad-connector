@@ -79,6 +79,14 @@ class NaadSocketClient
     protected Logger $logger;
 
     /**
+     * The Database class that handles connection setup and returns
+     * a Doctrine EntityManager instance.
+     *
+     * @var Database
+     */
+    protected Database $database;
+
+    /**
      * Constructor for NaadClient.
      *
      * @param string            $name              The name of the NAAD connection
@@ -89,6 +97,7 @@ class NaadSocketClient
      *                                             to handle making requests to a
      *                                             destination.
      * @param Logger            $logger            An instance of Monolog/Logger.
+     * @param Database          $database          An instance of Database.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */
@@ -97,12 +106,14 @@ class NaadSocketClient
         string $socketUrl,
         DestinationClient $destinationClient,
         Logger $logger,
+        Database $database,
         int $port = 8080,
     ) {
         $this->name = $name;
         $this->address = $socketUrl;
         $this->destinationClient = $destinationClient;
         $this->logger = $logger;
+        $this->database = $database;
         $this->port = $port;
     }
 
@@ -211,9 +222,9 @@ class NaadSocketClient
      */
     protected function insertAlert(SimpleXMLElement $xml)
     {
-        $alert = Alert::fromXml($xml);
         try {
-            $entityManager = Database::getEntityManager();
+            $alert = Alert::fromXml($xml);
+            $entityManager = $this->database::getEntityManager();
             $entityManager->persist($alert);
             $entityManager->flush();
         } catch(Exception $e) {
@@ -297,7 +308,6 @@ class NaadSocketClient
      */
     protected function logXmlErrors()
     {
-        $this->logger->info($this->currentOutput);
         foreach (libxml_get_errors() as $error) {
             $this->logger->info($error->message);
         }

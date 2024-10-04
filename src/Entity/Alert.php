@@ -21,22 +21,22 @@ class Alert
 {
     #[ORM\Id]
     #[ORM\Column]
-    private string $_id;
+    private string $id;
 
     #[ORM\Column]
-    private string $_body;
+    private string $body;
 
     #[ORM\Column]
-    private DateTime $_received;
+    private DateTime $received;
 
     #[ORM\Column]
-    private DateTime $_send_attempted;
+    private DateTime $send_attempted;
 
     #[ORM\Column]
-    private int $_failures;
+    private int $failures;
 
     #[ORM\Column]
-    private bool $_success;
+    private bool $success;
 
     /**
      * Gets the alert ID.
@@ -45,64 +45,64 @@ class Alert
      */
     public function getId(): string
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
      * Sets the alert ID.
      *
-     * @param string $_id The unique identifier of the alert.
+     * @param string $id The unique identifier of the alert.
      *
      * @return void
      */
-    public function setId(string $_id): void
+    public function setId(string $id): void
     {
-        $this->_id = $_id;
+        $this->id = $id;
     }
 
     /**
-     * Gets the alert _body.
+     * Gets the alert body.
      *
      * @return string
      */
     public function getBody(): string
     {
-        return $this->_body;
+        return $this->body;
     }
 
     /**
-     * Sets the alert _body.
+     * Sets the alert body.
      *
-     * @param string $_body The raw XML body of the alert.
+     * @param string $body The raw XML body of the alert.
      *
      * @return void
      */
-    public function setBody(string $_body): void
+    public function setBody(string $body): void
     {
-        $this->_body = $_body;
+        $this->body = $body;
     }
 
     /**
-     * Gets the _received date and time.
+     * Gets the received date and time.
      *
      * @return \DateTimeInterface
      */
     public function getReceived(): \DateTime
     {
-        return $this->_received;
+        return $this->received;
     }
 
     /**
-     * Sets the _received date and time.
+     * Sets the received date and time.
      *
-     * @param \DateTime $_received The date and time the alert
-     *                             was received from NAAD.
+     * @param \DateTime $received The date and time the alert
+     *                            was received from NAAD.
      *
      * @return void
      */
-    public function setReceived(\DateTime $_received): void
+    public function setReceived(\DateTime $received): void
     {
-        $this->_received = $_received;
+        $this->received = $received;
     }
 
     /**
@@ -112,7 +112,7 @@ class Alert
      */
     public function getSendAttempted(): DateTime
     {
-        return $this->_send_attempted;
+        return $this->send_attempted;
     }
 
     /**
@@ -125,53 +125,53 @@ class Alert
      */
     public function setSendAttempted(?\DateTime $sendAttempted): void
     {
-        $this->_send_attempted = $sendAttempted;
+        $this->send_attempted = $sendAttempted;
     }
 
     /**
-     * Gets the number of _failures.
+     * Gets the number of failures.
      *
      * @return int
      */
     public function getFailures(): int
     {
-        return $this->_failures;
+        return $this->failures;
     }
 
     /**
-     * Sets the number of _failures.
+     * Sets the number of failures.
      *
-     * @param int $_failures The number of times the alert has
-     *                       failed to send to its destination.
+     * @param int $failures The number of times the alert has
+     *                      failed to send to its destination.
      *
      * @return void
      */
-    public function setFailures(int $_failures): void
+    public function setFailures(int $failures): void
     {
-        $this->_failures = $_failures;
+        $this->failures = $failures;
     }
 
     /**
-     * Gets the _success status.
+     * Gets the success status.
      *
      * @return bool
      */
     public function getSuccess(): bool
     {
-        return $this->_success;
+        return $this->success;
     }
 
     /**
-     * Sets the _success status.
+     * Sets the success status.
      *
-     * @param bool $_success Whether the alert was successfully
-     *                       sent to its destination.
+     * @param bool $success Whether the alert was successfully
+     *                      sent to its destination.
      *
      * @return void
      */
-    public function setSuccess(bool $_success): void
+    public function setSuccess(bool $success): void
     {
-        $this->_success = $_success;
+        $this->success = $success;
     }
 
     /**
@@ -184,11 +184,11 @@ class Alert
     public static function fromXml(SimpleXMLElement $xml): Alert
     {
         $alert = new Alert();
-        $_id = $xml->xpath(
+        $id = $xml->xpath(
             '/x:alert/x:identifier'
         )[0];
-        
-        $alert->setId($_id);
+
+        $alert->setId($id);
         $alert->setBody($xml->asXML());
         $alert->setReceived(new DateTime());
 

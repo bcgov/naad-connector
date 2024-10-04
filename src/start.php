@@ -2,6 +2,7 @@
 require_once 'vendor/autoload.php';
 
 use Bcgov\NaadConnector\CustomLogger;
+use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\DestinationClient;
 use Bcgov\NaadConnector\NaadSocketClient;
 
@@ -15,6 +16,7 @@ $connector = new NaadSocketClient(
     $argv[1],
     $argv[2],
     $destinationClient,
-    $socketLogger
+    $socketLogger,
+    new Database()
 );
 return $connector->connect();
