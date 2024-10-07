@@ -1,8 +1,11 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use Bcgov\NaadConnector\Database;
+use Bcgov\NaadConnector\Entity\Alert;
 use Monolog\Logger;
 use SimpleXMLElement;
+use Exception;
 
 /**
  * NaadSocketClient class connects to the NAAD socket and logs its output.
@@ -76,6 +79,14 @@ class NaadSocketClient
     protected Logger $logger;
 
     /**
+     * The Database class that handles connection setup and returns
+     * a Doctrine EntityManager instance.
+     *
+     * @var Database
+     */
+    protected Database $database;
+
+    /**
      * Constructor for NaadClient.
      *
      * @param string            $name              The name of the NAAD connection
@@ -86,6 +97,7 @@ class NaadSocketClient
      *                                             to handle making requests to a
      *                                             destination.
      * @param Logger            $logger            An instance of Monolog/Logger.
+     * @param Database          $database          An instance of Database.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */
@@ -94,12 +106,14 @@ class NaadSocketClient
         string $socketUrl,
         DestinationClient $destinationClient,
         Logger $logger,
+        Database $database,
         int $port = 8080,
     ) {
         $this->name = $name;
         $this->address = $socketUrl;
         $this->destinationClient = $destinationClient;
         $this->logger = $logger;
+        $this->database = $database;
         $this->port = $port;
     }
 
@@ -186,6 +200,7 @@ class NaadSocketClient
         if ($this->isHeartbeat($xml)) {
             $this->logger->info('Heartbeat received.');
         } else {
+            $this->insertAlert($xml);
             $result = $this->destinationClient->sendRequest($this->currentOutput);
             $this->logger->info(
                 "{result}",
@@ -196,6 +211,31 @@ class NaadSocketClient
         }
         $this->currentOutput = '';
         return true;
+    }
+
+    /**
+     * Inserts an Alert into the database.
+     *
+     * @param SimpleXMLElement $xml XML of the Alert.
+     *
+     * @return void
+     */
+    protected function insertAlert(SimpleXMLElement $xml)
+    {
+        try {
+            $alert = Alert::fromXml($xml);
+            $entityManager = $this->database::getEntityManager();
+            $entityManager->persist($alert);
+            $entityManager->flush();
+        } catch(Exception $e) {
+            $this->logger->critical($e->getMessage());
+            $this->logger->critical(
+                'Could not connect to database or insert Alert ({id}).',
+                ['id' => $alert->getId()]
+            );
+            exit(1);
+        }
+        $this->logger->info('Inserted Alert ({id}).', ['id' => $alert->getId()]);
     }
 
     /**
