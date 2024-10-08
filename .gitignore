@@ -2,3 +2,4 @@
 /vendor/
 naad-socket.log
 .phpunit.result.cache
+.vscode
