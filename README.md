@@ -12,6 +12,15 @@ docker build -t bcgovgdx/naad-app .
 docker run --rm  bcgovgdx/naad-app
 ```
 
+#### Docker-Compose deployment
+
+```shell
+docker compose up
+```
+- make sure that you:
+  - rename the `sample-env` in the root of the project to .env
+  - fill in the values for the environment variables found inside
+
 #### Docker Desktop Kubernetes deployment
 To build and run in Kubernetes via Docker Desktop:
 Note: Kubernetes must be enabled in Docker Desktop.
@@ -23,7 +32,7 @@ kubectl apply -k deployments/kustomize/base/
 
 ### OpenShift Build
 ```sh
-# Change nameplate 
+# Change nameplate
 oc project 12345-tools
 oc apply -k deployments/kustomize/image-builds --namespace=12345-tools
 oc start-build naad-app --follow --namespace=12345-tools
@@ -34,3 +43,7 @@ oc start-build naad-app --follow --namespace=12345-tools
 oc project 12345-tools
 oc apply -k deployments/kustomize/base --namespace=12345-tools
 ```
+
+### View the database tables (Local only)
+
+- visit http://0.0.0.0:8081 to see the phpMyAdmin page for the naad_connector database. It includes the latest migrations and all alerts that have been recorded.
