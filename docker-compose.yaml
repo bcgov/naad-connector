@@ -1,0 +1,75 @@
+services:
+  mariadb:
+    image: mariadb:11.5.2
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "0"
+      MARIADB_DATABASE: naad_connector
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}  # Loaded from .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - database-volume:/var/lib/mysql
+    networks:
+      - naad_deploy
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "-u", "root", "-p${MARIADB_ROOT_PASSWORD}", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  naad-app:
+    image: bcgovgdx/naad-app
+    environment:
+      DESTINATION_URL: https://localhost/wp-json/naad/v1/alert
+      DESTINATION_USER: ${DESTINATION_USER}  # Loaded from .env
+      DESTINATION_PASSWORD: ${DESTINATION_PASSWORD}  # Loaded from .env
+      NAAD_NAME: NAAD-1
+      NAAD_URL: streaming1.naad-adna.pelmorex.com
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}  # Loaded from .env
+      MARIADB_SERVICE_HOST: mariadb
+      MARIADB_SERVICE_PORT: 3306
+    depends_on:
+      - mariadb
+    ports:
+      - "8080:80"
+    networks:
+      - naad_deploy
+
+  database-migrate:
+    image: bcgovgdx/naad-app
+    environment:
+      DESTINATION_URL: https://localhost/wp-json/naad/v1/alert
+      DESTINATION_USER: ${DESTINATION_USER}  # Loaded from .env
+      DESTINATION_PASSWORD: ${DESTINATION_PASSWORD}  # Loaded from .env
+      NAAD_NAME: NAAD-1
+      NAAD_URL: streaming1.naad-adna.pelmorex.com
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}  # Loaded from .env
+      MARIADB_SERVICE_HOST: mariadb
+      MARIADB_SERVICE_PORT: 3306
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    entrypoint: ["sh", "-c", "vendor/bin/doctrine-migrations -vvv -n migrate"]
+    networks:
+      - naad_deploy
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MARIADB_ROOT_PASSWORD}  # Loaded from .env
+    networks:
+      - naad_deploy
+    ports:
+      - "8081:80"
+    restart: always
+
+networks:
+  naad_deploy:
+
+volumes:
+  database-volume:
