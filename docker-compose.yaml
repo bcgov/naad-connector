@@ -12,17 +12,26 @@ services:
     networks:
       - naad_deploy
     healthcheck:
-      test: ["CMD", "mariadb-admin", "-u", "root", "-p${MARIADB_ROOT_PASSWORD}", "ping", "-h", "localhost"]
+      test:
+        [
+          "CMD",
+          "mariadb-admin",
+          "-u",
+          "root",
+          "-p${MARIADB_ROOT_PASSWORD}",
+          "ping",
+          "-h",
+          "localhost",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
-
 
   # wait for mariadb to start up
   database-migrate:
     image: bcgovgdx/naad-app
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}  # Loaded from .env
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD} # Loaded from .env
       MARIADB_SERVICE_HOST: mariadb
       MARIADB_SERVICE_PORT: 3306
     depends_on:
@@ -37,13 +46,10 @@ services:
     image: bcgovgdx/naad-app
     environment:
       DESTINATION_URL: https://0.0.0.0/wp-json/naad/v1/alert
-      DESTINATION_USER: ${DESTINATION_USER}  # Loaded from .env
-      DESTINATION_PASSWORD: ${DESTINATION_PASSWORD}  # Loaded from .env
+      DESTINATION_USER: ${DESTINATION_USER} # Loaded from .env
+      DESTINATION_PASSWORD: ${DESTINATION_PASSWORD} # Loaded from .env
       NAAD_NAME: NAAD-1
       NAAD_URL: streaming1.naad-adna.pelmorex.com
-      # MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}  # Loaded from .env
-      # MARIADB_SERVICE_HOST: mariadb
-      # MARIADB_SERVICE_PORT: 3306
     depends_on:
       database-migrate:
         condition: service_completed_successfully
