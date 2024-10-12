@@ -12,20 +12,10 @@ services:
     networks:
       - naad_deploy
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mariadb-admin",
-          "-u",
-          "root",
-          "-p${MARIADB_ROOT_PASSWORD}",
-          "ping",
-          "-h",
-          "localhost",
-        ]
+      test: ["CMD-SHELL", "mariadb-admin -u root -p${MARIADB_ROOT_PASSWORD} ping -h 127.0.0.1"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   # wait for mariadb to start up
   database-migrate:
@@ -37,7 +27,7 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    entrypoint: ["sh", "-c", "vendor/bin/doctrine-migrations -vvv -n migrate"]
+    entrypoint: ["vendor/bin/doctrine-migrations", "-vvv", "-n", "migrate"]
     networks:
       - naad_deploy
 
