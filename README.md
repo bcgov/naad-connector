@@ -14,12 +14,12 @@ docker run --rm  bcgovgdx/naad-app
 
 #### Docker-Compose deployment
 
+- Prerequisites: rename the `./sample-env` to `.env` and fill in the values for local use only.
+
 ```shell
 docker compose up
 ```
-- make sure that you:
-  - rename the `sample-env` in the root of the project to .env
-  - fill in the values for the environment variables found inside
+
 
 #### Docker Desktop Kubernetes deployment
 To build and run in Kubernetes via Docker Desktop:
@@ -31,6 +31,7 @@ kubectl apply -k deployments/kustomize/base/
 ```
 
 ### OpenShift Build
+
 ```sh
 # Change nameplate
 oc project 12345-tools
@@ -39,6 +40,7 @@ oc start-build naad-app --follow --namespace=12345-tools
 ```
 
 ### OpenShift Deploy
+
 ```sh
 oc project 12345-tools
 oc apply -k deployments/kustomize/base --namespace=12345-tools

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1
+
+- Add support for `docker-compose` to stand up a local development environment: ([DESCW-2672](https://citz-gdx.atlassian.net/browse/DESCW-2672))
+  - Includes phpMyAdmin to inspect the alerts in the new alerts table
+  - Updates README with instructions on running the docker compose and phpMyAdmin.
+  - Adds a `docker-compose.yml` file to the root of the repository.
+  - Adds .vscode to the `.gitignore`.
+  - Adds an .env file to feed environment config to the `docker-compose.yaml` config.
+
 ## 1.0.0
 ### March 11, 2024
 - Add monolog as the logging channel for Naad socket client ([DESCW-1901](https://apps.itsm.gov.bc.ca/jira/browse/DESCW-1901))
