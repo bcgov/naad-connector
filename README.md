@@ -48,4 +48,6 @@ oc apply -k deployments/kustomize/base --namespace=12345-tools
 
 ### View the database tables (Local only)
 
-- visit http://0.0.0.0:8081 to see the phpMyAdmin page for the naad_connector database. It includes the latest migrations and all alerts that have been recorded.
+- visit http://0.0.0.0:8082 to see the phpMyAdmin page for the naad_connector database. It includes the latest migrations and all alerts that have been recorded.
+
+_note:  this is mapped to port 8082 to avoid conflict with our wordpress containers_
