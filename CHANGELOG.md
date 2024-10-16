@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.1
+## 1.0.0
 
 - Add support for `docker-compose` to stand up a local development environment: ([DESCW-2672](https://citz-gdx.atlassian.net/browse/DESCW-2672))
   - Includes phpMyAdmin to inspect the alerts in the new alerts table

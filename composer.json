@@ -1,6 +1,6 @@
 {
     "name": "bcgov/naad-connector",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "description": "Connection to The National Alert Aggregation & Dissemination System",
     "type": "project",
     "autoload": {
