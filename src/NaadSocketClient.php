@@ -199,6 +199,21 @@ class NaadSocketClient
 
         if ($this->isHeartbeat($xml)) {
             $this->logger->info('Heartbeat received.');
+            $missedAlerts = $this->findMissedAlerts($xml);
+            if (count($missedAlerts) > 0) {
+                $this->logger->info(
+                    'Found {count} missing alerts in heartbeat. '
+                        . 'Fetching from NAAD repository.',
+                    ['count' => count($missedAlerts)]
+                );
+                foreach ($missedAlerts as $alert) {
+                    $this->currentOutput = '';
+                    $xml = $this->fetchAlertFromRepository($alert);
+                    if ($xml) {
+                        $result = $this->insertAlert($xml);
+                    }
+                }
+            }
         } else {
             $this->insertAlert($xml);
             $result = $this->destinationClient->sendRequest($this->currentOutput);
@@ -224,9 +239,7 @@ class NaadSocketClient
     {
         try {
             $alert = Alert::fromXml($xml);
-            $entityManager = $this->database::getEntityManager();
-            $entityManager->persist($alert);
-            $entityManager->flush();
+            $this->database->insertAlert($alert);
         } catch(Exception $e) {
             $this->logger->critical($e->getMessage());
             $this->logger->critical(
@@ -299,6 +312,100 @@ class NaadSocketClient
             '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
         );
         return !empty($sender);
+    }
+
+    /**
+     * Finds any alerts that were missed by the socket connection.
+     *
+     * @param SimpleXmlElement $xml Heartbeat XML.
+     *
+     * @return array An array containing the heartbeat references for any alerts
+     *               that are not already in the database.
+     */
+    protected function findMissedAlerts(SimpleXMLElement $xml): array
+    {
+        $rawReferences = explode(' ', $xml->references);
+        $references = [];
+
+        // Separate the references value into sender, id, and sent parts.
+        foreach ($rawReferences as $reference) {
+            $referenceParts = explode(',', $reference);
+            $references[] = [
+                'sender' => $referenceParts[0],
+                'id' => $referenceParts[1],
+                'sent' => $referenceParts[2],
+            ];
+        }
+
+        // Remove any reference ids that already exist in the database.
+        $existingAlerts = $this->database->getAlertsById(
+            array_column($references, 'id')
+        );
+        $existingAlertIds = array_map(
+            function ($alert) {
+                return $alert->getId(); 
+            }, $existingAlerts
+        );
+        foreach ($references as $key => $reference) {
+            if (in_array($reference['id'], $existingAlertIds)) {
+                unset($references[$key]);
+            }
+        }
+        return $references;
+    }
+
+    /**
+     * Per NAAD documentation, certain characters must be replaced when
+     * building the URL for the short-term alert repository.
+     *
+     * @param string $s The string to perform the replacement on.
+     *
+     * @return string
+     */
+    protected function replaceForRepositoryUrl(string $s): string
+    {
+        return str_replace(
+            [ '-', '+', ':' ],
+            [ '_', 'p', '_' ],
+            $s
+        );
+    }
+
+    /**
+     * Fetches an alert from the NAAD repository.
+     *
+     * @param array $reference Heartbeat references array parts (sender, id, sent).
+     *
+     * @return boolean|SimpleXMLElement
+     */
+    protected function fetchAlertFromRepository(
+        array $reference
+    ): bool|SimpleXMLElement {
+        $url = sprintf(
+            'http://%s/%s/%sI%s.xml',
+            'capcp1.naad-adna.pelmorex.com',
+            explode('T', $reference['sent'])[0],
+            $this->replaceForRepositoryUrl($reference['sent']),
+            $this->replaceForRepositoryUrl($reference['id']),
+        );
+
+        // Open curl connection.
+        $curl = curl_init();
+
+        // Set repository url.
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    
+        // GET from repository.
+        $result = curl_exec($curl);
+        print_r(curl_error($curl));
+    
+        // Close curl connection.
+        curl_close($curl);
+
+        $xml = $this->validateResponse($result);
+    
+        return $xml;
     }
 
     /**
