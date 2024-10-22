@@ -172,6 +172,8 @@ class NaadSocketClient
 
             // Sets XML error reporting back to its original value.
             libxml_use_internal_errors($previousUseInternalErrorsValue);
+            
+            $this->logger->info(memory_get_usage());
         }
 
         $this->logger->info('Closing socket');
@@ -328,8 +330,8 @@ class NaadSocketClient
         $references = [];
 
         // Separate the references value into sender, id, and sent parts.
-        foreach ($rawReferences as $reference) {
-            $referenceParts = explode(',', $reference);
+        foreach ($rawReferences as $rawReference) {
+            $referenceParts = explode(',', $rawReference);
             $references[] = [
                 'sender' => $referenceParts[0],
                 'id' => $referenceParts[1],

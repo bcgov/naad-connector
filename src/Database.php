@@ -64,6 +64,8 @@ class Database
      * @param Alert $alert The alert to persist.
      *
      * @return string
+     * 
+     * @see https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/working-with-objects.html#persisting-entities
      */
     protected function persistAlert(
         Alert $alert
