@@ -184,9 +184,7 @@ class Alert
     public static function fromXml(SimpleXMLElement $xml): Alert
     {
         $alert = new Alert();
-        $id = $xml->xpath(
-            '/x:alert/x:identifier'
-        )[0];
+        $id = $xml->identifier;
 
         $alert->setId($id);
         $alert->setBody($xml->asXML());
