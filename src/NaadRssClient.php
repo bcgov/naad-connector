@@ -16,6 +16,7 @@ use SimpleXMLElement;
 class NaadRssClient
 {
 
+
     /**
      * The URL of the NAAD RSS feed.
      *
@@ -45,7 +46,7 @@ class NaadRssClient
     public function __construct( string $url )
     {
         $this->address = $url;
-        $this->logger = CustomLogger::getLogger('NaadRssClient', 'info');
+        $this->logger  = CustomLogger::getLogger('NaadRssClient', 'info');
     }
 
     /**
@@ -59,14 +60,14 @@ class NaadRssClient
         $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
 
         $feed = simplexml_load_file($this->address);
-        if (!$feed) {
+        if (! $feed ) {
             print_r('Could not fetch RSS feed.');
             $this->logXmlErrors();
             return 2;
         }
 
         $feed->rewind();
-        if (!$feed->registerXPathNamespace('x', 'http://www.w3.org/2005/Atom')) {
+        if (! $feed->registerXPathNamespace('x', 'http://www.w3.org/2005/Atom') ) {
             print_r('Could not register XPath namespace.');
             $this->logXmlErrors();
             return 3;
@@ -88,12 +89,12 @@ class NaadRssClient
      * @return SimpleXMLElement|false SimpleXMLElement of the alert with the given id
      * or false if alert could not be found.
      */
-    public function getAlert(string $id): SimpleXMLElement|false
+    public function getAlert( string $id ): SimpleXMLElement|false
     {
         $entries = $this->feed->xpath(
             sprintf('/x:feed/x:entry[x:id[contains(text(),"%s")]]', $id)
         );
-        if (empty($entries)) {
+        if (empty($entries) ) {
             print_r(sprintf('Alert "%s" not found in RSS feed.', $id));
             return false;
         }
@@ -107,7 +108,7 @@ class NaadRssClient
      */
     protected function logXmlErrors()
     {
-        foreach (libxml_get_errors() as $error) {
+        foreach ( libxml_get_errors() as $error ) {
             $this->logger->info($error->message);
         }
     }

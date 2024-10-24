@@ -18,38 +18,39 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AlertRepository extends EntityRepository
 {
+
     /**
      * Constructs an AlertRepository object.
      *
      * @param ManagerRegistry $registry ManagerRegistry object to construct with.
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct( ManagerRegistry $registry )
     {
         parent::__construct($registry, Alert::class);
     }
 
-    //    /**
-    //     * @return Alert[] Returns an array of Alert objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    // **
+    // * @return Alert[] Returns an array of Alert objects
+    // */
+    // public function findByExampleField($value): array
+    // {
+    // return $this->createQueryBuilder('a')
+    // ->andWhere('a.exampleField = :val')
+    // ->setParameter('val', $value)
+    // ->orderBy('a.id', 'ASC')
+    // ->setMaxResults(10)
+    // ->getQuery()
+    // ->getResult()
+    // ;
+    // }
 
-    //    public function findOneBySomeField($value): ?Alert
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    // public function findOneBySomeField($value): ?Alert
+    // {
+    // return $this->createQueryBuilder('a')
+    // ->andWhere('a.exampleField = :val')
+    // ->setParameter('val', $value)
+    // ->getQuery()
+    // ->getOneOrNullResult()
+    // ;
+    // }
 }

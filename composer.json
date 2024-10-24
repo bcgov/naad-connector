@@ -37,14 +37,18 @@
         ]
 	},
     "config": {
-        "process-timeout": 0
+        "allow-plugins": {
+            "process-timeout": false,
+            "composer/installers": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     },
     "require": {
         "monolog/monolog": "^3.5",
         "doctrine/dbal": "^4.1",
         "doctrine/migrations": "^3.8",
         "doctrine/orm": "^3.2",
-        "symfony/cache": "^7.1",
-        "symfony/yaml": "^7.1"
+        "symfony/cache": "^6.2",
+        "symfony/yaml": "^6.2"
     }
 }

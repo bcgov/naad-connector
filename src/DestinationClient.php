@@ -12,6 +12,7 @@ namespace Bcgov\NaadConnector;
  */
 class DestinationClient
 {
+
     /**
      * The url of the destination (including full API endpoint).
      *
@@ -48,8 +49,8 @@ class DestinationClient
         string $username,
         string $applicationPassword
     ) {
-        $this->url = $url;
-        $this->username = $username;
+        $this->url                 = $url;
+        $this->username            = $username;
         $this->applicationPassword = $applicationPassword;
     }
 
@@ -60,16 +61,16 @@ class DestinationClient
      *
      * @return string
      */
-    public function sendRequest(string $xml): string
+    public function sendRequest( string $xml ): string
     {
         // Open curl connection.
         $curl = curl_init();
 
         // Set method to POST, add XML to payload.
         curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode(['xml' => $xml]));
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
-    
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode([ 'xml' => $xml ]));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [ 'Content-Type:application/json' ]);
+
         // Set authentication using username and application password.
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt(
@@ -77,18 +78,18 @@ class DestinationClient
             CURLOPT_USERPWD,
             sprintf('%s:%s', $this->username, $this->applicationPassword)
         );
-    
+
         // Set destination url.
         curl_setopt($curl, CURLOPT_URL, $this->url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    
+
         // POST to destination.
         $result = curl_exec($curl);
         print_r(curl_error($curl));
-    
+
         // Close curl connection.
         curl_close($curl);
-    
+
         return $result;
     }
 }

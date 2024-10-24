@@ -7,10 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 use SimpleXMLElement;
 
 #[ORM\Entity]
-#[ORM\Table(name: "alerts")]
+#[ORM\Table(name: 'alerts')]
 /**
  * Alert model to be used with the database.
- * 
+ *
  * @category Database
  * @package  NaadConnector
  * @author   Michael Haswell <Michael.Haswell@gov.bc.ca>
@@ -19,6 +19,9 @@ use SimpleXMLElement;
  */
 class Alert
 {
+
+    // Disabling underscored variable names until the code can be refactored.
+    // phpcs:disable PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore
     #[ORM\Id]
     #[ORM\Column]
     private string $id;
@@ -37,6 +40,7 @@ class Alert
 
     #[ORM\Column]
     private bool $success;
+    // phpcs:enable PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore
 
     /**
      * Gets the alert ID.
@@ -55,7 +59,7 @@ class Alert
      *
      * @return void
      */
-    public function setId(string $id): void
+    public function setId( string $id ): void
     {
         $this->id = $id;
     }
@@ -77,7 +81,7 @@ class Alert
      *
      * @return void
      */
-    public function setBody(string $body): void
+    public function setBody( string $body ): void
     {
         $this->body = $body;
     }
@@ -100,7 +104,7 @@ class Alert
      *
      * @return void
      */
-    public function setReceived(\DateTime $received): void
+    public function setReceived( \DateTime $received ): void
     {
         $this->received = $received;
     }
@@ -123,7 +127,7 @@ class Alert
      *
      * @return void
      */
-    public function setSendAttempted(?\DateTime $sendAttempted): void
+    public function setSendAttempted( ?\DateTime $sendAttempted ): void
     {
         $this->send_attempted = $sendAttempted;
     }
@@ -146,7 +150,7 @@ class Alert
      *
      * @return void
      */
-    public function setFailures(int $failures): void
+    public function setFailures( int $failures ): void
     {
         $this->failures = $failures;
     }
@@ -169,7 +173,7 @@ class Alert
      *
      * @return void
      */
-    public function setSuccess(bool $success): void
+    public function setSuccess( bool $success ): void
     {
         $this->success = $success;
     }
@@ -181,10 +185,10 @@ class Alert
      *
      * @return Alert
      */
-    public static function fromXml(SimpleXMLElement $xml): Alert
+    public static function fromXml( SimpleXMLElement $xml ): Alert
     {
         $alert = new Alert();
-        $id = $xml->identifier;
+        $id    = $xml->identifier;
 
         $alert->setId($id);
         $alert->setBody($xml->asXML());
