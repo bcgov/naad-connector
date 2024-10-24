@@ -19,6 +19,7 @@ use Exception;
 class NaadSocketClient
 {
 
+
     /**
      * The number of bytes to read at once from the socket stream.
      *
@@ -109,12 +110,12 @@ class NaadSocketClient
         Database $database,
         int $port = 8080,
     ) {
-        $this->name = $name;
-        $this->address = $socketUrl;
+        $this->name              = $name;
+        $this->address           = $socketUrl;
         $this->destinationClient = $destinationClient;
-        $this->logger = $logger;
-        $this->database = $database;
-        $this->port = $port;
+        $this->logger            = $logger;
+        $this->database          = $database;
+        $this->port              = $port;
     }
 
     /**
@@ -131,7 +132,7 @@ class NaadSocketClient
             $this->logger->error(
                 'socket_create() failed: reason: {error}',
                 [
-                    'error'=>socket_strerror(socket_last_error()),
+                    'error' => socket_strerror(socket_last_error()),
                 ]
             );
             return 2;
@@ -140,12 +141,13 @@ class NaadSocketClient
         }
 
         $address = $this->address;
-        $port = $this->port;
+        $port    = $this->port;
 
         $this->logger->info(
             "Attempting to connect to '{address}' on port '{port}'...",
             [
-                'address'=> $address, 'port' =>$port,
+                'address' => $address,
+            'port'    => $port,
             ]
         );
         $result = socket_connect($socket, $address, $port);
@@ -154,8 +156,8 @@ class NaadSocketClient
             $this->logger->error(
                 "socket_connect() failed.\nReason: ({result}) {error}",
                 [
-                    'result'=> $result,
-                    'error'=> $error
+                    'result' => $result,
+                    'error'  => $error,
                 ]
             );
             return 3;
@@ -167,12 +169,12 @@ class NaadSocketClient
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
             // Enables error XML error reporting (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
-            
+
             $this->handleResponse($out);
 
             // Sets XML error reporting back to its original value.
             libxml_use_internal_errors($previousUseInternalErrorsValue);
-            
+
             $this->logger->info(memory_get_usage());
         }
 
@@ -192,26 +194,26 @@ class NaadSocketClient
     protected function handleResponse( string $response ): bool
     {
         $xml = $this->validateResponse($response);
-        
-        if (!$xml) {
+
+        if (! $xml ) {
             return false;
         }
 
         $xml->registerXPathNamespace('x', self::$XML_NAMESPACE);
 
-        if ($this->isHeartbeat($xml)) {
+        if ($this->isHeartbeat($xml) ) {
             $this->logger->info('Heartbeat received.');
             $missedAlerts = $this->findMissedAlerts($xml);
-            if (count($missedAlerts) > 0) {
+            if (count($missedAlerts) > 0 ) {
                 $this->logger->info(
                     'Found {count} missing alerts in heartbeat. '
                         . 'Fetching from NAAD repository.',
-                    ['count' => count($missedAlerts)]
+                    [ 'count' => count($missedAlerts) ]
                 );
-                foreach ($missedAlerts as $alert) {
+                foreach ( $missedAlerts as $alert ) {
                     $this->currentOutput = '';
-                    $xml = $this->fetchAlertFromRepository($alert);
-                    if ($xml) {
+                    $xml                 = $this->fetchAlertFromRepository($alert);
+                    if ($xml ) {
                         $result = $this->insertAlert($xml);
                     }
                 }
@@ -220,9 +222,9 @@ class NaadSocketClient
             $this->insertAlert($xml);
             $result = $this->destinationClient->sendRequest($this->currentOutput);
             $this->logger->info(
-                "{result}",
+                '{result}',
                 [
-                    'result'=>$result
+                    'result' => $result,
                 ]
             );
         }
@@ -237,20 +239,20 @@ class NaadSocketClient
      *
      * @return void
      */
-    protected function insertAlert(SimpleXMLElement $xml)
+    protected function insertAlert( SimpleXMLElement $xml )
     {
         try {
             $alert = Alert::fromXml($xml);
             $this->database->insertAlert($alert);
-        } catch(Exception $e) {
+        } catch ( Exception $e ) {
             $this->logger->critical($e->getMessage());
             $this->logger->critical(
                 'Could not connect to database or insert Alert ({id}).',
-                ['id' => $alert->getId()]
+                [ 'id' => $alert->getId() ]
             );
             exit(1);
         }
-        $this->logger->info('Inserted Alert ({id}).', ['id' => $alert->getId()]);
+        $this->logger->info('Inserted Alert ({id}).', [ 'id' => $alert->getId() ]);
     }
 
     /**
@@ -264,16 +266,16 @@ class NaadSocketClient
     protected function validateResponse( string $response ): bool|SimpleXMLElement
     {
         $this->currentOutput .= $response;
-        
+
         $xml = simplexml_load_string($this->currentOutput);
 
         // Current output is not a valid XML document.
-        if (false === $xml) {
+        if (false === $xml ) {
             /**
              * </alert> indicates the end of an alert XML document,
              * clear current output for the next response.
              */
-            if (str_ends_with(trim($this->currentOutput), '</alert>')) {
+            if (str_ends_with(trim($this->currentOutput), '</alert>') ) {
                 $this->logger->info('Invalid XML document received.');
                 $this->currentOutput = '';
             } else {
@@ -284,15 +286,15 @@ class NaadSocketClient
         }
 
         // If XML does not have the correct namespace, return false.
-        $namespaces = $xml->getNamespaces();
-        $capNamespace = $namespaces[""];
-        if (self::$XML_NAMESPACE !== $capNamespace) {
+        $namespaces   = $xml->getNamespaces();
+        $capNamespace = $namespaces[''];
+        if (self::$XML_NAMESPACE !== $capNamespace ) {
             $this->logger->info(
                 "Unexpected namespace '{capNamespace}'.
                 Expecting namespace '{xmlNamespace}'.",
                 [
-                    'capNamespace'=>$capNamespace,
-                    'xmlNamespace'=>self::$XML_NAMESPACE 
+                    'capNamespace' => $capNamespace,
+                    'xmlNamespace' => self::$XML_NAMESPACE,
                 ]
             );
             return false;
@@ -313,7 +315,7 @@ class NaadSocketClient
         $sender = $xml->xpath(
             '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
         );
-        return !empty($sender);
+        return ! empty($sender);
     }
 
     /**
@@ -324,33 +326,34 @@ class NaadSocketClient
      * @return array An array containing the heartbeat references for any alerts
      *               that are not already in the database.
      */
-    protected function findMissedAlerts(SimpleXMLElement $xml): array
+    protected function findMissedAlerts( SimpleXMLElement $xml ): array
     {
         $rawReferences = explode(' ', $xml->references);
-        $references = [];
+        $references    = [];
 
         // Separate the references value into sender, id, and sent parts.
-        foreach ($rawReferences as $rawReference) {
+        foreach ( $rawReferences as $rawReference ) {
             $referenceParts = explode(',', $rawReference);
-            $references[] = [
+            $references[]   = [
                 'sender' => $referenceParts[0],
-                'id' => $referenceParts[1],
-                'sent' => $referenceParts[2],
+                'id'     => $referenceParts[1],
+                'sent'   => $referenceParts[2],
             ];
         }
 
         // Remove any reference ids that already exist in the database.
-        $existingAlerts = $this->database->getAlertsById(
+        $existingAlerts   = $this->database->getAlertsById(
             array_column($references, 'id')
         );
         $existingAlertIds = array_map(
-            function ($alert) {
-                return $alert->getId(); 
-            }, $existingAlerts
+            function ( $alert ) {
+                return $alert->getId();
+            },
+            $existingAlerts
         );
-        foreach ($references as $key => $reference) {
-            if (in_array($reference['id'], $existingAlertIds)) {
-                unset($references[$key]);
+        foreach ( $references as $key => $reference ) {
+            if (in_array($reference['id'], $existingAlertIds) ) {
+                unset($references[ $key ]);
             }
         }
         return $references;
@@ -364,7 +367,7 @@ class NaadSocketClient
      *
      * @return string
      */
-    protected function replaceForRepositoryUrl(string $s): string
+    protected function replaceForRepositoryUrl( string $s ): string
     {
         return str_replace(
             [ '-', '+', ':' ],
@@ -397,16 +400,16 @@ class NaadSocketClient
         // Set repository url.
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    
+
         // GET from repository.
         $result = curl_exec($curl);
         print_r(curl_error($curl));
-    
+
         // Close curl connection.
         curl_close($curl);
 
         $xml = $this->validateResponse($result);
-    
+
         return $xml;
     }
 
@@ -417,7 +420,7 @@ class NaadSocketClient
      */
     protected function logXmlErrors()
     {
-        foreach (libxml_get_errors() as $error) {
+        foreach ( libxml_get_errors() as $error ) {
             $this->logger->info($error->message);
         }
     }

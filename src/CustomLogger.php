@@ -17,13 +17,14 @@ use Monolog\Processor\PsrLogMessageProcessor;
  */
 class CustomLogger
 {
+
     /**
      * Return a Monolog Logger.
-     * 
+     *
      * @param string $channelName The name of the logging channel.
      * @param string $level       The minimum logging level to record.
      * @param string $logFilePath The path to the log file to write to.
-     * 
+     *
      * @return Logger
      */
     public static function getLogger(
@@ -52,7 +53,7 @@ class CustomLogger
         // Log to file.
         $file = new StreamHandler($logFilePath, $logLevel);
         $logger->pushHandler($file);
-        
+
         return $logger;
     }
 
@@ -60,10 +61,10 @@ class CustomLogger
      * Converts a string to a Monolog level enum.
      *
      * @param string $loggingLevel The desired logging level.
-     * 
+     *
      * @return int
      */
-    private static function _convertLogLevel($loggingLevel)
+    private static function _convertLogLevel( $loggingLevel )
     {
         $normalizedLevel = strtolower($loggingLevel);
 
@@ -78,6 +79,6 @@ class CustomLogger
             'debug'     => Level::Debug,
         ];
 
-        return $logLevels[$normalizedLevel] ?? Level::Info;
+        return $logLevels[ $normalizedLevel ] ?? Level::Info;
     }
 }
