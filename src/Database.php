@@ -10,7 +10,7 @@ use Doctrine\ORM\ORMSetup;
 
 /**
  * Database class for interacting with the database.
- * 
+ *
  * @category Database
  * @package  NaadConnector
  * @author   Michael Haswell <Michael.Haswell@gov.bc.ca>
@@ -19,6 +19,7 @@ use Doctrine\ORM\ORMSetup;
  */
 class Database
 {
+
 
     protected EntityManager $entityManager;
 
@@ -39,7 +40,7 @@ class Database
     {
         // Create a simple "default" Doctrine ORM configuration.
         $config = ORMSetup::createAttributeMetadataConfiguration(
-            paths: [__DIR__ . '/src'],
+            paths: [ __DIR__ . '/src' ],
             isDevMode: true,
         );
 
@@ -47,7 +48,7 @@ class Database
         $connection = DriverManager::getConnection(
             [
             // TODO: Create non-root user and replace with env variable.
-            'user'     => 'root', 
+            'user'     => 'root',
             'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
             'host'     => $_ENV['MARIADB_SERVICE_HOST'],
             'port'     => $_ENV['MARIADB_SERVICE_PORT'],
@@ -64,7 +65,7 @@ class Database
      * @param Alert $alert The alert to persist.
      *
      * @return string
-     * 
+     *
      * @see https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/working-with-objects.html#persisting-entities
      */
     protected function persistAlert(
@@ -72,7 +73,7 @@ class Database
     ): string {
         try {
             $this->entityManager->persist($alert);
-        } catch(UniqueConstraintViolationException $e) {
+        } catch ( UniqueConstraintViolationException $e ) {
             $this->entityManager = $this->getEntityManager();
         }
         return $alert->getId();
@@ -85,7 +86,7 @@ class Database
      *
      * @return void
      */
-    public function insertAlert(Alert $alert): void
+    public function insertAlert( Alert $alert ): void
     {
         $this->persistAlert($alert);
         $this->entityManager->flush();
@@ -98,10 +99,10 @@ class Database
      *
      * @return array
      */
-    public function getAlertsById(array $ids): array
+    public function getAlertsById( array $ids ): array
     {
         $alertRepository = $this->entityManager->getRepository(Alert::class);
-        $alerts = $alertRepository->findBy(['id' => $ids]);
+        $alerts          = $alertRepository->findBy([ 'id' => $ids ]);
         $this->entityManager->flush();
         return $alerts;
     }

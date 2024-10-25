@@ -1,7 +1,12 @@
 # Changelog
 
 ## 1.0.0
+### Oct 23, 2024
+- Add github workflows for enforcing tests on pull requests:
+  - PHPCS ([DESCW-2623](https://citz-gdx.atlassian.net/browse/DESCW-2623))
+  - PHPUNIT ([DESCW-2658](https://citz-gdx.atlassian.net/browse/DESCW-2658))
 
+### October 15, 2024
 - Add support for `docker-compose` to stand up a local development environment: ([DESCW-2672](https://citz-gdx.atlassian.net/browse/DESCW-2672))
   - Includes phpMyAdmin to inspect the alerts in the new alerts table
   - Updates README with instructions on running the docker compose and phpMyAdmin.
