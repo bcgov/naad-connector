@@ -174,8 +174,6 @@ class NaadSocketClient
 
             // Sets XML error reporting back to its original value.
             libxml_use_internal_errors($previousUseInternalErrorsValue);
-
-            $this->logger->info(memory_get_usage());
         }
 
         $this->logger->info('Closing socket');
@@ -276,10 +274,13 @@ class NaadSocketClient
              * clear current output for the next response.
              */
             if (str_ends_with(trim($this->currentOutput), '</alert>') ) {
-                $this->logger->info('Invalid XML document received.');
+                $this->logger->error('Invalid XML document received.');
                 $this->currentOutput = '';
             } else {
-                $this->logger->info('Invalid or partial XML document received.');
+                $this->logger->debug(
+                    'Partial XML document received. ' . 
+                    'Attempting to build complete alert.'
+                );
             }
             $this->logXmlErrors();
             return false;
@@ -421,7 +422,7 @@ class NaadSocketClient
     protected function logXmlErrors()
     {
         foreach ( libxml_get_errors() as $error ) {
-            $this->logger->info($error->message);
+            $this->logger->debug($error->message);
         }
     }
 }
