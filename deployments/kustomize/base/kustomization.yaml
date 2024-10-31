@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - app
 - database
+- phpmyadmin
 
 commonLabels:
   app: naad-app
