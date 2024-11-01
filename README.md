@@ -27,7 +27,7 @@ Note: Kubernetes must be enabled in Docker Desktop.
 ```sh
 kubectl config use-context docker-desktop
 docker build -t bcgovgdx/naad-app .
-kubectl apply -k deployments/kustomize/base/
+kubectl apply -k deployments/kustomize/overlays/local
 ```
 
 PHPMyAdmin will then be accessible at http://0.0.0.0:31008. You may need to use Firefox or Safari to access this as Chrome may block this address due to it not using https.
