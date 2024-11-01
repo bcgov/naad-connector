@@ -3,7 +3,8 @@ kind: Deployment
 metadata:
   name: phpmyadmin
   labels:
-    app.kubernetes.io/version:	11.5.2
+    app.kubernetes.io/name: phpmyadmin
+    app.kubernetes.io/instance: phpmyadmin
 spec:
   replicas: 1
   selector:
