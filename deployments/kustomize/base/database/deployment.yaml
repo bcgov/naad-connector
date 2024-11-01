@@ -3,7 +3,8 @@ kind: Deployment
 metadata:
   name: mariadb
   labels:
-    app.kubernetes.io/version:	11.5.2
+    app.kubernetes.io/name: database
+    app.kubernetes.io/instance: database
 spec:
   replicas: 1
   template:

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  labels:
+    app.kubernetes.io/name: phpmyadmin
+    app.kubernetes.io/instance: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin/phpmyadmin:5.2
+          ports:
+            - containerPort: 80
+          envFrom:
+          - configMapRef:
+              name: phpmyadmin-config
+          env:
+          - name: PMA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secrets
+                key: MARIADB_ROOT_PASSWORD
