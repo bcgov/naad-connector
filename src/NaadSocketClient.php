@@ -247,7 +247,7 @@ class NaadSocketClient
             $alert = Alert::fromXml($xml);
             $this->database->insertAlert($alert);
         } catch ( Exception $e ) {
-            $this->logger->critical(print_r($e, true));
+            $this->logger->critical($e->getMessage());
             $this->logger->critical(
                 'Could not connect to database or insert Alert ({id}).',
                 [ 'id' => $alert->getId() ]
