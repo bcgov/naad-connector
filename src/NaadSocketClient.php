@@ -203,15 +203,19 @@ class NaadSocketClient
             $this->logger->info('Heartbeat received.');
             $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0 ) {
+                $repoUrl = getenv('NAAD_REPO_URL');
                 $this->logger->info(
                     'Found {count} missing alerts in heartbeat. '
-                        . 'Fetching from NAAD repository.',
-                    [ 'count' => count($missedAlerts) ]
+                        . 'Fetching from NAAD repository ({repoUrl}).',
+                    [ 'count' => count($missedAlerts), 'repoUrl' => $repoUrl ]
                 );
                 foreach ( $missedAlerts as $alert ) {
                     $this->currentOutput = '';
-                    $xml                 = $this->fetchAlertFromRepository($alert);
-                    if ($xml ) {
+                    $xml                 = $this->fetchAlertFromRepository(
+                        $alert,
+                        $repoUrl
+                    );
+                    if ($xml) {
                         $result = $this->insertAlert($xml);
                     }
                 }
@@ -243,7 +247,7 @@ class NaadSocketClient
             $alert = Alert::fromXml($xml);
             $this->database->insertAlert($alert);
         } catch ( Exception $e ) {
-            $this->logger->critical($e->getMessage());
+            $this->logger->critical(print_r($e, true));
             $this->logger->critical(
                 'Could not connect to database or insert Alert ({id}).',
                 [ 'id' => $alert->getId() ]
@@ -380,16 +384,18 @@ class NaadSocketClient
     /**
      * Fetches an alert from the NAAD repository.
      *
-     * @param array $reference Heartbeat references array parts (sender, id, sent).
+     * @param array  $reference Heartbeat references array parts (sender, id, sent).
+     * @param string $url       URL of the NAAD repo to fetch alerts from.
      *
      * @return boolean|SimpleXMLElement
      */
     protected function fetchAlertFromRepository(
-        array $reference
+        array $reference,
+        string $url
     ): bool|SimpleXMLElement {
         $url = sprintf(
             'http://%s/%s/%sI%s.xml',
-            'capcp1.naad-adna.pelmorex.com',
+            $url,
             explode('T', $reference['sent'])[0],
             $this->replaceForRepositoryUrl($reference['sent']),
             $this->replaceForRepositoryUrl($reference['id']),

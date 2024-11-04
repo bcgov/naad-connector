@@ -2,17 +2,27 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - deployment.yaml
+- deployment2.yaml
 - job.yaml
 
 # Updates the labels for all containers.
 commonLabels:
   app.kubernetes.io/component: socket
   app.kubernetes.io/part-of: naad-connector
+
 configMapGenerator:
-  - name: naad-config
+  - name: naad1-config
     literals:
     - NAAD_NAME=NAAD-1
     - NAAD_URL=streaming1.naad-adna.pelmorex.com
+    - NAAD_REPO_URL=capcp1.naad-adna.pelmorex.com
+  - name: naad2-config
+    literals:
+    - NAAD_NAME=NAAD-2
+    - NAAD_URL=streaming2.naad-adna.pelmorex.com
+    - NAAD_REPO_URL=capcp2.naad-adna.pelmorex.com
+  - name: naad-shared-config
+    literals:
     - DESTINATION_URL=https://localhost/wp-json/naad/v1/alert
     - DESTINATION_USER=naadbot
 
