@@ -71,11 +71,7 @@ class Database
     protected function persistAlert(
         Alert $alert
     ): string {
-        try {
-            $this->entityManager->persist($alert);
-        } catch ( UniqueConstraintViolationException $e ) {
-            $this->entityManager = $this->getEntityManager();
-        }
+        $this->entityManager->persist($alert);
         return $alert->getId();
     }
 
@@ -88,8 +84,12 @@ class Database
      */
     public function insertAlert( Alert $alert ): void
     {
-        $this->persistAlert($alert);
-        $this->entityManager->flush();
+        try {
+            $this->persistAlert($alert);
+            $this->entityManager->flush();
+        } catch ( UniqueConstraintViolationException $e ) {
+            $this->entityManager = $this->getEntityManager();
+        }
     }
 
     /**

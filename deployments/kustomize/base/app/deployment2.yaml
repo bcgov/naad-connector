@@ -1,10 +1,10 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: naad-socket-1
+  name: naad-socket-2
   labels:
-    app.kubernetes.io/name: naad-socket-1
-    app.kubernetes.io/instance: naad-1
+    app.kubernetes.io/name: naad-socket-2
+    app.kubernetes.io/instance: naad-2
     app.openshift.io/runtime: php
 spec:
   replicas: 1
@@ -16,7 +16,7 @@ spec:
           imagePullPolicy: IfNotPresent
           envFrom:
           - configMapRef:
-              name: naad1-config
+              name: naad2-config
           - configMapRef:
               name: naad-shared-config
           - secretRef:
