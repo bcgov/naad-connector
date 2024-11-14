@@ -8,8 +8,16 @@ RUN set -ex; \
 
 ENV LOG_FILE_PATH="/var/www/html/naad-socket.log"
 
+# Copy application code
 COPY ./ /var/www/html/
 COPY ./entrypoint.sh /home/
+
+
+# Use Docker secrets (via BuildKit)
+# RUN --mount=type=secret,id=destination_password \
+#   destination_password=$(cat /run/secrets/destination_password) && \
+#   echo "destination_password=$destination_password" > /var/www/html/.env
+
 RUN touch $LOG_FILE_PATH && chown 1001 $LOG_FILE_PATH
 RUN chmod +x /home/entrypoint.sh
 
