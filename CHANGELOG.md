@@ -6,6 +6,7 @@
 
 - remove NaadRSSClientTest
 - tweak test output with `--testdox` option
+- [DESCW-2704](https://citz-gdx.atlassian.net/browse/DESCW-2704)
 
 ### Oct 23, 2024
 
