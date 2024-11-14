@@ -4,6 +4,8 @@
 
 ### Nov 14, 2024
 
+- remove NaadRSSClient class
+- remove get_rss module that uses it
 - remove NaadRSSClientTest
 - tweak test output with `--testdox` option
 - [DESCW-2704](https://citz-gdx.atlassian.net/browse/DESCW-2704)
