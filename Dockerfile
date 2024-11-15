@@ -6,13 +6,7 @@ RUN set -ex; \
   docker-php-ext-install sockets zip pdo pdo_mysql; \
   docker-php-ext-enable sockets;
 
-ENV NAAD_NAME=NAAD-1
-ENV NAAD_URL=streaming1.naad-adna.pelmorex.com
-ENV DESTINATION_URL=https://localhost/wp-json/naad/v1/alert
-ENV DESTINATION_USER=naadbot
-ENV DESTINATION_PASSWORD="AAAA AAAA AAAA AAAA"
 ENV LOG_FILE_PATH="/var/www/html/naad-socket.log"
-ENV DATABASE_NAME="naad_connector"
 
 COPY ./ /var/www/html/
 COPY ./entrypoint.sh /home/

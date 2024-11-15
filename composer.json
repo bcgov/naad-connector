@@ -33,7 +33,10 @@
             "vendor/bin/phpcbf ./src"
         ],
         "test": [
-            "vendor/bin/phpunit --testdox ./tests"
+            "vendor/bin/phpunit --testdox"
+        ],
+        "test-coverage": [
+            "vendor/bin/phpunit --testdox --coverage-html=coverage/"
         ]
 	},
     "config": {

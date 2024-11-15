@@ -1,47 +1,41 @@
-<?php
+<?php declare(strict_types=1);
+use PHPUnit\Framework\Attributes\{
+    Test,
+    CoversClass,
+    DataProvider,
+    UsesClass
+};
+use PHPUnit\Framework\TestCase;
 
 use Bcgov\NaadConnector\CustomLogger;
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\DestinationClient;
-use PHPUnit\Framework\TestCase;
+use Bcgov\NaadConnector\NaadRepositoryClient;
 use Bcgov\NaadConnector\NaadSocketClient;
-use Doctrine\ORM\EntityManager;
 
+#[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
+#[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
 final class NaadSocketClientTest extends TestCase {
 
     const XML_TEST_FILE_LOCATION = './tests/Socket/';
 
-    /**
-     * Tests validateResponse function.
-     *
-     * @dataProvider validateResponseDataProvider
-     * @param string $id
-     * @param array  $expected
-     * @return void
-     */
-    public function testValidateResponse( array $xmlResponses ) {
-        $class  = new ReflectionClass( 'Bcgov\NaadConnector\NaadSocketClient' );
-        $method = $class->getMethod( 'validateResponse' );
-        $logger = CustomLogger::getLogger();
-        $client = new NaadSocketClient( 'test-naad', 'testing.url', new DestinationClient( 'testing.url', 'user', 'pass' ), $logger, new Database() );
+    #[Test]
+    #[DataProvider('handleResponseProvider')]
+    public function testHandleResponse(array $xmlResponses) {
+        $database = $this->createStub( Database::class );
+        $destinationClient = $this->createStub( DestinationClient::class );
+        $logger = $this->createStub(CustomLogger::class);
+        $repositoryClient = $this->createStub( NaadRepositoryClient::class );
 
-        foreach ( $xmlResponses as $response ) {
-            $xml    = file_get_contents( self::XML_TEST_FILE_LOCATION . $response['location'] );
-            $result = $method->invokeArgs( $client, [ $xml ] );
-            if ( false === $response['expected'] ) {
-                $this->assertSame( $response['expected'], $result );
-            } else {
-                $this->assertIsObject( $result );
-            }
+        $client = new NaadSocketClient( 'test-naad', $destinationClient, $logger, $database, $repositoryClient );
+        libxml_use_internal_errors(true);
+        foreach($xmlResponses as $response) {
+            $result = $client->handleResponse(file_get_contents( self::XML_TEST_FILE_LOCATION . $response['location'] ));
+            $this->assertEquals($response['expected'], $result);
         }
     }
 
-    /**
-     * Provides data for testValidateResponse().
-     *
-     * @return array
-     */
-    public static function validateResponseDataProvider(): array {
+    public static function handleResponseProvider() {
         return [
             'Success - single part'                => [
                 [
@@ -108,58 +102,5 @@ final class NaadSocketClientTest extends TestCase {
                 ],
             ],
         ];
-    }
-
-    /**
-     * Tests isHeartbeat function.
-     *
-     * @return void
-     */
-    public function testIsHeartbeat() {
-        $class  = new ReflectionClass( 'Bcgov\NaadConnector\NaadSocketClient' );
-        $method = $class->getMethod( 'isHeartbeat' );
-        $logger = CustomLogger::getLogger();
-        $client = new NaadSocketClient( 'test-naad', 'testing.url', new DestinationClient( 'testing.url', 'user', 'pass' ), $logger, new Database() );
-
-        // Test that a heartbeat XML returns true.
-        $heartbeat = simplexml_load_file( self::XML_TEST_FILE_LOCATION . '/heartbeat.xml' );
-        $heartbeat->registerXPathNamespace( 'x', 'urn:oasis:names:tc:emergency:cap:1.2' );
-        $result = $method->invokeArgs( $client, [ $heartbeat ] );
-        $this->assertTrue( $result );
-
-        // Test that an alert XML returns false.
-        $alert = simplexml_load_file( self::XML_TEST_FILE_LOCATION . '/complete-alert.xml' );
-        $alert->registerXPathNamespace( 'x', 'urn:oasis:names:tc:emergency:cap:1.2' );
-        $result = $method->invokeArgs( $client, [ $alert ] );
-        $this->assertFalse( $result );
-    }
-
-    /**
-     * Tests handleResponse function.
-     * TODO: figure out how to mock database for testing.
-     *
-     * @return void
-     */
-    public function testHandleResponse() {
-        $this->markTestSkipped( 'TODO: figure out how to mock database for testing.' );
-        $emStub = $this->createStub( EntityManager::class );
-        $emStub->method( 'persist' )->willThrowException( new Exception( 'test' ) );
-        $emStub->method( 'flush' );
-        $database = $this->createStub( Database::class );
-        $database->method( 'getEntityManager' )
-            ->willReturn( $emStub );
-
-        $logger = CustomLogger::getLogger();
-        $client = new NaadSocketClient( 'test-naad', 'testing.url', new DestinationClient( 'testing.url', 'user', 'pass' ), $logger, $database );
-        $class  = new ReflectionClass( 'Bcgov\NaadConnector\NaadSocketClient' );
-        $method = $class->getMethod( 'handleResponse' );
-
-        $response = '';
-        $result   = $method->invokeArgs( $client, [ $response ] );
-        $this->assertFalse( $result );
-
-        $response = file_get_contents( self::XML_TEST_FILE_LOCATION . '/complete-alert.xml' );
-        $result   = $method->invokeArgs( $client, [ $response ] );
-        $this->assertTrue( $result );
     }
 }
