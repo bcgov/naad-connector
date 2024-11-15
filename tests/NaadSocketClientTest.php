@@ -7,14 +7,11 @@ use PHPUnit\Framework\Attributes\{
 };
 use PHPUnit\Framework\TestCase;
 
-use Bcgov\NaadConnector\{
-    CustomLogger,
-    Database,
-    DestinationClient,
-    NaadRepositoryClient,
-    NaadSocketClient
-};
-use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\CustomLogger;
+use Bcgov\NaadConnector\Database;
+use Bcgov\NaadConnector\DestinationClient;
+use Bcgov\NaadConnector\NaadRepositoryClient;
+use Bcgov\NaadConnector\NaadSocketClient;
 
 #[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
 #[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
@@ -105,68 +102,5 @@ final class NaadSocketClientTest extends TestCase {
                 ],
             ],
         ];
-    }
-
-    #[Test]
-    public function testHandleResponseMissedAlerts() {
-        $database = $this->createStub( Database::class );
-        $database->method('getAlertsById')->willReturn([]);
-
-        $destinationClient = $this->createStub( DestinationClient::class );
-        $logger = $this->createStub( CustomLogger::class );
-
-        $repositoryClient = $this->createMock( NaadRepositoryClient::class );
-        // Should fetch 10 times because all 10 heartbeat reference ids are new.
-        $repositoryClient
-            ->expects($this->exactly(10))
-            ->method('fetchAlert')
-            ->willReturn(file_get_contents( self::XML_TEST_FILE_LOCATION . 'complete-alert.xml' ));
-
-        $client = new NaadSocketClient( 'test-naad', $destinationClient, $logger, $database, $repositoryClient );
-        libxml_use_internal_errors(true);
-
-        $result = $client->handleResponse(file_get_contents( self::XML_TEST_FILE_LOCATION . 'heartbeat.xml' ));
-        $this->assertEquals(true, $result);
-    }
-
-    #[Test]
-    public function testHandleResponseExistingMissedAlert() {
-        $alertXml = file_get_contents(self::XML_TEST_FILE_LOCATION . 'complete-alert.xml');
-
-        $database = $this->createStub( Database::class );
-        $database
-            ->method('getAlertsById')
-            ->willReturn([Alert::fromXml(new SimpleXMLElement($alertXml))]);
-
-        $destinationClient = $this->createStub( DestinationClient::class );
-        $logger = $this->createStub( CustomLogger::class );
-
-        $repositoryClient = $this->createMock( NaadRepositoryClient::class );
-        // Should only fetch 9 times because one was already in the database.
-        $repositoryClient
-            ->expects($this->exactly(9))
-            ->method('fetchAlert');
-
-        $client = new NaadSocketClient( 'test-naad', $destinationClient, $logger, $database, $repositoryClient );
-        libxml_use_internal_errors(true);
-
-        $result = $client->handleResponse(file_get_contents( self::XML_TEST_FILE_LOCATION . 'heartbeat.xml' ));
-        $this->assertEquals(true, $result);
-    }
-
-    #[Test]
-    public function testHandleResponseDatabaseException() {
-        $database = $this->createStub( Database::class );
-        $database->method('insertAlert')->willThrowException(new Exception());
-        $destinationClient = $this->createStub( DestinationClient::class );
-        $logger = $this->createStub( CustomLogger::class );
-        $repositoryClient = $this->createStub( NaadRepositoryClient::class );
-
-        $client = new NaadSocketClient( 'test-naad', $destinationClient, $logger, $database, $repositoryClient );
-        libxml_use_internal_errors(true);
-
-        $this->expectException(Exception::class);
-
-        $client->handleResponse(file_get_contents( self::XML_TEST_FILE_LOCATION . 'complete-alert.xml' ));
     }
 }

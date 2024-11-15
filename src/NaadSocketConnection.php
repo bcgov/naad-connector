@@ -62,7 +62,7 @@ class NaadSocketConnection
     public function connect(): int
     {
         // Create a TCP/IP socket.
-        $this->logger->info('Creating socket.');
+        $this->logger->info('Creating socket');
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false ) {
             $this->logger->error(
@@ -73,7 +73,7 @@ class NaadSocketConnection
             );
             return 2;
         } else {
-            $this->logger->info('Created socket.');
+            $this->logger->info('OK.');
         }
 
         $address = $this->address;
@@ -83,7 +83,7 @@ class NaadSocketConnection
             "Attempting to connect to '{address}' on port '{port}'...",
             [
                 'address' => $address,
-                'port'    => $port,
+            'port'    => $port,
             ]
         );
         $result = socket_connect($socket, $address, $port);
@@ -98,10 +98,10 @@ class NaadSocketConnection
             );
             return 3;
         } else {
-            $this->logger->info('Connected to socket.');
+            $this->logger->info('OK.');
         }
 
-        $this->logger->info('Listening for socket messages...');
+        $this->logger->info('Reading response:');
         $socketClient = new NaadSocketClient(
             $this->name,
             $this->destinationClient,
@@ -118,9 +118,9 @@ class NaadSocketConnection
             libxml_use_internal_errors($previousUseInternalErrorsValue);
         }
 
-        $this->logger->info('Closing socket.');
+        $this->logger->info('Closing socket');
         socket_close($socket);
-        $this->logger->info('Socket closed.');
+        $this->logger->info('OK.');
         return 1;
     }
 }
