@@ -117,7 +117,10 @@ final class NaadSocketClientTest extends TestCase {
 
         $repositoryClient = $this->createMock( NaadRepositoryClient::class );
         // Should fetch 10 times because all 10 heartbeat reference ids are new.
-        $repositoryClient->expects($this->exactly(10))->method('fetchAlert');
+        $repositoryClient
+            ->expects($this->exactly(10))
+            ->method('fetchAlert')
+            ->willReturn(file_get_contents( self::XML_TEST_FILE_LOCATION . 'complete-alert.xml' ));
 
         $client = new NaadSocketClient( 'test-naad', $destinationClient, $logger, $database, $repositoryClient );
         libxml_use_internal_errors(true);
@@ -131,14 +134,18 @@ final class NaadSocketClientTest extends TestCase {
         $alertXml = file_get_contents(self::XML_TEST_FILE_LOCATION . 'complete-alert.xml');
 
         $database = $this->createStub( Database::class );
-        $database->method('getAlertsById')->willReturn([Alert::fromXml(new SimpleXMLElement($alertXml))]);
+        $database
+            ->method('getAlertsById')
+            ->willReturn([Alert::fromXml(new SimpleXMLElement($alertXml))]);
 
         $destinationClient = $this->createStub( DestinationClient::class );
         $logger = $this->createStub( CustomLogger::class );
 
         $repositoryClient = $this->createMock( NaadRepositoryClient::class );
         // Should only fetch 9 times because one was already in the database.
-        $repositoryClient->expects($this->exactly(9))->method('fetchAlert');
+        $repositoryClient
+            ->expects($this->exactly(9))
+            ->method('fetchAlert');
 
         $client = new NaadSocketClient( 'test-naad', $destinationClient, $logger, $database, $repositoryClient );
         libxml_use_internal_errors(true);
