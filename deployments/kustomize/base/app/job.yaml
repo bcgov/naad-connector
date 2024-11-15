@@ -11,6 +11,8 @@ spec:
           image: bcgovgdx/naad-app
           imagePullPolicy: IfNotPresent
           envFrom:
+          - configMapRef:
+              name: database-config
           - secretRef:
               name: database-secrets
           resources:

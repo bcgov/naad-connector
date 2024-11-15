@@ -19,6 +19,8 @@ spec:
               name: naad1-config
           - configMapRef:
               name: naad-shared-config
+          - configMapRef:
+              name: database-config
           - secretRef:
               name: naad-secrets
           - secretRef:

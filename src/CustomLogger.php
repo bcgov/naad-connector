@@ -15,11 +15,11 @@ use Monolog\Processor\PsrLogMessageProcessor;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-class CustomLogger
+class CustomLogger extends Logger
 {
 
     /**
-     * Return a Monolog Logger.
+     * Construct a CustomLogger.
      *
      * @param string $channelName The name of the logging channel.
      * @param string $level       The minimum logging level to record.
@@ -27,34 +27,22 @@ class CustomLogger
      *
      * @return Logger
      */
-    public static function getLogger(
+    public function __construct(
         string $channelName = 'monolog',
         string $level = 'info',
         string $logFilePath = './naad-socket.log'
     ) {
-        // Set up a monolog channel.
-        $logger = new Logger($channelName);
-
-        // Processes a record's message according to PSR-3 rules.
-        $processor = new PsrLogMessageProcessor();
-        $logger->pushProcessor($processor);
+        $processors = [
+            new PsrLogMessageProcessor(),
+        ];
 
         $logLevel = self::_convertLogLevel($level);
+        $handlers = [
+            new StreamHandler('php://stdout', $logLevel),
+            new StreamHandler($logFilePath, $logLevel)
+        ];
 
-        // Store records to stdout.
-        $stream = new StreamHandler('php://stdout', $logLevel);
-
-        // Optionally, you can set a custom formatter here.
-        // For example, JSON formatter: $stream->setFormatter(new JsonFormatter());
-        // Don't forget to include `use Monolog\Formatter\JsonFormatter` if you do.
-
-        $logger->pushHandler($stream);
-
-        // Log to file.
-        $file = new StreamHandler($logFilePath, $logLevel);
-        $logger->pushHandler($file);
-
-        return $logger;
+        parent::__construct($channelName, $handlers, $processors);
     }
 
     /**

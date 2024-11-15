@@ -20,7 +20,6 @@ use Doctrine\ORM\ORMSetup;
 class Database
 {
 
-
     protected EntityManager $entityManager;
 
     /**
@@ -52,7 +51,7 @@ class Database
             'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
             'host'     => $_ENV['MARIADB_SERVICE_HOST'],
             'port'     => $_ENV['MARIADB_SERVICE_PORT'],
-            'dbname'   => $_ENV['DATABASE_NAME'],
+            'dbname'   => $_ENV['MARIADB_DATABASE'],
             'driver'   => 'pdo_mysql',
             ]
         );

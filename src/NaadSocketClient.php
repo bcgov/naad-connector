@@ -8,7 +8,7 @@ use SimpleXMLElement;
 use Exception;
 
 /**
- * NaadSocketClient class connects to the NAAD socket and logs its output.
+ * NaadSocketClient class handles responses from the NAAD socket and logs its output.
  *
  * @category Client
  * @package  NaadConnector
@@ -18,14 +18,6 @@ use Exception;
  */
 class NaadSocketClient
 {
-
-
-    /**
-     * The number of bytes to read at once from the socket stream.
-     *
-     * @var int
-     */
-    protected static int $MAX_MESSAGE_SIZE = 5000000;
 
     /**
      * The expected XML namespace of alerts, referring to the CAP 1.2 schema.
@@ -43,143 +35,40 @@ class NaadSocketClient
      */
     protected string $name;
 
-    /**
-     * The URL of the NAAD socket to connect to.
-     *
-     * @var string
-     */
-    protected string $address;
-
-    /**
-     * An instance of DestinationClient.
-     *
-     * @var DestinationClient
-     */
     protected DestinationClient $destinationClient;
 
-    /**
-     * The port of the NAAD socket to connect to.
-     *
-     * @var integer
-     */
-    protected int $port;
-
-    /**
-     * The current output of the socket. Stored so that multi-part responses can
-     * be combined.
-     *
-     * @var string
-     */
     protected string $currentOutput = '';
 
-    /**
-     * The monolog channel for saving to stream or file.
-     *
-     * @var Logger
-     */
     protected Logger $logger;
 
-    /**
-     * The Database class that handles connection setup and returns
-     * a Doctrine EntityManager instance.
-     *
-     * @var Database
-     */
     protected Database $database;
+
+    protected NaadRepositoryClient $repositoryClient;
 
     /**
      * Constructor for NaadClient.
      *
-     * @param string            $name              The name of the NAAD connection
-     *                                             instance.
-     * @param string            $socketUrl         The URL of the NAAD socket to
-     *                                             connect to.
-     * @param DestinationClient $destinationClient An instance of DestinationClient
-     *                                             to handle making requests to a
-     *                                             destination.
-     * @param Logger            $logger            An instance of Monolog/Logger.
-     * @param Database          $database          An instance of Database.
-     * @param integer           $port              The port of the NAAD socket to
-     *                                             connect to.
+     * @param string               $name              The name of the NAAD connection
+     *                                                instance.
+     * @param DestinationClient    $destinationClient An instance of
+     *                                                DestinationClient.
+     * @param Logger               $logger            An instance of Monolog/Logger.
+     * @param Database             $database          An instance of Database.
+     * @param NaadRepositoryClient $repositoryClient  An instance of
+     *                                                NaadRepositoryClient.
      */
     public function __construct(
         string $name,
-        string $socketUrl,
         DestinationClient $destinationClient,
         Logger $logger,
         Database $database,
-        int $port = 8080,
+        NaadRepositoryClient $repositoryClient = null
     ) {
         $this->name              = $name;
-        $this->address           = $socketUrl;
         $this->destinationClient = $destinationClient;
         $this->logger            = $logger;
         $this->database          = $database;
-        $this->port              = $port;
-    }
-
-    /**
-     * Connects to the NAAD socket at the given URL and listens.
-     *
-     * @return int An exit code.
-     */
-    public function connect(): int
-    {
-        // Create a TCP/IP socket.
-        $this->logger->info('Creating socket');
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if ($socket === false ) {
-            $this->logger->error(
-                'socket_create() failed: reason: {error}',
-                [
-                    'error' => socket_strerror(socket_last_error()),
-                ]
-            );
-            return 2;
-        } else {
-            $this->logger->info('OK.');
-        }
-
-        $address = $this->address;
-        $port    = $this->port;
-
-        $this->logger->info(
-            "Attempting to connect to '{address}' on port '{port}'...",
-            [
-                'address' => $address,
-            'port'    => $port,
-            ]
-        );
-        $result = socket_connect($socket, $address, $port);
-        if ($result === false ) {
-            $error = socket_strerror(socket_last_error($socket));
-            $this->logger->error(
-                "socket_connect() failed.\nReason: ({result}) {error}",
-                [
-                    'result' => $result,
-                    'error'  => $error,
-                ]
-            );
-            return 3;
-        } else {
-            $this->logger->info('OK.');
-        }
-
-        $this->logger->info('Reading response:');
-        while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
-            // Enables error XML error reporting (used by libxml_get_errors()).
-            $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
-
-            $this->handleResponse($out);
-
-            // Sets XML error reporting back to its original value.
-            libxml_use_internal_errors($previousUseInternalErrorsValue);
-        }
-
-        $this->logger->info('Closing socket');
-        socket_close($socket);
-        $this->logger->info('OK.');
-        return 1;
+        $this->repositoryClient  = $repositoryClient ?? new NaadRepositoryClient();
     }
 
     /**
@@ -189,7 +78,7 @@ class NaadSocketClient
      *
      * @return bool
      */
-    protected function handleResponse( string $response ): bool
+    public function handleResponse( string $response ): bool
     {
         $xml = $this->validateResponse($response);
 
@@ -211,10 +100,10 @@ class NaadSocketClient
                 );
                 foreach ( $missedAlerts as $alert ) {
                     $this->currentOutput = '';
-                    $xml                 = $this->fetchAlertFromRepository(
-                        $alert,
-                        $repoUrl
+                    $rawXml                 = $this->repositoryClient->fetchAlert(
+                        $alert
                     );
+                    $xml = $this->validateResponse($rawXml);
                     if ($xml) {
                         $result = $this->insertAlert($xml);
                     }
@@ -252,7 +141,7 @@ class NaadSocketClient
                 'Could not connect to database or insert Alert ({id}).',
                 [ 'id' => $alert->getId() ]
             );
-            exit(1);
+            throw $e;
         }
         $this->logger->info('Inserted Alert ({id}).', [ 'id' => $alert->getId() ]);
     }
@@ -362,62 +251,6 @@ class NaadSocketClient
             }
         }
         return $references;
-    }
-
-    /**
-     * Per NAAD documentation, certain characters must be replaced when
-     * building the URL for the short-term alert repository.
-     *
-     * @param string $s The string to perform the replacement on.
-     *
-     * @return string
-     */
-    protected function replaceForRepositoryUrl( string $s ): string
-    {
-        return str_replace(
-            [ '-', '+', ':' ],
-            [ '_', 'p', '_' ],
-            $s
-        );
-    }
-
-    /**
-     * Fetches an alert from the NAAD repository.
-     *
-     * @param array  $reference Heartbeat references array parts (sender, id, sent).
-     * @param string $url       URL of the NAAD repo to fetch alerts from.
-     *
-     * @return boolean|SimpleXMLElement
-     */
-    protected function fetchAlertFromRepository(
-        array $reference,
-        string $url
-    ): bool|SimpleXMLElement {
-        $url = sprintf(
-            'http://%s/%s/%sI%s.xml',
-            $url,
-            explode('T', $reference['sent'])[0],
-            $this->replaceForRepositoryUrl($reference['sent']),
-            $this->replaceForRepositoryUrl($reference['id']),
-        );
-
-        // Open curl connection.
-        $curl = curl_init();
-
-        // Set repository url.
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-        // GET from repository.
-        $result = curl_exec($curl);
-        print_r(curl_error($curl));
-
-        // Close curl connection.
-        curl_close($curl);
-
-        $xml = $this->validateResponse($result);
-
-        return $xml;
     }
 
     /**
