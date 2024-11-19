@@ -25,7 +25,7 @@
         "start": [
 
             "composer build",
-            "Composer\\Config::disableProcessTimeout", // allow docker compose to run for longer than 300 seconds.
+            "Composer\\Config::disableProcessTimeout",
             "docker compose up"
         ],
         "stop": [
