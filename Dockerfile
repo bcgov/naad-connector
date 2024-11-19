@@ -28,13 +28,9 @@ WORKDIR /var/www/html/
 
 # Copy Composer binary from the official image to our working directory
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-
-# Switch to non-root user
 USER 1001
-
-# Install PHP dependencies using Composer
-RUN /usr/local/bin/composer install && \
-/usr/local/bin/composer dump-autoload
+RUN /usr/local/bin/composer install
+RUN /usr/local/bin/composer dump-autoload
 
 # Set the entrypoint script for this image
 ENTRYPOINT ["/home/entrypoint.sh"]
