@@ -20,10 +20,10 @@
     },
     "scripts": {
         "build": [
-            "docker build --secret id=destination_password,src=.env -t bcgovgdx/naad-app ."
+            "docker build -t bcgovgdx/naad-app ."
         ],
         "start": [
-            "composer run build",
+            "composer build",
             "docker compose up"
         ],
         "stop": [
