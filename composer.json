@@ -23,7 +23,9 @@
             "docker build -t bcgovgdx/naad-app ."
         ],
         "start": [
+
             "composer build",
+            "Composer\\Config::disableProcessTimeout", // allow docker compose to run for longer than 300 seconds.
             "docker compose up"
         ],
         "stop": [
