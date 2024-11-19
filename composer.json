@@ -20,11 +20,14 @@
     },
     "scripts": {
         "build": [
-            "docker build -t naad-app ."
+            "docker build --secret id=destination_password,src=.env -t bcgovgdx/naad-app ."
         ],
         "start": [
             "composer run build",
-            "docker run --rm --name=naad-app naad-app"
+            "docker compose up"
+        ],
+        "stop": [
+            "docker compose down"
         ],
         "phpcs": [
             "vendor/bin/phpcs ./src"
