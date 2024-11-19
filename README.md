@@ -18,8 +18,6 @@ composer start
 
 - note: _It is no longer possible to run this app from docker because the database requires either docker-compose or K8s deployments in order to manage database migrations and logging._
 
-- This leverages a secret that extracts `DESTINATION_PASSWORD` from your .env file.
-
 #### Docker-Compose deployment
 
 - Prerequisites: rename the `./sample-env` to `.env` and fill in the values for local use only.
