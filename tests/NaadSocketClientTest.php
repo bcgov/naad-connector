@@ -169,4 +169,20 @@ final class NaadSocketClientTest extends TestCase {
 
         $client->handleResponse(file_get_contents( self::XML_TEST_FILE_LOCATION . 'complete-alert.xml' ));
     }
+
+    #[Test]
+    public function testHandleResponseMissingIdentifier() {
+        $database = $this->createStub(Database::class);
+        $destinationClient = $this->createStub(DestinationClient::class);
+        $logger = $this->createStub(CustomLogger::class);
+        $repositoryClient = $this->createStub(NaadRepositoryClient::class);
+
+        $client = new NaadSocketClient('test-naad', $destinationClient, $logger, $database, $repositoryClient);
+        libxml_use_internal_errors(true);
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid XML: The "identifier" field is required.');
+
+        $client->handleResponse(file_get_contents(self::XML_TEST_FILE_LOCATION . 'empty-identifier.xml'));
+    }
 }

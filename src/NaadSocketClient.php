@@ -132,14 +132,17 @@ class NaadSocketClient
      */
     protected function insertAlert( SimpleXMLElement $xml )
     {
+        $alert = null;
+
         try {
             $alert = Alert::fromXml($xml);
             $this->database->insertAlert($alert);
         } catch ( Exception $e ) {
+            $alertId = $alert ? $alert->getId() : 'unknown';
             $this->logger->critical($e->getMessage());
             $this->logger->critical(
                 'Could not connect to database or insert Alert ({id}).',
-                [ 'id' => $alert->getId() ]
+                [ 'id' => $alertId ]
             );
             throw $e;
         }
