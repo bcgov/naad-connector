@@ -63,10 +63,12 @@ class DestinationClient
         $this->username            = $username;
         $this->applicationPassword = $applicationPassword;
 
-        $this->client = new Client([
+        $this->client = new Client(
+            [
             'base_uri' => $this->url,
             'auth'     => [$this->username, $this->applicationPassword],
-        ]);
+            ]
+        );
     }
 
     /**
@@ -79,12 +81,14 @@ class DestinationClient
     public function sendRequest( string $xml ): string
     {
         try {
-            $response = $this->client->post('', [
+            $response = $this->client->post(
+                '', [
                 'json' => ['xml' => $xml],
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-            ]);
+                ]
+            );
 
             return (string) $response->getBody();
         } catch (RequestException $e) {
