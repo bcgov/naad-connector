@@ -2,6 +2,10 @@
 
 ## 1.0.0
 
+### Nov 20, 2024
+
+- Replace raw curl commands with guzzle in DestinationClient ([DESCW-2764](https://citz-gdx.atlassian.net/browse/DESCW-2764))
+
 ### Nov 19, 2024
 
 - Add error handling for missing identifiers in alerts ([DESCW-2669](https://citz-gdx.atlassian.net/browse/DESCW-2672))
