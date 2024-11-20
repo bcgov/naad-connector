@@ -41,9 +41,9 @@ services:
       MARIADB_SERVICE_HOST: mariadb
       MARIADB_SERVICE_PORT: 3306
       MARIADB_DATABASE: ${MARIADB_DATABASE}
-      NAAD_NAME: NAAD-1
-      NAAD_URL: streaming1.naad-adna.pelmorex.com
-      NAAD_REPO_URL: capcp1.naad-adna.pelmorex.com
+      NAAD_NAME: ${NAAD_NAME}
+      NAAD_URL: ${NAAD_URL}
+      NAAD_REPO_URL: ${NAAD_REPO_URL}
       NAAD_PORT: ${NAAD_PORT}
       PHPMYADMIN_PORT: ${PHPMYADMIN_PORT}
     depends_on:
