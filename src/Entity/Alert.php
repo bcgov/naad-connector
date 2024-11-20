@@ -195,15 +195,12 @@ class Alert
             $errorMessage = 'Invalid XML: The "identifier" field is required.';
             throw new Exception($errorMessage);
         }
-        try {
-            $alert = new Alert();
-            $alert->setId($identifier);
-            $alert->setBody($xml->asXML());
-            $alert->setReceived(new DateTime());
-    
-            return $alert;
-        } catch (Exception $e) {
-            throw $e;
-        }
+        
+        $alert = new Alert();
+        $alert->setId($identifier);
+        $alert->setBody($xml->asXML());
+        $alert->setReceived(new DateTime());
+
+        return $alert;
     }
 }

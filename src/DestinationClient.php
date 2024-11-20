@@ -1,6 +1,9 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
 /**
  * DestinationClient class makes requests to a destination url.
  *
@@ -35,6 +38,13 @@ class DestinationClient
     protected string $applicationPassword;
 
     /**
+     * Guzzle HTTP client.
+     *
+     * @var Client
+     */
+    protected Client $client;
+
+    /**
      * Constructor for DestinationClient.
      *
      * @param string $url                 The url of the destination
@@ -52,6 +62,13 @@ class DestinationClient
         $this->url                 = $url;
         $this->username            = $username;
         $this->applicationPassword = $applicationPassword;
+
+        $this->client = new Client(
+            [
+            'base_uri' => $this->url,
+            'auth'     => [$this->username, $this->applicationPassword],
+            ]
+        );
     }
 
     /**
@@ -63,33 +80,24 @@ class DestinationClient
      */
     public function sendRequest( string $xml ): string
     {
-        // Open curl connection.
-        $curl = curl_init();
+        try {
+            $response = $this->client->post(
+                '', [
+                'json' => ['xml' => $xml],
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                ]
+            );
 
-        // Set method to POST, add XML to payload.
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode([ 'xml' => $xml ]));
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [ 'Content-Type:application/json' ]);
+            return (string) $response->getBody();
+        } catch (RequestException $e) {
+            // Log or handle the exception.
+            if ($e->hasResponse()) {
+                return (string) $e->getResponse()->getBody();
+            }
 
-        // Set authentication using username and application password.
-        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt(
-            $curl,
-            CURLOPT_USERPWD,
-            sprintf('%s:%s', $this->username, $this->applicationPassword)
-        );
-
-        // Set destination url.
-        curl_setopt($curl, CURLOPT_URL, $this->url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-        // POST to destination.
-        $result = curl_exec($curl);
-        print_r(curl_error($curl));
-
-        // Close curl connection.
-        curl_close($curl);
-
-        return $result;
+            throw $e;
+        }
     }
 }
