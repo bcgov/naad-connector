@@ -5,6 +5,7 @@ namespace Bcgov\NaadConnector\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use SimpleXMLElement;
+use Exception;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'alerts')]
@@ -184,16 +185,25 @@ class Alert
      * @param SimpleXMLElement $xml XML to create alert from.
      *
      * @return Alert
+     * @throws Exception if the identifier field is missing or empty.
      */
     public static function fromXml( SimpleXMLElement $xml ): Alert
     {
-        $alert = new Alert();
-        $id    = $xml->identifier;
-
-        $alert->setId($id);
-        $alert->setBody($xml->asXML());
-        $alert->setReceived(new DateTime());
-
-        return $alert;
+        // Ensure the identifier field is not empty.
+        $identifier = (string) $xml->identifier;
+        if (empty($identifier)) {
+            $errorMessage = 'Invalid XML: The "identifier" field is required.';
+            throw new Exception($errorMessage);
+        }
+        try {
+            $alert = new Alert();
+            $alert->setId($identifier);
+            $alert->setBody($xml->asXML());
+            $alert->setReceived(new DateTime());
+    
+            return $alert;
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

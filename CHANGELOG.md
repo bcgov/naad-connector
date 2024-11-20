@@ -2,6 +2,10 @@
 
 ## 1.0.0
 
+### Nov 19, 2024
+
+- Add error handling for missing identifiers in alerts ([DESCW-2669](https://citz-gdx.atlassian.net/browse/DESCW-2672))
+
 ### Nov 14, 2024
 
 - remove NaadRSSClient class
