@@ -193,10 +193,8 @@ class Alert
         $identifier = (string) $xml->identifier;
         if (empty($identifier)) {
             $errorMessage = 'Invalid XML: The "identifier" field is required.';
-            error_log($errorMessage);
             throw new Exception($errorMessage);
         }
-
         try {
             $alert = new Alert();
             $alert->setId($identifier);
@@ -205,8 +203,6 @@ class Alert
     
             return $alert;
         } catch (Exception $e) {
-            // Log meaningful error message and rethrow the exception.
-            error_log('Failed to create Alert from XML: ' . $e->getMessage());
             throw $e;
         }
     }

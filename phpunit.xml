@@ -11,7 +11,9 @@
          displayDetailsOnPhpunitDeprecations="true"
          failOnPhpunitDeprecation="true"
          failOnRisky="true"
-         failOnWarning="true">
+         failOnWarning="true"
+         colors="true"
+         testdox="true">
     <php>
         <env name="MARIADB_ROOT_PASSWORD" value="none" />
         <env name="MARIADB_SERVICE_HOST" value="" />

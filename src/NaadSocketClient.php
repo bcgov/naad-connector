@@ -136,6 +136,15 @@ class NaadSocketClient
 
         try {
             $alert = Alert::fromXml($xml);
+        } catch(Exception $e) {
+            $alertId = $alert ? $alert->getId() : 'unknown';
+            $this->logger->critical($e->getMessage());
+            $this->logger->critical(
+                'Could not parse alert XML.'
+            );
+            throw $e;
+        }
+        try {
             $this->database->insertAlert($alert);
         } catch ( Exception $e ) {
             $alertId = $alert ? $alert->getId() : 'unknown';
