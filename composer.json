@@ -31,7 +31,8 @@
             "docker compose down"
         ],
         "phpcs": [
-            "vendor/bin/phpcs ./src"
+            "# show the rule that is being applied using the -s flag",
+            "vendor/bin/phpcs ./src -s"
         ],
         "phpcbf": [
             "vendor/bin/phpcbf ./src"
