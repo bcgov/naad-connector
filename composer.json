@@ -47,12 +47,13 @@
         }
     },
     "require": {
-        "monolog/monolog": "^3.5",
         "doctrine/dbal": "^4.1",
         "doctrine/migrations": "^3.8",
         "doctrine/orm": "^3.2",
+        "guzzlehttp/guzzle": "^7.9",
+        "monolog/monolog": "^3.5",
+        "react/socket": "^1.16",
         "symfony/cache": "^6.2",
-        "symfony/yaml": "^6.2",
-        "guzzlehttp/guzzle": "^7.9"
+        "symfony/yaml": "^6.2"
     }
 }
