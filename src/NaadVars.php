@@ -23,11 +23,10 @@ namespace Bcgov\NaadConnector;
 class NaadVars
 {
 
-    private ?string $rootPassword;
-    private ?string $serviceHost;
-    private ?string $servicePort;
+    private ?string $databaseRootPassword;
+    private ?string $databaseHost;
+    private ?string $databasePort;
     private ?string $databaseName;
-    private ?string $phpMyAdminPort;
     private ?string $destinationURL;
     private ?string $destinationUser;
     private ?string $destinationPassword;
