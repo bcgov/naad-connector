@@ -41,7 +41,7 @@ class NaadVars
      * Predefined environment variable keys and their defaults.
      */
     private static array $defaultValues = [
-        'logFilePath'  => '/var/www/html/naad-socket.log',
+        'logFilePath'  => 'naad-socket.log',
         'naadName'     => 'NAAD-1',
         'naadUrl'      => 'streaming1.naad-adna.pelmorex.com',
         'naadRepoUrl'  => 'capcp1.naad-adna.pelmorex.com'
