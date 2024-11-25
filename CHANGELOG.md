@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-### Nov 21, 2024
+### Nov 25, 2024
 
 - ([DESCW-2739](https://citz-gdx.atlassian.net/browse/DESCW-2739))
   - refactor entrypoint.sh to remove passing environment variables
