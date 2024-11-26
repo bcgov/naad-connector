@@ -14,11 +14,14 @@
         8080,
         3306
     ],
+
+    // This env variable is necessary for code coverage reports to be generated through PHPUnit.
     "remoteEnv": {
         "XDEBUG_MODE": "coverage"
-    }
+    },
+
     // Use 'postCreateCommand' to run commands after the container is created.
-    // "postCreateCommand": "sudo chmod a+x \"$(pwd)\" && sudo rm -rf /var/www/html && sudo ln -s \"$(pwd)\" /var/www/html"
+    "postCreateCommand": "bash -i -c 'vendor/bin/doctrine-migrations -vvv -n migrate'"
     
     // Configure tool-specific properties.
     // "customizations": {},

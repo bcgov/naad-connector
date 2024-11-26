@@ -24,12 +24,6 @@ services:
       - naad-database:/var/lib/mysql
     restart: unless-stopped
 
-  database-migrate:
-    image: bcgovgdx/naad-app
-    env_file: devcontainer.env
-    restart: unless-stopped
-    entrypoint: ["vendor/bin/doctrine-migrations", "-vvv", "-n", "migrate"]
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
