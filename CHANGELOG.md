@@ -2,6 +2,14 @@
 
 ## 1.0.0
 
+### Nov 25, 2024
+
+- ([DESCW-2739](https://citz-gdx.atlassian.net/browse/DESCW-2739))
+  - refactor entrypoint.sh to remove passing environment variables
+  - refactor start.php to access environment variables using the NaadVars class.
+  - refactor Dockerfile to remove environment variable declarations
+  - add scripts to composer.json for starting the client and building the image.
+
 ### Nov 20, 2024
 
 - Replace raw curl commands with guzzle in DestinationClient ([DESCW-2764](https://citz-gdx.atlassian.net/browse/DESCW-2764))

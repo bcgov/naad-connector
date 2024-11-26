@@ -1,7 +1,16 @@
+# Database environment vars
 MARIADB_ROOT_PASSWORD=
+MARIADB_SERVICE_HOST=mariadb
+MARIADB_SERVICE_PORT=3306
 MARIADB_DATABASE=naad_connector
+PHPMYADMIN_PORT=8082
+
+# App environment vars
+DESTINATION_URL=https://0.0.0.0/wp-json/naad/v1/alert
 DESTINATION_USER=naadbot
 DESTINATION_PASSWORD=
-DESTINATION_URL=https://0.0.0.0/wp-json/naad/v1/alert
-PHPMYADMIN_PORT=8082
 NAAD_PORT=8080
+NAAD_NAME="NAAD-1"
+NAAD_URL="streaming1.naad-adna.pelmorex.com"
+NAAD_REPO_URL="capcp1.naad-adna.pelmorex.com"
+LOG_FILE_PATH="/var/www/html/naad-socket.log"

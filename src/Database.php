@@ -3,6 +3,7 @@
 namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\NaadVars; // Container class for managing environment variables
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -43,15 +44,19 @@ class Database
             isDevMode: true,
         );
 
+
+        // Create a new instance of the NaadVars class to access database configuration variables.
+        $naadVars = new NaadVars();
+
         // Configuring the database connection.
         $connection = DriverManager::getConnection(
             [
             // TODO: Create non-root user and replace with env variable.
             'user'     => 'root',
-            'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
-            'host'     => $_ENV['MARIADB_SERVICE_HOST'],
-            'port'     => $_ENV['MARIADB_SERVICE_PORT'],
-            'dbname'   => $_ENV['MARIADB_DATABASE'],
+            'password' => $naadVars-> databaseRootPassword,
+            'host'     => $naadVars-> databaseHost,
+            'port'     => $naadVars-> databaseHost,
+            'dbname'   => $naadVars-> databaseName,
             'driver'   => 'pdo_mysql',
             ]
         );

@@ -23,7 +23,6 @@
             "docker build -t bcgovgdx/naad-app ."
         ],
         "start": [
-
             "composer build",
             "Composer\\Config::disableProcessTimeout",
             "docker compose up"
@@ -32,7 +31,8 @@
             "docker compose down"
         ],
         "phpcs": [
-            "vendor/bin/phpcs ./src"
+            "# show the rule that is being applied using the -s flag",
+            "vendor/bin/phpcs ./src -s"
         ],
         "phpcbf": [
             "vendor/bin/phpcbf ./src"
