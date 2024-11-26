@@ -92,7 +92,15 @@ class NaadSocketClient
 
         if ($this->isHeartbeat($xml) ) {
             $this->logger->info('Heartbeat received.');
-            $missedAlerts = $this->findMissedAlerts($xml);
+            try {
+                $missedAlerts = $this->findMissedAlerts($xml);
+            } catch (Exception $e) {
+                $this->logger->critical($e->getMessage());
+                $this->logger->critical(
+                    'Could not find missed alerts.'
+                );
+                throw $e;
+            }
             if (count($missedAlerts) > 0 ) {
                 $repoUrl = $naadVars->naadRepoUrl;
                 $this->logger->info(

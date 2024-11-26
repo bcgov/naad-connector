@@ -27,8 +27,16 @@
             "Composer\\Config::disableProcessTimeout",
             "docker compose up"
         ],
+        "startPods": [
+            "composer build",
+            "kubectl config use-context docker-desktop",
+            "kubectl apply -k deployments/kustomize/overlays/local"
+        ],
         "stop": [
             "docker compose down"
+        ],
+        "stopPods": [
+            "kubectl delete -k deployments/kustomize/overlays/local"
         ],
         "phpcs": [
             "# show the rule that is being applied using the -s flag",

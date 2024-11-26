@@ -3,7 +3,7 @@
 namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Entity\Alert;
-use Bcgov\NaadConnector\NaadVars; // Container class for managing environment variables
+use Bcgov\NaadConnector\NaadVars;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -38,24 +38,23 @@ class Database
      */
     protected function getEntityManager(): EntityManager
     {
+        // Extract environment variables from .env file.
+        $naadVars = new NaadVars();
+
         // Create a simple "default" Doctrine ORM configuration.
         $config = ORMSetup::createAttributeMetadataConfiguration(
             paths: [ __DIR__ . '/src' ],
             isDevMode: true,
         );
 
-
-        // Create a new instance of the NaadVars class to access database configuration variables.
-        $naadVars = new NaadVars();
-
         // Configuring the database connection.
         $connection = DriverManager::getConnection(
             [
-            // TODO: Create non-root user and replace with env variable.
+            // TODO: Create non-root user.
             'user'     => 'root',
             'password' => $naadVars-> databaseRootPassword,
             'host'     => $naadVars-> databaseHost,
-            'port'     => $naadVars-> databaseHost,
+            'port'     => $naadVars-> databasePort,
             'dbname'   => $naadVars-> databaseName,
             'driver'   => 'pdo_mysql',
             ]

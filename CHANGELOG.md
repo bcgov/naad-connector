@@ -2,13 +2,18 @@
 
 ## 1.0.0
 
-### Nov 25, 2024
+### Nov 26, 2024
 
 - ([DESCW-2739](https://citz-gdx.atlassian.net/browse/DESCW-2739))
-  - refactor entrypoint.sh to remove passing environment variables
-  - refactor start.php to access environment variables using the NaadVars class.
-  - refactor Dockerfile to remove environment variable declarations
-  - add scripts to composer.json for starting the client and building the image.
+- test and update K8s deployment so it works properly with NaadVars class getter.
+- fix typo in socket client NaadVars.
+- Update Readme layout and instructions.
+- add scripts to simplify k8s build/start/stop for local development.
+- add socket client try/catch block to catch environment variable misconfiguration.
+- refactor entrypoint.sh to remove passing environment variables
+- refactor start.php to access environment variables using the NaadVars class.
+- refactor Dockerfile to remove environment variable declarations
+- add scripts to composer.json for starting the client and building the image.
 
 ### Nov 20, 2024
 
