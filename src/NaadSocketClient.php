@@ -3,6 +3,7 @@ namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\NaadVars;
 use Monolog\Logger;
 use SimpleXMLElement;
 use Exception;
@@ -80,6 +81,7 @@ class NaadSocketClient
      */
     public function handleResponse( string $response ): bool
     {
+        $naadVars = new NaadVars();
         $xml = $this->validateResponse($response);
 
         if (! $xml ) {
@@ -92,7 +94,7 @@ class NaadSocketClient
             $this->logger->info('Heartbeat received.');
             $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0 ) {
-                $repoUrl = getenv('NAAD_REPO_URL');
+                $repoUrl = $naadVars->naadRepoUrl;
                 $this->logger->info(
                     'Found {count} missing alerts in heartbeat. '
                         . 'Fetching from NAAD repository ({repoUrl}).',
@@ -183,7 +185,7 @@ class NaadSocketClient
                 $this->currentOutput = '';
             } else {
                 $this->logger->debug(
-                    'Partial XML document received. ' . 
+                    'Partial XML document received. ' .
                     'Attempting to build complete alert.'
                 );
             }

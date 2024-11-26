@@ -1,5 +1,6 @@
 <?php
 namespace Bcgov\NaadConnector;
+use Bcgov\NaadConnector\NaadVars;
 
 /**
  * NaadRepositoryClient class makes requests to the NAAD alert repository.
@@ -23,9 +24,9 @@ class NaadRepositoryClient
     /**
      * Constructor for NaadRepositoryClient.
      */
-    public function __construct()
-    {
-        $this->baseUrl             = getenv('NAAD_REPO_URL');
+    public function __construct() {
+        $naadVars       = new NaadVars();
+        $this->baseUrl  = $naadVars->naadRepoUrl;
     }
 
     /**
