@@ -16,11 +16,14 @@
          testdox="true">
     <php>
         <env name="MARIADB_ROOT_PASSWORD" value="none" />
-        <env name="MARIADB_SERVICE_HOST" value="" />
-        <env name="MARIADB_SERVICE_PORT" value="0" />
+        <env name="MARIADB_SERVICE_HOST" value="test-mariadb" />
+        <env name="MARIADB_SERVICE_PORT" value="3306" />
         <env name="MARIADB_DATABASE" value="test_database" />
+        <env name="DESTINATION_URL" value="https://0.0.0.0/wp-json/naad/v1/alert" />
+        <env name="DESTINATION_USER" value="test-naadbot" />
+        <env name="DESTINATION_PASSWORD" value="testPassword" />
     </php>
-    
+
     <testsuites>
         <testsuite name="default">
             <directory>tests</directory>

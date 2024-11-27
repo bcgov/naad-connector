@@ -3,6 +3,7 @@ namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\NaadVars;
 use Monolog\Logger;
 use SimpleXMLElement;
 use Exception;
@@ -80,6 +81,7 @@ class NaadSocketClient
      */
     public function handleResponse( string $response ): bool
     {
+        $naadVars = new NaadVars();
         $xml = $this->validateResponse($response);
 
         if (! $xml ) {
@@ -90,9 +92,9 @@ class NaadSocketClient
 
         if ($this->isHeartbeat($xml) ) {
             $this->logger->info('Heartbeat received.');
-            $missedAlerts = $this->findMissedAlerts($xml);
+                $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0 ) {
-                $repoUrl = getenv('NAAD_REPO_URL');
+                $repoUrl = $naadVars->naadRepoUrl;
                 $this->logger->info(
                     'Found {count} missing alerts in heartbeat. '
                         . 'Fetching from NAAD repository ({repoUrl}).',
@@ -183,7 +185,7 @@ class NaadSocketClient
                 $this->currentOutput = '';
             } else {
                 $this->logger->debug(
-                    'Partial XML document received. ' . 
+                    'Partial XML document received. ' .
                     'Attempting to build complete alert.'
                 );
             }
@@ -248,9 +250,17 @@ class NaadSocketClient
         }
 
         // Remove any reference ids that already exist in the database.
-        $existingAlerts   = $this->database->getAlertsById(
-            array_column($references, 'id')
-        );
+        try {
+            $existingAlerts   = $this->database->getAlertsById(
+                array_column($references, 'id')
+            );
+        } catch (Exception $e) {
+            $this->logger->critical($e->getMessage());
+            $this->logger->critical(
+                'Could not retrieve existing alerts from database.'
+            );
+            throw $e;
+        }
         $existingAlertIds = array_map(
             function ( $alert ) {
                 return $alert->getId();

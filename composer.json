@@ -20,14 +20,27 @@
     },
     "scripts": {
         "build": [
-            "docker build -t naad-app ."
+            "docker build -t bcgovgdx/naad-app ."
         ],
         "start": [
-            "composer run build",
-            "docker run --rm --name=naad-app naad-app"
+            "composer build",
+            "Composer\\Config::disableProcessTimeout",
+            "docker compose up"
+        ],
+        "k8s-start": [
+            "composer build",
+            "kubectl config use-context docker-desktop",
+            "kubectl apply -k deployments/kustomize/overlays/local"
+        ],
+        "stop": [
+            "docker compose down"
+        ],
+        "k8s-delete": [
+            "kubectl delete -k deployments/kustomize/overlays/local"
         ],
         "phpcs": [
-            "vendor/bin/phpcs ./src"
+            "# show the rule that is being applied using the -s flag",
+            "vendor/bin/phpcs ./src -s"
         ],
         "phpcbf": [
             "vendor/bin/phpcbf ./src"

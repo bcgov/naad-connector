@@ -12,7 +12,8 @@ use Bcgov\NaadConnector\{
     Database,
     DestinationClient,
     NaadRepositoryClient,
-    NaadSocketClient
+    NaadSocketClient,
+    NaadVars,
 };
 use Bcgov\NaadConnector\Entity\Alert;
 

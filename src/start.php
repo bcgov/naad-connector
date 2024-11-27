@@ -4,17 +4,33 @@ require_once 'vendor/autoload.php';
 use Bcgov\NaadConnector\CustomLogger;
 use Bcgov\NaadConnector\DestinationClient;
 use Bcgov\NaadConnector\NaadSocketConnection;
+use Bcgov\NaadConnector\NaadVars;
 
-$destinationClient = new DestinationClient($argv[3], $argv[4], $argv[5]);
+// Get environment variables for configuring a socket connection.
+$naadVars = new NaadVars();
 
-// If $argv[6] (log location) is given, use it. Otherwise use default.
-$socketLogger = $argv[6] ?
-    new CustomLogger('NaadSocketConnection', 'info', $argv[6]) :
-    new CustomLogger('NaadSocketConnection', 'info');
+// Create a new DestinationClient instance with the provided configuration.
+$destinationClient = new DestinationClient(
+    $naadVars->destinationURL,
+    $naadVars->destinationUser,
+    $naadVars->destinationPassword,
+);
+
+// Create a custom logger for the NaadSocketConnection
+$socketLogger = new CustomLogger(
+    'NaadSocketConnection',
+    'info',
+    $naadVars->logFilePath
+);
+
+
 $connector    = new NaadSocketConnection(
-    $argv[1],
-    $argv[2],
+    $naadVars->naadName,
+    $naadVars->naadUrl,
     $destinationClient,
     $socketLogger
 );
+
 return $connector->connect();
+
+
