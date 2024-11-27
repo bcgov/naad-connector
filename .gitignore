@@ -6,3 +6,4 @@ naad-socket.log
 .phpunit.result.cache
 .vscode
 .env
+.devcontainer/override.env

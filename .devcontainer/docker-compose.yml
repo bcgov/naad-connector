@@ -1,6 +1,10 @@
 services:
   app:
-    env_file: devcontainer.env
+    env_file:
+      - path: ./devcontainer.env
+        required: true
+      - path: ./override.env
+        required: false
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,18 +23,22 @@ services:
   
   mariadb:
     image: mariadb:11
-    env_file: devcontainer.env
+    env_file:
+      - path: ./devcontainer.env
+        required: true
+      - path: ./override.env
+        required: false
     volumes:
       - naad-database:/var/lib/mysql
     restart: unless-stopped
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
-    environment:
-      PMA_HOST: mariadb
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: rootpassword
+    env_file:
+      - path: ./devcontainer.env
+        required: true
+      - path: ./override.env
+        required: false
     ports:
       - "${PHPMYADMIN_PORT:-8082}:80"
 

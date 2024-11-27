@@ -37,6 +37,9 @@
         ],
         "test-coverage": [
             "vendor/bin/phpunit --coverage-html=coverage/"
+        ],
+        "migrate": [
+            "vendor/bin/doctrine-migrations -vvv -n migrate"
         ]
 	},
     "config": {
