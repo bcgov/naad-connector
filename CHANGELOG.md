@@ -2,9 +2,11 @@
 
 ## 1.0.0
 
-### Nov 26, 2024
+### Nov 27, 2024
 
 - ([DESCW-2739](https://citz-gdx.atlassian.net/browse/DESCW-2739))
+- moved try/catch block directly to the possible failure point in the socket client module
+- restored kustomization base for the app to previous import order
 - test and update K8s deployment so it works properly with NaadVars class getter.
 - fix typo in socket client NaadVars.
 - Update Readme layout and instructions.
