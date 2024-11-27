@@ -27,7 +27,7 @@
             "Composer\\Config::disableProcessTimeout",
             "docker compose up"
         ],
-        "startPods": [
+        "k8s-start": [
             "composer build",
             "kubectl config use-context docker-desktop",
             "kubectl apply -k deployments/kustomize/overlays/local"
