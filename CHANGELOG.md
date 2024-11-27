@@ -2,6 +2,21 @@
 
 ## 1.0.0
 
+### Nov 27, 2024
+
+- ([DESCW-2739](https://citz-gdx.atlassian.net/browse/DESCW-2739))
+- moved try/catch block directly to the possible failure point in the socket client module
+- restored kustomization base for the app to previous import order
+- test and update K8s deployment so it works properly with NaadVars class getter.
+- fix typo in socket client NaadVars.
+- Update Readme layout and instructions.
+- add scripts to simplify k8s build/start/stop for local development.
+- add socket client try/catch block to catch environment variable misconfiguration.
+- refactor entrypoint.sh to remove passing environment variables
+- refactor start.php to access environment variables using the NaadVars class.
+- refactor Dockerfile to remove environment variable declarations
+- add scripts to composer.json for starting the client and building the image.
+
 ### Nov 20, 2024
 
 - Replace raw curl commands with guzzle in DestinationClient ([DESCW-2764](https://citz-gdx.atlassian.net/browse/DESCW-2764))

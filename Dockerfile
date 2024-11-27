@@ -1,23 +1,36 @@
 # Don't change the FROM, updated by the OpenShift BuildConfig.
 FROM php:8.3
-RUN set -ex; apt update && apt install -y libzip-dev;
-RUN set -ex; \
-  docker-php-ext-configure zip; \
-  docker-php-ext-install sockets zip pdo pdo_mysql; \
-  docker-php-ext-enable sockets;
 
+# Install linux package dependencies and PHP extensions
+RUN set -ex; \
+  apt update && apt install -y libzip-dev && \
+  docker-php-ext-configure zip && \
+  docker-php-ext-install sockets zip pdo pdo_mysql && \
+  docker-php-ext-enable sockets && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
 ENV LOG_FILE_PATH="/var/www/html/naad-socket.log"
 
-COPY ./ /var/www/html/
-COPY ./entrypoint.sh /home/
-RUN touch $LOG_FILE_PATH && chown 1001 $LOG_FILE_PATH
+# Copy the entrypoint script and set permissions
+COPY ./entrypoint.sh /home/entrypoint.sh
 RUN chmod +x /home/entrypoint.sh
 
+# Copy application source code and composer config
+COPY ./ /var/www/html/
+
+# Create log file and set permissions
+RUN touch $LOG_FILE_PATH && chown 1001:1001 $LOG_FILE_PATH
+
+# Set working directory
 WORKDIR /var/www/html/
 
+# Copy Composer binary from the official image to our working directory
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 USER 1001
 RUN /usr/local/bin/composer install
 RUN /usr/local/bin/composer dump-autoload
 
+# Set the entrypoint script for this image
 ENTRYPOINT ["/home/entrypoint.sh"]

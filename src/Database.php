@@ -3,6 +3,7 @@
 namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\NaadVars;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -37,6 +38,9 @@ class Database
      */
     protected function getEntityManager(): EntityManager
     {
+        // Extract environment variables from .env file.
+        $naadVars = new NaadVars();
+
         // Create a simple "default" Doctrine ORM configuration.
         $config = ORMSetup::createAttributeMetadataConfiguration(
             paths: [ __DIR__ . '/src' ],
@@ -46,12 +50,12 @@ class Database
         // Configuring the database connection.
         $connection = DriverManager::getConnection(
             [
-            // TODO: Create non-root user and replace with env variable.
+            // TODO: Create non-root user.
             'user'     => 'root',
-            'password' => $_ENV['MARIADB_ROOT_PASSWORD'],
-            'host'     => $_ENV['MARIADB_SERVICE_HOST'],
-            'port'     => $_ENV['MARIADB_SERVICE_PORT'],
-            'dbname'   => $_ENV['MARIADB_DATABASE'],
+            'password' => $naadVars-> databaseRootPassword,
+            'host'     => $naadVars-> databaseHost,
+            'port'     => $naadVars-> databasePort,
+            'dbname'   => $naadVars-> databaseName,
             'driver'   => 'pdo_mysql',
             ]
         );
