@@ -24,7 +24,8 @@ class NaadRepositoryClient
     /**
      * Constructor for NaadRepositoryClient.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $naadVars       = new NaadVars();
         $this->baseUrl  = $naadVars->naadRepoUrl;
     }

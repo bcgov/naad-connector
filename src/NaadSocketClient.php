@@ -92,7 +92,7 @@ class NaadSocketClient
 
         if ($this->isHeartbeat($xml) ) {
             $this->logger->info('Heartbeat received.');
-            $missedAlerts = $this->findMissedAlerts($xml);
+                $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0 ) {
                 $repoUrl = $naadVars->naadRepoUrl;
                 $this->logger->info(
@@ -250,9 +250,17 @@ class NaadSocketClient
         }
 
         // Remove any reference ids that already exist in the database.
-        $existingAlerts   = $this->database->getAlertsById(
-            array_column($references, 'id')
-        );
+        try {
+            $existingAlerts   = $this->database->getAlertsById(
+                array_column($references, 'id')
+            );
+        } catch (Exception $e) {
+            $this->logger->critical($e->getMessage());
+            $this->logger->critical(
+                'Could not retrieve existing alerts from database.'
+            );
+            throw $e;
+        }
         $existingAlertIds = array_map(
             function ( $alert ) {
                 return $alert->getId();
