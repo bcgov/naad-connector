@@ -89,6 +89,26 @@ final class NaadSocketClientTest extends TestCase {
                     ],
                 ],
             ],
+            'Success - Recover from multipart alert heartbeat interruption' => [
+                [
+                    [
+                        'location' => 'multipart/1.xml',
+                        'expected' => false,
+                    ],
+                    [
+                        'location' => 'heartbeat.xml',
+                        'expected' => false,
+                    ],
+                    [
+                        'location' => 'multipart/success/2.xml',
+                        'expected' => false,
+                    ],
+                    [
+                        'location' => 'heartbeat.xml',
+                        'expected' => true,
+                    ],
+                ],
+            ],
             'Success - Heartbeat'                  => [
                 [
                     [

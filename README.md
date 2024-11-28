@@ -6,6 +6,20 @@ A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD
 
 ### Local Deployment
 
+#### Devcontainer
+To run in the devcontainer (see .devcontainer/ directory):
+1. Install the Dev Containers VSCode extension.
+1. Run `cp .devcontainer/sample.override.env .devcontainer/override.env` and add/remove any env variable overrides you need based on your environment.
+    - Note: this step can be skipped if you do'ot need to override any env variables.
+1. View > Command Palette... > Dev Containers: Reopen in Container
+1. VSCode should relaunch and the terminal should look like this: `vscode ➜ /workspaces/naad-connector`
+1. This terminal should allow most commands to be run without any further dev environment setup:
+    - `php src/start.php` to start the application
+    - `composer test` to run unit tests
+    - `composer test-coverage` to generate unit test coverage reports
+    - `composer phpcs` to run linting
+    - `composer migrate` to run database migrations
+
 #### Docker deployment
 
 ```zsh
@@ -26,6 +40,10 @@ composer start
 docker compose up
 ```
 
+#### Docker Desktop Kubernetes deployment
+To build and run in Kubernetes via Docker Desktop:
+Note: Kubernetes must be enabled in Docker Desktop.
+=======
 
 #### Docker Desktop Kubernetes Deployment
 
