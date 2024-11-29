@@ -168,47 +168,80 @@ class NaadSocketClient
      * @return bool|SimpleXMLElement Returns SimpleXMLElement on success,
      *                               false otherwise.
      */
-    protected function validateResponse( string $response ): bool|SimpleXMLElement
+    protected function validateResponse(?string $response): bool|SimpleXMLElement
     {
+        // Return false if the response is null or empty.
+        if (empty($response) ) {
+            return false;
+        }
+
+        // Append the response to the current output.
         $this->currentOutput .= $response;
 
+        // Attempt to load the current output as XML.
         $xml = simplexml_load_string($this->currentOutput);
 
         // Current output is not a valid XML document.
         if (false === $xml ) {
-            /**
-             * </alert> indicates the end of an alert XML document,
-             * clear current output for the next response.
-             */
-            if (str_ends_with(trim($this->currentOutput), '</alert>') ) {
-                $this->logger->error('Invalid XML document received.');
-                $this->currentOutput = '';
-            } else {
-                $this->logger->debug(
-                    'Partial XML document received. ' .
-                    'Attempting to build complete alert.'
-                );
-            }
-            $this->logXmlErrors();
+            return $this->handleInvalidXml();
+        }
+
+        // Validate the XML namespace.
+        if (!$this->isValidNamespace($xml)) {
             return false;
         }
 
-        // If XML does not have the correct namespace, return false.
-        $namespaces   = $xml->getNamespaces();
-        $capNamespace = $namespaces[''];
-        if (self::$XML_NAMESPACE !== $capNamespace ) {
+        return $xml; // Return the valid SimpleXMLElement.
+
+    }
+
+    /**
+     * Handles the case where the XML is invalid.
+     *
+     * @return bool Returns false after logging the error.
+     */
+    protected function handleInvalidXml(): bool
+    {
+        // Check if the current output ends with the closing alert tag.
+        if (str_ends_with(trim($this->currentOutput), '</alert>')) {
+            $this->logger->error('Invalid XML document received.');
+            $this->currentOutput = ''; // Clear output for the next response.
+        } else {
+            $this->logger->debug(
+                'Partial XML document received. Attempting to build complete alert.'
+            );
+        }
+
+        // Log XML errors for further debugging.
+        $this->logXmlErrors();
+
+        return false;
+    }
+
+    /**
+     * Validates the XML namespace.
+     *
+     * @param SimpleXMLElement $xml The XML element to check.
+
+     * @return bool Returns true if the namespace is valid, false otherwise.
+     */
+    private function isValidNamespace(SimpleXMLElement $xml): bool
+    {
+        $namespaces = $xml->getNamespaces();
+        $currentNamespace = $namespaces[''];
+
+        if (self::$XML_NAMESPACE !== $currentNamespace) {
             $this->logger->info(
-                "Unexpected namespace '{capNamespace}'.
-                Expecting namespace '{xmlNamespace}'.",
+                "Unexpected namespace: {capNamespace}. Expected: {xmlNamespace}.",
                 [
-                    'capNamespace' => $capNamespace,
+                    'capNamespace' => $currentNamespace,
                     'xmlNamespace' => self::$XML_NAMESPACE,
                 ]
             );
             return false;
         }
 
-        return $xml;
+        return true;
     }
 
     /**
