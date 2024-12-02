@@ -71,7 +71,7 @@ class NaadRepositoryClient
      *
      * @return string The constructed URL.
      */
-    public function getURL(array $reference)
+    protected function getURL(array $reference)
     {
         // Extract and sanitize values from the reference array.
         $date = strtok($reference['sent'], 'T');
