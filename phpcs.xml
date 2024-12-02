@@ -1,9 +1,15 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="NaadConnectorStandard">
     <description>Naad Connector coding standard.</description>
+
     <rule ref="PEAR">
+        <!-- Exclude specific rules that are not applicable -->
         <exclude name="PEAR.Commenting.FileComment.Missing"/>
         <exclude name="PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
         <exclude name="PEAR.NamingConventions.ValidFunctionName.PrivateNoUnderscore"/>
     </rule>
+
+    <!-- apply only to the ./src and ./tests directories -->
+    <file>src</file>
+    <file>tests</file>
 </ruleset>
