@@ -105,16 +105,6 @@ class NaadSocketClient
                     $rawXml                 = $this->repositoryClient->fetchAlert(
                         $alert
                     );
-
-                    // if the type of the response is not string, print out the response.
-                    if (!is_string($rawXml)) {
-                    // show the type of $rawXml
-                    error_log('RESPONSE TYPE: ' . gettype($rawXml));
-                    error_log('*********************************************************');
-                    error_log('ALERT' . print_r($alert));
-                    error_log('RAW XML TO BE VALIDATED: ' .$rawXml);
-                    error_log('*********************************************************');
-                    }
                     $xml = $this->validateResponse($rawXml);
                     if ($xml) {
                         $result = $this->insertAlert($xml);
@@ -178,80 +168,47 @@ class NaadSocketClient
      * @return bool|SimpleXMLElement Returns SimpleXMLElement on success,
      *                               false otherwise.
      */
-    protected function validateResponse(string $response): bool|SimpleXMLElement
+    protected function validateResponse( string $response ): bool|SimpleXMLElement
     {
-        // Return false if the response is null or empty.
-        if (empty($response) ) {
-            return false;
-        }
-
-        // Append the response to the current output.
         $this->currentOutput .= $response;
 
-        // Attempt to load the current output as XML.
         $xml = simplexml_load_string($this->currentOutput);
 
         // Current output is not a valid XML document.
         if (false === $xml ) {
-            return $this->handleInvalidXml();
-        }
-
-        // Validate the XML namespace.
-        if (!$this->isValidNamespace($xml)) {
+            /**
+             * </alert> indicates the end of an alert XML document,
+             * clear current output for the next response.
+             */
+            if (str_ends_with(trim($this->currentOutput), '</alert>') ) {
+                $this->logger->error('Invalid XML document received.');
+                $this->currentOutput = '';
+            } else {
+                $this->logger->debug(
+                    'Partial XML document received. ' .
+                    'Attempting to build complete alert.'
+                );
+            }
+            $this->logXmlErrors();
             return false;
         }
 
-        return $xml; // Return the valid SimpleXMLElement.
-
-    }
-
-    /**
-     * Handles the case where the XML is invalid.
-     *
-     * @return bool Returns false after logging the error.
-     */
-    protected function handleInvalidXml(): bool
-    {
-        // Check if the current output ends with the closing alert tag.
-        if (str_ends_with(trim($this->currentOutput), '</alert>')) {
-            $this->logger->error('Invalid XML document received.');
-            $this->currentOutput = ''; // Clear output for the next response.
-        } else {
-            $this->logger->debug(
-                'Partial XML document received. Attempting to build complete alert.'
-            );
-        }
-
-        // Log XML errors for further debugging.
-        $this->logXmlErrors();
-
-        return false;
-    }
-
-    /**
-     * Validates the XML namespace.
-     *
-     * @param SimpleXMLElement $xml The XML element to check.
-
-     * @return bool Returns true if the namespace is valid, false otherwise.
-     */
-    private function isValidNamespace(SimpleXMLElement $xml): bool
-    {
-        $namespaces = $xml->getNamespaces();
-        $currentNamespace = $namespaces[''];
-
-        if (self::$XML_NAMESPACE !== $currentNamespace) {
+        // If XML does not have the correct namespace, return false.
+        $namespaces   = $xml->getNamespaces();
+        $capNamespace = $namespaces[''];
+        if (self::$XML_NAMESPACE !== $capNamespace ) {
             $this->logger->info(
-                "Unexpected namespace: {capNamespace}. Expected: {xmlNamespace}.",
+                "Unexpected namespace '{capNamespace}'.
+                Expecting namespace '{xmlNamespace}'.",
                 [
-                    'capNamespace' => $currentNamespace,
+                    'capNamespace' => $capNamespace,
                     'xmlNamespace' => self::$XML_NAMESPACE,
                 ]
             );
             return false;
         }
 
-        return true;
+        return $xml;
     }
 
     /**
