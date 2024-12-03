@@ -35,7 +35,6 @@ final class NaadSocketClientTest extends TestCase {
         libxml_use_internal_errors(true);
         foreach($xmlResponses as $response) {
             $result = $client->handleResponse(file_get_contents( self::XML_TEST_FILE_LOCATION . $response['location'] ));
-           // error_log('INSIDE NAADSOCKETCLIENT TEST RESULT: ---- '. $result);
             $this->assertEquals($response['expected'], $result);
         }
     }
