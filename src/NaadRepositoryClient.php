@@ -47,7 +47,7 @@ class NaadRepositoryClient
      *
      * @throws Exception if an error occurs during the GET request.
      */
-    public function fetchAlert(array $reference): ?string
+    public function fetchAlert(array $reference): string
     {
         try {
             $url = $this->getURL($reference);
