@@ -40,7 +40,7 @@
             "vendor/bin/phpcs"
         ],
         "phpcbf": [
-            "vendor/bin/phpcbf ./src ./tests"
+            "vendor/bin/phpcbf"
         ],
         "test": [
             "vendor/bin/phpunit"
