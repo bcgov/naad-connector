@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use PHPUnit\Framework\Attributes\{
     Test,
@@ -16,12 +14,9 @@ use Bcgov\NaadConnector\{
     DestinationClient,
     NaadRepositoryClient,
     NaadSocketClient,
-    NaadVars,
 };
 use Bcgov\NaadConnector\Entity\Alert;
 
-#[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
-#[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
 /**
  * NaadSocketClientTest Class for testing NaadSocketClient.
  * Uses the \Entity\Alert class.
@@ -32,13 +27,52 @@ use Bcgov\NaadConnector\Entity\Alert;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
+#[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
+#[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
 final class NaadSocketClientTest extends TestCase
 {
 
     const XML_TEST_FILE_LOCATION = './tests/Socket/';
-
+    /**
+     * Tests the handleResponse method of the NaadSocketClient class.
+     *
+     * This test verifies that the handleResponse method correctly processes
+     * various XML responses and returns the expected results. It uses
+     * a data provider to supply different XML response scenarios.
+     *
+     * @param array $xmlResponses An array of XML response data, where each
+     *                            entry contains a 'location' for the XML file
+     *                            and an 'expected' value for assertion.
+     *
+     * @return void
+     */
     #[Test]
     #[DataProvider('handleResponseProvider')]
+    public function testHandleResponse(array $xmlResponses)
+    {
+        $database = $this->createStub(Database::class);
+        $destinationClient = $this->createStub(DestinationClient::class);
+        $logger = $this->createStub(CustomLogger::class);
+        $repositoryClient = $this->createStub(NaadRepositoryClient::class);
+
+        $client = new NaadSocketClient(
+            'test-naad',
+            $destinationClient,
+            $logger,
+            $database,
+            $repositoryClient
+        );
+        libxml_use_internal_errors(true);
+        foreach ($xmlResponses as $response) {
+            $result = $client->handleResponse(
+                file_get_contents(
+                    self::XML_TEST_FILE_LOCATION . $response['location']
+                )
+            );
+            $this->assertEquals($response['expected'], $result);
+        }
+    }
+
     /**
      * Tests the handleResponse method of the NaadSocketClient class.
      *
@@ -46,8 +80,6 @@ final class NaadSocketClientTest extends TestCase
      * It checks if the method correctly handles different types of responses,
      * including single part responses, multi-part responses,
      * and heartbeat responses.
-     *
-     * @dataProvider handleResponseProvider
      *
      * @return array The test responses
      */
@@ -187,7 +219,6 @@ final class NaadSocketClientTest extends TestCase
         $this->assertEquals(true, $result);
     }
 
-    #[Test]
 
     /**
      * Tests the handleResponse method of the NaadSocketClient class when there are
@@ -201,6 +232,7 @@ final class NaadSocketClientTest extends TestCase
      *
      * @return void
      */
+    #[Test]
     public function testHandleResponseExistingMissedAlert()
     {
         $alertXml = file_get_contents(
@@ -237,7 +269,6 @@ final class NaadSocketClientTest extends TestCase
         $this->assertEquals(true, $result);
     }
 
-    #[Test]
     /**
      * Tests the handleResponse method of the NaadSocketClient class when
      * a database  exception occurs.
@@ -250,6 +281,7 @@ final class NaadSocketClientTest extends TestCase
      *
      * @return void
      */
+    #[Test]
     public function testHandleResponseDatabaseException()
     {
         $database = $this->createStub(Database::class);
@@ -276,7 +308,6 @@ final class NaadSocketClientTest extends TestCase
         );
     }
 
-    #[Test]
     /**
      * Tests the handleResponse method of the NaadSocketClient class when the XML
      * response is missing the identifier field.
@@ -288,6 +319,7 @@ final class NaadSocketClientTest extends TestCase
      *
      * @return void
      */
+    #[Test]
     public function testHandleResponseMissingIdentifier()
     {
         $database = $this->createStub(Database::class);
