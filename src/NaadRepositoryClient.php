@@ -43,7 +43,7 @@ class NaadRepositoryClient
      *
      * @param array $reference Heartbeat references array parts (sender, id, sent).
      *
-     * @return string|null The alert response body or null if an error occurs.
+     * @return string The alert response body.
      *
      * @throws Exception if an error occurs during the GET request.
      */
@@ -57,8 +57,7 @@ class NaadRepositoryClient
 
             return (string) $response->getBody();
         } catch (RequestException $e) {
-            error_log("Request failed: " . $e->getMessage());
-            return null;
+            throw new \Exception("Request failed: " . $e->getMessage());
         }
     }
 
