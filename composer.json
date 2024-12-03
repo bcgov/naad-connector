@@ -37,7 +37,7 @@
             "kubectl delete -k deployments/kustomize/overlays/local"
         ],
         "phpcs": [
-            "vendor/bin/phpcs ./src ./tests"
+            "vendor/bin/phpcs"
         ],
         "phpcbf": [
             "vendor/bin/phpcbf ./src ./tests"
