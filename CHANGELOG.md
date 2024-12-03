@@ -2,6 +2,11 @@
 
 ## 1.0.0
 
+### DEC 3, 2024
+- use Guzzle instead of CURL for NaadRepositoryClient
+- Refactor NaadSocketClient to fix failing tests
+- fix null bug in Repository Client
+
 ### Nov 27, 2024
 
 - ([DESCW-2739](https://citz-gdx.atlassian.net/browse/DESCW-2739))
