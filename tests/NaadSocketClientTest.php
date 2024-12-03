@@ -166,7 +166,11 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient
             ->expects($this->exactly(10))
             ->method('fetchAlert')
-            ->willReturn( file_get_contents( self::XML_TEST_FILE_LOCATION . 'complete-alert.xml'));
+            ->willReturn(
+                file_get_contents(
+                    self::XML_TEST_FILE_LOCATION . 'complete-alert.xml'
+                )
+            );
 
         $client = new NaadSocketClient(
             'test-naad',
