@@ -47,15 +47,13 @@ class NaadRepositoryClient
      *
      * @throws Exception if an error occurs during the GET request.
      */
-    public function fetchAlert(array $reference): ?string
-    {
-        $url = $this->getURL($reference);
-        $this->client = new Client();
-
+    public function fetchAlert(array $reference): ?string {
         try {
+            $url = $this->getURL($reference);
+            $this->client = new Client();
             $response = $this->client->get($url);
-
-            return (string) $response->getBody();
+            $responseBody = (string) $response->getBody();
+            return $responseBody;
         } catch (RequestException $e) {
             throw new \Exception("Request failed: " . $e->getMessage());
         }

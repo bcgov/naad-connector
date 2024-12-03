@@ -105,6 +105,16 @@ class NaadSocketClient
                     $rawXml                 = $this->repositoryClient->fetchAlert(
                         $alert
                     );
+
+                    // if the type of the response is not string, print out the response.
+                    if (!is_string($rawXml)) {
+                    // show the type of $rawXml
+                    error_log('RESPONSE TYPE: ' . gettype($rawXml));
+                    error_log('*********************************************************');
+                    error_log('ALERT' . print_r($alert));
+                    error_log('RAW XML TO BE VALIDATED: ' .$rawXml);
+                    error_log('*********************************************************');
+                    }
                     $xml = $this->validateResponse($rawXml);
                     if ($xml) {
                         $result = $this->insertAlert($xml);
@@ -168,7 +178,7 @@ class NaadSocketClient
      * @return bool|SimpleXMLElement Returns SimpleXMLElement on success,
      *                               false otherwise.
      */
-    protected function validateResponse(?string $response): bool|SimpleXMLElement
+    protected function validateResponse(string $response): bool|SimpleXMLElement
     {
         // Return false if the response is null or empty.
         if (empty($response) ) {
