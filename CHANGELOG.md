@@ -2,6 +2,12 @@
 
 ## 1.0.0
 
+### DEC 4, 2024
+
+- [DESCW-2792](https://citz-gdx.atlassian.net/browse/DESCW-2792)
+  - add .dockerignore
+  - cleanup Dockerfile
+
 ### DEC 3, 2024
 
 - [DESCW-2793](https://citz-gdx.atlassian.net/browse/DESCW-2793)
