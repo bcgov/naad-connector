@@ -1,9 +1,28 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="NaadConnectorStandard">
     <description>Naad Connector coding standard.</description>
+
+    <!-- apply only to the ./src and ./tests directories -->
+    <file>src</file>
+    <file>tests</file>
+
+	<!-- How to scan -->
+	<!-- Usage instructions: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
+	<!-- Annotated ruleset: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
+	<arg value="sp"/> <!-- Show sniff and progress -->
+	<arg name="basepath" value="./"/><!-- Strip the file paths down to the relevant bit -->
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/><!-- Enables parallel processing when available for faster results. -->
+
+    <!-- ruleset -->
     <rule ref="PEAR">
+
+        <!-- Exclude specific rules that are not applicable -->
         <exclude name="PEAR.Commenting.FileComment.Missing"/>
         <exclude name="PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
         <exclude name="PEAR.NamingConventions.ValidFunctionName.PrivateNoUnderscore"/>
+
     </rule>
+
 </ruleset>

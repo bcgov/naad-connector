@@ -37,11 +37,10 @@
             "kubectl delete -k deployments/kustomize/overlays/local"
         ],
         "phpcs": [
-            "# show the rule that is being applied using the -s flag",
-            "vendor/bin/phpcs ./src -s"
+            "vendor/bin/phpcs"
         ],
         "phpcbf": [
-            "vendor/bin/phpcbf ./src"
+            "vendor/bin/phpcbf"
         ],
         "test": [
             "vendor/bin/phpunit"
