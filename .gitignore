@@ -1,9 +1,23 @@
+# Ignore operating system files
 .DS_Store
+Thumbs.db
+
+# Ignore vendor files
 /vendor/
+
+# Ignore testing files
 coverage/
 .phpunit.cache/
-naad-socket.log
 .phpunit.result.cache
+
+# Ignore logs
+naad-socket.log
+
+# Ignore IDE files
 .vscode
 .env
 .devcontainer/override.env
+
+# Ignore documentation files
+/docs/
+.phpdoc
