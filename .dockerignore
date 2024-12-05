@@ -15,6 +15,13 @@ vendor
 node_modules
 Dockerfile
 docker-compose.yaml
+.devcontainer
+.DS_Store
+.env
+.github
+.gitignore
+.phpunit.cache
+.phpunit.result.cache
 
 # only allow these paths in the Dockerfile
 #src
