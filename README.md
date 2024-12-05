@@ -52,7 +52,7 @@ kubectl config use-context docker-desktop
 docker build -t bcgovgdx/naad-app .
 kubectl apply -k deployments/kustomize/overlays/local
 # or use composer instead:
-composer startpods
+composer k8s-start
 ```
 
 **Note:** Kubernetes must be enabled in Docker Desktop.

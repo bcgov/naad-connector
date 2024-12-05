@@ -4,8 +4,7 @@
 
 ### DEC 5, 2024
 
-[DESCW-2792](https://citz-gdx.atlassian.net/browse/DESCW-2786)
-
+- [DESCW-2792](https://citz-gdx.atlassian.net/browse/DESCW-2786)
 - add the ability to generate documentation using phpDocumentor
 - add script in composer.json to generate documentation
 - add script in composer.json to view documentation
