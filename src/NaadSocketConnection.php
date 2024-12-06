@@ -37,7 +37,7 @@ class NaadSocketConnection
      * @param string            $socketUrl         The URL of the NAAD socket to
      *                                             connect to.
      * @param DestinationClient $destinationClient An instance of DestinationClient.
-     * @param NaadSocketClient $socketClient An instance of NaadSocketClient.
+     * @param NaadSocketClient  $socketClient      An instance of NaadSocketClient.
      * @param Logger            $logger            An instance of Monolog/Logger.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
