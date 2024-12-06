@@ -73,7 +73,6 @@ class NaadVars
         'destinationURL' => 'DESTINATION_URL',
         'destinationUser' => 'DESTINATION_USER',
         'destinationPassword' => 'DESTINATION_PASSWORD',
-        'logFilePath' => 'LOG_FILE_PATH',
         'naadName' => 'NAAD_NAME',
         'naadUrl' => 'NAAD_URL',
         'naadRepoUrl' => 'NAAD_REPO_URL',

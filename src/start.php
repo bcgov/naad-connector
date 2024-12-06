@@ -2,7 +2,9 @@
 require_once 'vendor/autoload.php';
 
 use Bcgov\NaadConnector\CustomLogger;
+use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\DestinationClient;
+use Bcgov\NaadConnector\NaadSocketClient;
 use Bcgov\NaadConnector\NaadSocketConnection;
 use Bcgov\NaadConnector\NaadVars;
 
@@ -19,15 +21,21 @@ $destinationClient = new DestinationClient(
 // Create a custom logger for the NaadSocketConnection
 $socketLogger = new CustomLogger(
     'NaadSocketConnection',
-    'info',
-    $naadVars->logFilePath
+    'info'
 );
 
+$socketClient = new NaadSocketClient(
+    $naadVars->naadName,
+    $destinationClient,
+    $socketLogger,
+    new Database()
+);
 
 $connector    = new NaadSocketConnection(
     $naadVars->naadName,
     $naadVars->naadUrl,
     $destinationClient,
+    $socketClient,
     $socketLogger
 );
 

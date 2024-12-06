@@ -11,7 +11,7 @@ coverage/
 .phpunit.result.cache
 
 # Ignore logs
-naad-socket.log
+heartbeat.log
 
 # Ignore IDE files
 .vscode
