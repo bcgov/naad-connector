@@ -34,8 +34,6 @@ namespace Bcgov\NaadConnector;
  * endpoint requests with.
  * @property-read string $destinationPassword The password to authenticate the
  * endpoint requests with.
- * @property-read string $logFilePath The path to the file which will hold the
- * socket connection logs.
  * @property-read string $naadName The instance of NAAD the application is
  * connecting to, eg. NAAD-1, NAAD-2.
  * @property-read string $naadUrl The URL of the NAAD endpoint the application
@@ -56,7 +54,6 @@ class NaadVars
     private ?string $destinationURL;
     private ?string $destinationUser;
     private ?string $destinationPassword;
-    private ?string $logFilePath;
     private ?string $naadName;
     private ?string $naadUrl;
     private ?string $naadRepoUrl;
@@ -83,7 +80,6 @@ class NaadVars
      * variables are not defined.
      */
     private static array $defaultValues = [
-        'logFilePath'  => 'naad-socket.log',
         'naadName'     => 'NAAD-1',
         'naadUrl'      => 'streaming1.naad-adna.pelmorex.com',
         'naadRepoUrl'  => 'capcp1.naad-adna.pelmorex.com'
