@@ -31,6 +31,8 @@ class NaadSocketClient
 
     protected const HEARTBEAT_FILE_PATH = 'heartbeat.log';
 
+    protected string $HEARTBEAT_FILE_PATH = 'heartbeat.log';
+
     /**
      * The name of the NAAD connection instance.
      *

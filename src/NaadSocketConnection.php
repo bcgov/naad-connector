@@ -111,12 +111,6 @@ class NaadSocketConnection
         }
 
         $this->logger->info('Listening for socket messages...');
-        $socketClient = new NaadSocketClient(
-            $this->name,
-            $this->destinationClient,
-            $this->logger,
-            $this->database
-        );
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
             // Enables error XML error reporting (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
