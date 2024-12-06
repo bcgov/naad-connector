@@ -23,6 +23,8 @@ class NaadSocketConnection
     protected string $address;
 
     protected int $port;
+    
+    protected Database $database;
 
     protected Logger $logger;
 
@@ -37,6 +39,7 @@ class NaadSocketConnection
      *                                             connect to.
      * @param DestinationClient $destinationClient An instance of DestinationClient.
      * @param Logger            $logger            An instance of Monolog/Logger.
+     * @param Database          $database          The Database for storing alerts.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
      */
@@ -45,12 +48,14 @@ class NaadSocketConnection
         string $socketUrl,
         DestinationClient $destinationClient,
         Logger $logger,
+        Database $database,
         int $port = 8080,
     ) {
         $this->name              = $name;
         $this->address           = $socketUrl;
         $this->destinationClient = $destinationClient;
         $this->logger            = $logger;
+        $this->database          = $database;
         $this->port              = $port;
     }
 
@@ -106,7 +111,7 @@ class NaadSocketConnection
             $this->name,
             $this->destinationClient,
             $this->logger,
-            new Database()
+            $this->database
         );
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
             // Enables error XML error reporting (used by libxml_get_errors()).

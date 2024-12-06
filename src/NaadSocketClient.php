@@ -92,72 +92,87 @@ class NaadSocketClient
 
         if ($this->isHeartbeat($xml) ) {
             $this->logger->info('Heartbeat received.');
-                $missedAlerts = $this->findMissedAlerts($xml);
+            $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0 ) {
                 $repoUrl = $naadVars->naadRepoUrl;
                 $this->logger->info(
                     'Found {count} missing alerts in heartbeat. '
-                        . 'Fetching from NAAD repository ({repoUrl}).',
+                    . 'Fetching from NAAD repository ({repoUrl}).',
                     [ 'count' => count($missedAlerts), 'repoUrl' => $repoUrl ]
                 );
                 foreach ( $missedAlerts as $alert ) {
                     $this->currentOutput = '';
-                    $rawXml                 = $this->repositoryClient->fetchAlert(
-                        $alert
-                    );
+                    $rawXml = $this->repositoryClient->fetchAlert($alert);
                     $xml = $this->validateResponse($rawXml);
                     if ($xml) {
-                        $result = $this->insertAlert($xml);
+                        $this->processAlert($xml);
                     }
                 }
             }
         } else {
-            $this->insertAlert($xml);
-            $result = $this->destinationClient->sendRequest($this->currentOutput);
-            $this->logger->info(
-                '{result}',
-                [
-                    'result' => $result,
-                ]
-            );
+            $this->processAlert($xml);
         }
+
         $this->currentOutput = '';
         return true;
     }
 
     /**
-     * Inserts an Alert into the database.
+     * Processes an alert by sending it to the destination
+     * and inserting it into the database.
      *
-     * @param SimpleXMLElement $xml XML of the Alert.
+     * This method:
+     * - Parses the alert from the given XML.
+     * - Sends the alert to the configured destination using the DestinationClient.
+     * - Updates the alert's success status and failure count based on the response.
+     * - Inserts the updated alert into the database.
+     *
+     * @param SimpleXMLElement $xml The XML representation of the alert.
      *
      * @return void
+     *
+     * @throws \Exception If the alert cannot be parsed
+     * or inserted into the database.
      */
-    protected function insertAlert( SimpleXMLElement $xml )
+    protected function processAlert( SimpleXMLElement $xml )
     {
         $alert = null;
 
+        // Try to parse the XML into an alert.
         try {
             $alert = Alert::fromXml($xml);
-        } catch(Exception $e) {
-            $alertId = $alert ? $alert->getId() : 'unknown';
-            $this->logger->critical($e->getMessage());
+        } catch ( Exception $e ) {
             $this->logger->critical(
-                'Could not parse alert XML.'
+                'Could not parse alert XML: ' . $e->getMessage()
             );
             throw $e;
         }
+
+        // Try to insert the alert into the database.
         try {
             $this->database->insertAlert($alert);
-        } catch ( Exception $e ) {
-            $alertId = $alert ? $alert->getId() : 'unknown';
-            $this->logger->critical($e->getMessage());
+            $this->logger->info(
+                'Inserted Alert ({id}).',
+                [ 'id' => $alert->getId() ]
+            );
+        } catch (Exception $e) {
             $this->logger->critical(
-                'Could not connect to database or insert Alert ({id}).',
-                [ 'id' => $alertId ]
+                'Could not connect to database or insert Alert ({id}): {error}',
+                [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
             );
             throw $e;
         }
-        $this->logger->info('Inserted Alert ({id}).', [ 'id' => $alert->getId() ]);
+
+        // Try to send alerts to the destination.
+        try {
+            $this->destinationClient->sendAlerts($alert);
+        } catch (Exception $e) {
+            $this->logger->critical(
+                'Could not update alerts: {error}',
+                [ 'error' => $e->getMessage() ]
+            );
+            throw $e;
+        }
     }
 
     /**
