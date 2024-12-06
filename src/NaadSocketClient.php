@@ -27,7 +27,9 @@ class NaadSocketClient
      *
      * @var string
      */
-    protected static string $XML_NAMESPACE = 'urn:oasis:names:tc:emergency:cap:1.2';
+    protected const XML_NAMESPACE = 'urn:oasis:names:tc:emergency:cap:1.2';
+
+    protected const HEARTBEAT_FILE_PATH = 'heartbeat.log';
 
     /**
      * The name of the NAAD connection instance.
@@ -88,11 +90,12 @@ class NaadSocketClient
             return false;
         }
 
-        $xml->registerXPathNamespace('x', self::$XML_NAMESPACE);
+        $xml->registerXPathNamespace('x', self::XML_NAMESPACE);
 
         if ($this->isHeartbeat($xml) ) {
             $this->logger->info('Heartbeat received.');
-                $missedAlerts = $this->findMissedAlerts($xml);
+            $this->touchHeartbeatFile();
+            $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0 ) {
                 $repoUrl = $naadVars->naadRepoUrl;
                 $this->logger->info(
@@ -230,12 +233,12 @@ class NaadSocketClient
         $namespaces = $xml->getNamespaces();
         $currentNamespace = $namespaces[''];
 
-        if (self::$XML_NAMESPACE !== $currentNamespace) {
+        if (self::XML_NAMESPACE !== $currentNamespace) {
             $this->logger->info(
                 "Unexpected namespace: {capNamespace}. Expected: {xmlNamespace}.",
                 [
                     'capNamespace' => $currentNamespace,
-                    'xmlNamespace' => self::$XML_NAMESPACE,
+                    'xmlNamespace' => self::XML_NAMESPACE,
                 ]
             );
             return false;
@@ -257,6 +260,17 @@ class NaadSocketClient
             '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
         );
         return ! empty($sender);
+    }
+
+    /**
+     * Touches the heartbeat file in order to set its last modified date for
+     * liveness probe.
+     *
+     * @return void
+     */
+    protected function touchHeartbeatFile()
+    {
+        touch(self::HEARTBEAT_FILE_PATH);
     }
 
     /**

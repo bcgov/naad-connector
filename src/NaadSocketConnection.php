@@ -1,7 +1,6 @@
 <?php
 namespace Bcgov\NaadConnector;
 
-use Bcgov\NaadConnector\Database;
 use Monolog\Logger;
 
 /**
@@ -28,6 +27,8 @@ class NaadSocketConnection
 
     protected DestinationClient $destinationClient;
 
+    protected NaadSocketClient $socketClient;
+
     /**
      * Constructor for NaadClient.
      *
@@ -36,6 +37,7 @@ class NaadSocketConnection
      * @param string            $socketUrl         The URL of the NAAD socket to
      *                                             connect to.
      * @param DestinationClient $destinationClient An instance of DestinationClient.
+     * @param NaadSocketClient  $socketClient      An instance of NaadSocketClient.
      * @param Logger            $logger            An instance of Monolog/Logger.
      * @param integer           $port              The port of the NAAD socket to
      *                                             connect to.
@@ -44,12 +46,14 @@ class NaadSocketConnection
         string $name,
         string $socketUrl,
         DestinationClient $destinationClient,
+        NaadSocketClient $socketClient,
         Logger $logger,
         int $port = 8080,
     ) {
         $this->name              = $name;
         $this->address           = $socketUrl;
         $this->destinationClient = $destinationClient;
+        $this->socketClient      = $socketClient;
         $this->logger            = $logger;
         $this->port              = $port;
     }
@@ -102,17 +106,11 @@ class NaadSocketConnection
         }
 
         $this->logger->info('Listening for socket messages...');
-        $socketClient = new NaadSocketClient(
-            $this->name,
-            $this->destinationClient,
-            $this->logger,
-            new Database()
-        );
         while ( $out = socket_read($socket, self::$MAX_MESSAGE_SIZE) ) {
             // Enables error XML error reporting (used by libxml_get_errors()).
             $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
 
-            $socketClient->handleResponse($out);
+            $this->socketClient->handleResponse($out);
 
             // Sets XML error reporting back to its original value.
             libxml_use_internal_errors($previousUseInternalErrorsValue);
