@@ -11,24 +11,28 @@ use Bcgov\NaadConnector\NaadVars;
 // Get environment variables for configuring a socket connection.
 $naadVars = new NaadVars();
 
+// Create a new Database instance.
+$database = new Database();
+
 // Create a new DestinationClient instance with the provided configuration.
 $destinationClient = new DestinationClient(
     $naadVars->destinationURL,
     $naadVars->destinationUser,
     $naadVars->destinationPassword,
+    $database
 );
 
 // Create a custom logger for the NaadSocketConnection
 $socketLogger = new CustomLogger(
     'NaadSocketConnection',
-    'info'
+    'info',
 );
 
 $socketClient = new NaadSocketClient(
     $naadVars->naadName,
     $destinationClient,
     $socketLogger,
-    new Database()
+    $database
 );
 
 $connector    = new NaadSocketConnection(
@@ -36,9 +40,8 @@ $connector    = new NaadSocketConnection(
     $naadVars->naadUrl,
     $destinationClient,
     $socketClient,
-    $socketLogger
+    $socketLogger,
 );
 
 return $connector->connect();
-
 
