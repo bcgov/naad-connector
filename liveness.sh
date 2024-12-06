@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LAST_MODIFIED=$(date -r $LOG_FILE_PATH +%s)
+LAST_MODIFIED=$(date -r heartbeat.log +%s)
 CURRENT=$(date +%s)
 
 # If the log file hasn't been modified in the last 2 minutes, liveness fails.

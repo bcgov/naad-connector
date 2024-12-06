@@ -23,14 +23,12 @@ class CustomLogger extends Logger
      *
      * @param string $channelName The name of the logging channel.
      * @param string $level       The minimum logging level to record.
-     * @param string $logFilePath The path to the log file to write to.
      *
      * @return Logger
      */
     public function __construct(
         string $channelName = 'monolog',
-        string $level = 'info',
-        string $logFilePath = './naad-socket.log'
+        string $level = 'info'
     ) {
         $processors = [
             new PsrLogMessageProcessor(),
@@ -39,7 +37,6 @@ class CustomLogger extends Logger
         $logLevel = self::_convertLogLevel($level);
         $handlers = [
             new StreamHandler('php://stdout', $logLevel),
-            new StreamHandler($logFilePath, $logLevel)
         ];
 
         parent::__construct($channelName, $handlers, $processors);

@@ -1,11 +1,14 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use Bcgov\NaadConnector\Entity\Alert;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectException;
 
 /**
- * DestinationClient class makes requests to a destination url.
+ * DestinationClient class makes requests to a destination URL
+ * and logs results in the database.
  *
  * @category Client
  * @package  NaadConnector
@@ -45,56 +48,115 @@ class DestinationClient
     protected Client $client;
 
     /**
+     * The alert Database.
+     *
+     * @var Database
+     */
+    protected Database $database;
+
+    /**
      * Constructor for DestinationClient.
      *
-     * @param string $url                 The url of the destination
-     *                                    (including full API endpoint).
-     * @param string $username            The username of the user to
-     *                                    authenticate with.
-     * @param string $applicationPassword The application password of
-     *                                    the user to authenticate with.
+     * @param string   $url                 The destination API endpoint.
+     * @param string   $username            The username for authentication.
+     * @param string   $applicationPassword The password for authentication.
+     * @param Database $database            Instance of Database for alerts.
      */
     public function __construct(
         string $url,
         string $username,
-        string $applicationPassword
+        string $applicationPassword,
+        Database $database
     ) {
         $this->url                 = $url;
         $this->username            = $username;
         $this->applicationPassword = $applicationPassword;
+        $this->database            = $database;
 
         $this->client = new Client(
             [
-            'base_uri' => $this->url,
-            'auth'     => [$this->username, $this->applicationPassword],
+                'base_uri' => $this->url,
+                'auth'     => [$this->username, $this->applicationPassword],
             ]
         );
     }
 
     /**
-     * Sends an alert request to the destination.
+     * Sends unsent alerts to the destination and updates their statuses.
      *
-     * @param string $xml Raw XML string from alert.
-     *
-     * @return string
+     * @param Alert $placeholder_alert temporary alert for bypassing getUnsentAlerts.
+     * 
+     * @return bool Returns `true` if all alerts were sent successfully,
+     *              `false` if any alert failed to be sent.
      */
-    public function sendRequest( string $xml ): string
+    public function sendAlerts($placeholder_alert): bool
+    {
+        $unsentAlerts = [$placeholder_alert];
+        //$unsentAlerts = $this->database->getUnsentAlerts();
+        $allSuccessful = true; // For later use.
+
+        foreach ( $unsentAlerts as $alert ) {
+            try {
+                $response = $this->sendRequest($alert->getBody());
+        
+                if (200 === $response['status_code']) {
+                    $alert->setSuccess(true);
+                    
+                } else {
+                    $alert->incrementFailures();
+                    $alert->setSuccess(false);
+                    $allSuccessful = false;
+                }
+
+                $alert->setSendAttempted(new \DateTime());
+                $this->database->updateAlert($alert);
+            } catch ( Exception $e ) {
+                throw $e;
+            }
+        }
+
+        return $allSuccessful;
+    }
+
+    /**
+     * Sends an alert request to the destination and returns the response.
+     *
+     * @param string $xml Raw XML string from the alert.
+     *
+     * @return array Returns an associative array with the following keys:
+     *               - 'status_code' (int): The HTTP status code of the response.
+     *               - 'body' (string): The body of the response.
+     *
+     * @throws RequestException If the request fails and no response is available.
+     */
+    public function sendRequest(string $xml): array
     {
         try {
             $response = $this->client->post(
                 '', [
-                'json' => ['xml' => $xml],
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                ],
+                    'json'    => ['xml' => $xml],
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                    ],
                 ]
             );
-
-            return (string) $response->getBody();
+    
+            return [
+                'status_code' => $response->getStatusCode(),
+                'body'        => (string) $response->getBody(),
+            ];
+        } catch ( ConnectException $e ) {
+            return [
+                'status_code' => 0,
+                'body'        => 'Connection error: ' . $e->getMessage(),
+            ];
         } catch (RequestException $e) {
-            // Log or handle the exception.
+            // Handle other HTTP errors
             if ($e->hasResponse()) {
-                return (string) $e->getResponse()->getBody();
+                return [
+                    'status_code' => $e->getResponse()->getStatusCode(),
+                    'body'        => (string) $e->getResponse()->getBody(),
+                ];
             }
 
             throw $e;

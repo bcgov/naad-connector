@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+>
+
+    <title>phpDocumentor</title>
+    <!-- Output goes in ./docs -->
+    <paths>
+        <output>docs/</output>
+    </paths>
+    <version number="1.0.0">
+        <api format="php">
+            <!-- target the ./src directory for generating docs -->
+            <source dsn=".">
+                <path>src</path>
+            </source>
+            <!-- Ignore the vendor files -->
+            <ignore hidden="true" symlinks="true">
+                <path>vendor/**/*</path>
+            </ignore>
+        </api>
+    </version>
+</phpdocumentor>
