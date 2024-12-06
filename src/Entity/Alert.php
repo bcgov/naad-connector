@@ -31,16 +31,16 @@ class Alert
     private string $body;
 
     #[ORM\Column]
-    private DateTime $received;
+    private ?DateTime $received = null;
 
     #[ORM\Column]
-    private DateTime $send_attempted;
+    private ?DateTime $send_attempted = null;
 
     #[ORM\Column]
-    private int $failures;
+    private int $failures = 0;
 
     #[ORM\Column]
-    private bool $success;
+    private bool $success = false;
     // phpcs:enable PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore
 
     /**
@@ -140,7 +140,7 @@ class Alert
      */
     public function getFailures(): int
     {
-        return $this->failures;
+        return $this->failures ?? 0;
     }
 
     /**
@@ -157,13 +157,23 @@ class Alert
     }
 
     /**
+     * Increments the number of failures.
+     * 
+     * @return void
+     */
+    public function incrementFailures(): void
+    {
+        $this->failures = ( $this->failures ?? 0 ) + 1;
+    }
+
+    /**
      * Gets the success status.
      *
      * @return bool
      */
     public function getSuccess(): bool
     {
-        return $this->success;
+        return $this->success ?? false;
     }
 
     /**

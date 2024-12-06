@@ -53,7 +53,7 @@ class NaadSocketConnection
         $this->name              = $name;
         $this->address           = $socketUrl;
         $this->destinationClient = $destinationClient;
-        $this->socketClient      = $socketClient;
+        $this->socketClient = $socketClient;
         $this->logger            = $logger;
         $this->port              = $port;
     }

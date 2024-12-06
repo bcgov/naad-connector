@@ -96,6 +96,30 @@ class Database
     }
 
     /**
+     * Updates an alert's status in the database.
+     *
+     * @param Alert $alert The alert to update.
+     *
+     * @return void
+     */
+    public function updateAlert(Alert $alert): void
+    {
+        $existingAlert = $this->entityManager->find(Alert::class, $alert->getId());
+
+        if ($existingAlert) {
+            $existingAlert->setSuccess($alert->getSuccess());
+            $existingAlert->setSendAttempted($alert->getSendAttempted());
+            $existingAlert->setFailures($alert->getFailures());
+        } else {
+            throw new \RuntimeException(
+                'Alert not found for update: ' . $alert->getId()
+            );
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
      * Gets alerts from the database by an array of ids.
      *
      * @param array $ids The array of alert ids.
@@ -108,5 +132,17 @@ class Database
         $alerts          = $alertRepository->findBy([ 'id' => $ids ]);
         $this->entityManager->flush();
         return $alerts;
+    }
+
+    /**
+     * Placeholder for fetching unsent alerts from the database.
+     *
+     * @return array Returns an array of Alert entities.
+     */
+    public function getUnsentAlerts(): array
+    {
+        // To be implemented: query for alerts where success = false
+        // and send_attempted is null (or older than a specific threshold ?).
+        return [];
     }
 }

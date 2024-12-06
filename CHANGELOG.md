@@ -2,6 +2,10 @@
 
 ## 1.0.0
 
+### DEC 06, 2024
+
+- Update alerts table using request results ([DESCW-2765](https://citz-gdx.atlassian.net/browse/DESCW-2765))
+
 ### DEC 5, 2024
 
 - [DESCW-2792](https://citz-gdx.atlassian.net/browse/DESCW-2786)
