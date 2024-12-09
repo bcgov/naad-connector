@@ -133,26 +133,4 @@ final class NaadVarsTest extends TestCase
         $this->assertSame('test.naad_repo_url.com', $naadVars->naadRepoUrl);
     }
 
-    /**
-     * Clean up the test environment by reloading the original .env file
-     * and restoring environment variables.
-     *
-     * This method is called after each test to ensure a consistent
-     * test environment for subsequent tests.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        // Reload the original .env file from the root directory
-        $dotenv = Dotenv::createMutable(dirname(__DIR__));
-        $dotenv->load();
-
-        // Override environment variables manually to restore the original state
-        foreach ($_ENV as $key => $value) {
-            putenv("$key=$value");
-        }
-    }
 }
