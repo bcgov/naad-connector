@@ -32,6 +32,9 @@ services:
       - naad_deploy
 
   naad-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: bcgovgdx/naad-app
     environment:
       DESTINATION_URL: ${DESTINATION_URL:-https://0.0.0.0/wp-json/naad/v1/alert}
@@ -57,6 +60,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
+    platform: linux/amd64
     depends_on:
       naad-app:
         condition: service_started
