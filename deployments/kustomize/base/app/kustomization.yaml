@@ -23,7 +23,7 @@ configMapGenerator:
     - NAAD_REPO_URL=capcp2.naad-adna.pelmorex.com
   - name: naad-shared-config
     literals:
-    - DESTINATION_URL=https://localhost/wp-json/naad/v1/alert
+    - DESTINATION_URL="http://local:38080/embc/wp-json/naad/v1/alert"
     - DESTINATION_USER=naadbot
 
 secretGenerator:

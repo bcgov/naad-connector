@@ -2,6 +2,13 @@
 
 ## 1.0.0
 
+### DEC 09, 2024
+
+- [DESCW-2741](https://citz-gdx.atlassian.net/browse/DESCW-2741)
+- Dockerfile changed to use /app directory instead of /var/www/html (best practices)
+- Dockerfile cleanup
+- Readme updated to reflect changes to how we build this app for development
+
 ### DEC 06, 2024
 
 - Update alerts table using request results ([DESCW-2765](https://citz-gdx.atlassian.net/browse/DESCW-2765))

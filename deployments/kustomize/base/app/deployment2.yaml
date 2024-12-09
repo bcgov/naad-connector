@@ -35,6 +35,6 @@ spec:
           livenessProbe:
             exec:
               command:
-              - /var/www/html/liveness.sh
+              - /app/liveness.sh
             initialDelaySeconds: 60
             periodSeconds: 60

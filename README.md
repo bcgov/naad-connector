@@ -23,23 +23,15 @@ To run in the devcontainer (see .devcontainer/ directory):
     - `composer migrate` to run database migrations
     - `composer phpdoc` to generate project documentation
 
-#### Docker deployment
-
-```zsh
-# build only
-composer build
-
-# build and run
-composer start
-```
-
-- note: _It is no longer possible to run this app from docker because the database requires either docker-compose or K8s deployments in order to manage database migrations and logging._
-
 #### Docker Compose deployment
 
 - Prerequisites: rename the `./sample-env` to `.env` and fill in the values for local use only.
 
 ```shell
+# build and run
+docker compose up --build
+
+# run using known good app image build
 docker compose up
 ```
 
@@ -47,10 +39,11 @@ docker compose up
 
 To build and run in Kubernetes via Docker Desktop, follow these steps:
 
-```sh
+```shell
 kubectl config use-context docker-desktop
 docker build -t bcgovgdx/naad-app .
 kubectl apply -k deployments/kustomize/overlays/local
+
 # or use composer instead:
 composer k8s-start
 ```
@@ -59,8 +52,9 @@ composer k8s-start
 
 Stopping (deleting) all pods will destroy all alerts in the database. To stop all pods, run:
 
-```sh
+```shell
 kubectl delete -k deployments/kustomize/overlays/local
+
 # or use composer instead:
 composer k8s-delete
 ```
@@ -82,7 +76,7 @@ After deployment, PHPMyAdmin will be accessible at the following local addresses
 
 #### OpenShift Build
 
-```zsh
+```shell
 # Change to the correct namespace
 oc project 12345-tools
 
@@ -95,7 +89,7 @@ oc start-build naad-app --follow --namespace=12345-tools
 
 #### OpenShift Deploy
 
-```zsh
+```shell
 # Change to the correct namespace
 oc project 12345-tools
 
