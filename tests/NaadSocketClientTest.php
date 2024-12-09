@@ -29,6 +29,7 @@ use Bcgov\NaadConnector\Entity\Alert;
  */
 #[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
 #[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
+#[UsesClass('Bcgov\NaadConnector\NaadVars')]
 final class NaadSocketClientTest extends TestCase
 {
 
