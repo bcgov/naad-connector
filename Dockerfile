@@ -26,7 +26,6 @@ RUN chmod +x /app/entrypoint.sh
 RUN useradd -ms /bin/bash appuser \
     && mkdir /app/vendor \
     && touch /app/heartbeat.log \
-    && chown 1001:1001 heartbeat.log \
     && chown -R appuser:appuser /app
 
 # Switch to non-root user
