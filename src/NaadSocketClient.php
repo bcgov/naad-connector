@@ -176,9 +176,6 @@ class NaadSocketClient
             );
             throw $e;
         }
-
-            $this->destinationClient->sendAlerts();
-
     }
 
     /**
