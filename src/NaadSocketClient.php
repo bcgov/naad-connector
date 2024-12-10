@@ -168,7 +168,7 @@ class NaadSocketClient
 
         // Try to send alerts to the destination.
         try {
-            $this->destinationClient->sendAlerts($alert);
+            $this->destinationClient->sendAlerts();
         } catch (Exception $e) {
             $this->logger->critical(
                 'Could not update alerts: {error}',
