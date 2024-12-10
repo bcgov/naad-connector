@@ -4,6 +4,7 @@
 
 ### DEC 09, 2024
 
+- Send undelivered alerts from database [DESCW-2766](https://citz-gdx.atlassian.net/browse/DESCW-2766)
 - [DESCW-2799](https://citz-gdx.atlassian.net/browse/DESCW-2799)
 - unit tests for the NaadVars class
 - 100% coverage of methods, including constructor

@@ -141,8 +141,29 @@ class Database
      */
     public function getUnsentAlerts(): array
     {
-        // To be implemented: query for alerts where success = false
-        // and send_attempted is null (or older than a specific threshold ?).
-        return [];
+        $retryIntervalMinutes = 5;
+        $now = new \DateTime();
+
+        $query = $this->entityManager->createQuery(
+            'SELECT a
+            FROM Bcgov\NaadConnector\Entity\Alert a
+            WHERE a.success = false
+            AND (
+                a.send_attempted IS NULL OR
+                a.send_attempted < :retryThreshold
+            )'
+        );
+
+        // Calculate the retry threshold based on failure count.
+        $retryThreshold = clone $now;
+        $retryThreshold->modify('-' . $retryIntervalMinutes . ' minutes');
+
+        $query->setParameter('retryThreshold', $retryThreshold);
+
+        // Execute the query and return results.
+        $alerts = $query->getResult();
+        $this->entityManager->clear();
+        
+        return $alerts;
     }
 }
