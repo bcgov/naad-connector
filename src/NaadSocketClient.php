@@ -116,6 +116,17 @@ class NaadSocketClient
             $this->processAlert($xml);
         }
 
+        // Try to send alerts to the destination.
+        try {
+            $this->destinationClient->sendAlerts();
+        } catch (Exception $e) {
+            $this->logger->critical(
+                'Could not update alerts: {error}',
+                [ 'error' => $e->getMessage() ]
+            );
+            throw $e;
+        }
+
         $this->currentOutput = '';
         return true;
     }
@@ -166,16 +177,8 @@ class NaadSocketClient
             throw $e;
         }
 
-        // Try to send alerts to the destination.
-        try {
             $this->destinationClient->sendAlerts();
-        } catch (Exception $e) {
-            $this->logger->critical(
-                'Could not update alerts: {error}',
-                [ 'error' => $e->getMessage() ]
-            );
-            throw $e;
-        }
+
     }
 
     /**
