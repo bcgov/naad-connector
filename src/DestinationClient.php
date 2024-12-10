@@ -83,36 +83,38 @@ class DestinationClient
 
     /**
      * Sends unsent alerts to the destination and updates their statuses.
-     *
-     * @param Alert $placeholder_alert temporary alert for bypassing getUnsentAlerts.
      * 
      * @return bool Returns `true` if all alerts were sent successfully,
      *              `false` if any alert failed to be sent.
      */
-    public function sendAlerts($placeholder_alert): bool
+    public function sendAlerts(): bool
     {
-        $unsentAlerts = [$placeholder_alert];
-        //$unsentAlerts = $this->database->getUnsentAlerts();
-        $allSuccessful = true; // For later use.
+        $unsentAlerts = $this->database->getUnsentAlerts();
+        $allSuccessful = true;
 
-        foreach ( $unsentAlerts as $alert ) {
-            try {
-                $response = $this->sendRequest($alert->getBody());
-        
-                if (200 === $response['status_code']) {
-                    $alert->setSuccess(true);
-                    
-                } else {
-                    $alert->incrementFailures();
-                    $alert->setSuccess(false);
+        try {
+            foreach ( $unsentAlerts as $alert ) {
+                try {
+                    $response = $this->sendRequest($alert->getBody());
+            
+                    if (200 === $response['status_code']) {
+                        $alert->setSuccess(true);
+                        
+                    } else {
+                        $alert->incrementFailures();
+                        $alert->setSuccess(false);
+                        $allSuccessful = false;
+                    }
+    
+                    $alert->setSendAttempted(new \DateTime());
+                    $this->database->updateAlert($alert);
+                } catch ( Exception $e ) {
                     $allSuccessful = false;
+                    throw $e;
                 }
-
-                $alert->setSendAttempted(new \DateTime());
-                $this->database->updateAlert($alert);
-            } catch ( Exception $e ) {
-                throw $e;
             }
+        } catch (\Exception $e ) {
+            $allSuccessful = false;
         }
 
         return $allSuccessful;

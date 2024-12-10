@@ -58,6 +58,7 @@ final class DestinationClientTest extends TestCase
         $alert->expects($this->once())->method('setSendAttempted');
         
         $database = $this->createMock(Database::class);
+        $database->method('getUnsentAlerts')->willReturn([$alert]);
         $database->expects($this->once())->method('updateAlert')->with($alert);
 
         // Configure the HTTP client.
@@ -90,7 +91,7 @@ final class DestinationClientTest extends TestCase
         $clientProperty->setValue($destinationClient, $httpClient);
 
         // Execute the method and assert the results.
-        $result = $destinationClient->sendAlerts($alert);
+        $result = $destinationClient->sendAlerts();
         $this->assertEquals($alertData['expected_result'], $result);
     }
 
@@ -142,20 +143,37 @@ final class DestinationClientTest extends TestCase
     #[Test]
     public function testSendAlertsDatabaseException()
     {
+        $alert = $this->createMock(Alert::class);
+        $alert->method('getBody')->willReturn('<alert>data</alert>');
+        $alert->expects($this->once())->method('setSendAttempted');
+        
         $database = $this->createMock(Database::class);
-        $database->method('insertAlert')
+        $database->method('getUnsentAlerts')->willReturn([$alert]);
+        $database->method('updateAlert')
             ->willThrowException(new \Exception('Database error'));
-
+    
+        $httpClient = $this->createMock(Client::class);
+        $httpClient->method('post')->willReturn(
+            new Response(200, [], 'OK')
+        );
+    
         $destinationClient = new DestinationClient(
             'http://example.com',
             'user',
             'pass',
             $database
         );
-
-        $alert = $this->createMock(Alert::class);
-
-        $result = $destinationClient->sendAlerts($alert);
-        $this->assertFalse($result);
+    
+        $reflection = new \ReflectionClass(DestinationClient::class);
+        $clientProperty = $reflection->getProperty('client');
+        $clientProperty->setAccessible(true);
+        $clientProperty->setValue($destinationClient, $httpClient);
+    
+        $result = $destinationClient->sendAlerts();
+        $this->assertFalse(
+            $result,
+            'sendAlerts should return false if a database exception occurs'
+        );
     }
+    
 }
