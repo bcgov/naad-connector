@@ -2,6 +2,11 @@
 
 ## 1.0.0
 
+### DEC 12, 2024
+
+- Add tests for CustomLogger class [DESCW-2795](https://citz-gdx.atlasssian.net/browse/DESCW-2795)
+- uses DataProvider abstraction to iterate test cases.
+
 ### DEC 09, 2024
 
 - Send undelivered alerts from database [DESCW-2766](https://citz-gdx.atlassian.net/browse/DESCW-2766)
