@@ -54,6 +54,9 @@
     "test-coverage": [
       "vendor/bin/phpunit --coverage-text"
     ],
+    "test-report": [
+      "vendor/bin/phpunit --coverage-html=coverage/"
+    ],
     "migrate": [
       "vendor/bin/doctrine-migrations -vvv -n migrate"
     ]
