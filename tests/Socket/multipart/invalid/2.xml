@@ -1,4 +1,199 @@
-code>
-invalid
-</geocod>
-</aler>
+    <sender>earthquakeinfo-infoseisme@nrcan-rncan.gc.ca</sender>
+    <sent>2024-09-15T22:23:20-00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <source>Earthquakes Canada/Séismes Canada</source>
+    <scope>Public</scope>
+    <code>profile:CAP-CP:0.4</code>
+    <code>layer:SOREM:1.0</code>
+    <code>layer:SOREM:2.0</code>
+    <code>layer:WPAM:1.0</code>
+    <code>layer:EarthquakesCanada:0.1</code>
+    <info>
+        <language>en-CA</language>
+        <category>Geo</category>
+        <event>earthquake</event>
+        <responseType>Prepare</responseType>
+        <urgency>Immediate</urgency>
+        <severity>Severe</severity>
+        <certainty>Likely</certainty>
+        <eventCode>
+            <valueName>profile:CAP-CP:Event:0.4</valueName>
+            <value>earthquake</value>
+        </eventCode>
+        <effective>2024-09-15T22:22:44-00:00</effective>
+        <expires>2024-09-15T22:53:20-00:00</expires>
+        <senderName>Natural Resources Canada</senderName>
+        <headline>Earthquake detected</headline>
+        <description>Earthquake detected! Drop, Cover, and Hold on. Protect yourself. Natural
+            Resources Canada</description>
+        <instruction>Drop, Cover, and Hold on. Protect yourself.</instruction>
+        <web>https://www.earthquakescanada.nrcan.gc.ca/</web>
+        <contact>earthquakeinfo-infoseisme@nrcan-rncan.gc.ca</contact>
+        <parameter>
+            <valueName>layer:SOREM:1.0:Broadcast_Immediately</valueName>
+            <value>Yes</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:SOREM:1.0:Broadcast_Text</valueName>
+            <value>Earthquake detected! Drop, Cover, and Hold on. Protect yourself. Natural
+                Resources Canada</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:SOREM:2.0:WirelessImmediate</valueName>
+            <value>Yes</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:SOREM:2.0:WirelessText</valueName>
+            <value>Earthquake detected! Drop, Cover, and Hold on. Protect yourself. Natural
+                Resources Canada</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:WPAM:1.0:Expires</valueName>
+            <value>2024-09-15T22:53:20-00:00</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:eventId</valueName>
+            <value>1726439000</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:magnitude</valueName>
+            <value>5.8411</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:originTime</valueName>
+            <value>2024-09-15T22:22:44-00:00</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:depth</valueName>
+            <value>8.0</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:latitude</valueName>
+            <value>51.4285</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:longitude</valueName>
+            <value>-130.9409</value>
+        </parameter>
+        <area>
+            <areaDesc>Skeena-Queen Charlotte</areaDesc>
+            <polygon>52.2937,-130.9409 52.0361,-129.9464 51.4203,-129.5534 50.8127,-129.9727
+                50.5633,-130.9409 50.8127,-131.9091 51.4203,-132.3284 52.0361,-131.9354
+                52.2937,-130.9409</polygon>
+            <geocode>
+                <valueName>profile:CAP-CP:Location:0.3</valueName>
+                <value>5947032</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>fr-CA</language>
+        <category>Geo</category>
+        <event>tremblements de terre</event>
+        <responseType>Prepare</responseType>
+        <urgency>Immediate</urgency>
+        <severity>Severe</severity>
+        <certainty>Likely</certainty>
+        <eventCode>
+            <valueName>profile:CAP-CP:Event:0.4</valueName>
+            <value>earthquake</value>
+        </eventCode>
+        <effective>2024-09-15T22:22:44-00:00</effective>
+        <expires>2024-09-15T22:53:20-00:00</expires>
+        <senderName>Ressources naturelles Canada</senderName>
+        <headline>Tremblements de terre détecté</headline>
+        <description>Tremblements de terre détecté! Se baisser, s'abriter et s'agripper.
+            Protégez-vous. Ressources naturelles Canada</description>
+        <instruction>Se baisser, s'abriter et s'agripper. Protégez-vous.</instruction>
+        <web>https://www.seimescanada.rncan.gc.ca/</web>
+        <contact>earthquakeinfo-infoseisme@nrcan-rncan.gc.ca</contact>
+        <parameter>
+            <valueName>layer:SOREM:1.0:Broadcast_Immediately</valueName>
+            <value>Yes</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:SOREM:1.0:Broadcast_Text</valueName>
+            <value>Tremblements de terre détecté! Se baisser, s'abriter et s'agripper.
+                Protégez-vous. Ressources naturelles Canada</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:SOREM:2.0:WirelessImmediate</valueName>
+            <value>Yes</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:SOREM:2.0:WirelessText</valueName>
+            <value>Tremblements de terre détecté! Se baisser, s'abriter et s'agripper.
+                Protégez-vous. Ressources naturelles Canada</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:WPAM:1.0:Expires</valueName>
+            <value>2024-09-15T22:53:20-00:00</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:eventId</valueName>
+            <value>1726439000</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:magnitude</valueName>
+            <value>5.8411</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:originTime</valueName>
+            <value>2024-09-15T22:22:44-00:00</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:depth</valueName>
+            <value>8.0</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:latitude</valueName>
+            <value>51.4285</value>
+        </parameter>
+        <parameter>
+            <valueName>layer:EarthquakesCanada:0.1:longitude</valueName>
+            <value>-130.9409</value>
+        </parameter>
+        <area>
+            <areaDesc>Skeena-Queen Charlotte</areaDesc>
+            <polygon>52.2937,-130.9409 52.0361,-129.9464 51.4203,-129.5534 50.8127,-129.9727
+                50.5633,-130.9409 50.8127,-131.9091 51.4203,-132.3284 52.0361,-131.9354
+                52.2937,-130.9409</polygon>
+            <geocode>
+                <valueName>profile:CAP-CP:Location:0.3</valueName>
+                <value>5947032</value>
+            </geocode>
+        </area>
+    </info>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#" Id="NAADS Signature">
+        <SignedInfo>
+            <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+            <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" />
+            <Reference URI="">
+                <Transforms>
+                    <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+                </Transforms>
+                <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" />
+                <DigestValue>0SjPYjPL/0YRrc28vuYg2+KdIS9C9VxMjNBtj+dXxG0=</DigestValue>
+            </Reference>
+        </SignedInfo>
+        <SignatureValue>
+            etzRPWIZprOMfURTqViWFKKF23kdb6WngSEr3uy2R9JgcZRqNPnf0ADRw+kQMAkr4Zi0Z4k/5Q70nMrvfJsguw4zoACuEFO1TiDVdvVqGgQk4AusWgq1nYXKJM7dYOXZKfdIR/VVcazgVHhl0w+f6G2DoAqv+OdlcwKTgIWbvPEzBbtkMIqcYgSWJyQusMuqc8C9yb3K1UMWLqqMOrxtUUnTEmvvZ6KLtcvnC752AS4ZbgJmwC76Vap7xHg5yVSSdcxJX1+m/rtKjdgyL/htLt3myy478wZOmZwkmoJpR1J9zTo3PmmMFEZliQkANQ5kZ+fX4WxCViolytWlpJBfZg==</SignatureValue>
+        <KeyInfo>
+            <X509Data>
+                <X509Certificate>
+                    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</X509Certificate>
+            </X509Data>
+        </KeyInfo>
+        <Object xmlns="">
+            <SignatureProperties>
+                <SignatureProperty Id="NAADS-DSS1" Target="https://dss1.naad-adna.pelmorex.com">
+                    <xc:value xmlns:xc="http://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd" />
+                </SignatureProperty>
+                <SignatureProperty Id="NAADS-DSS2" Target="https://dss2.naad-adna.pelmorex.com">
+                    <xc:value xmlns:xc="http://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd" />
+                </SignatureProperty>
+            </SignatureProperties>
+        </Object>
+    </Signature>
+</alert>

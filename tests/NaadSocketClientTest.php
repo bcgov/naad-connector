@@ -126,7 +126,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => false,
                     ],
                     [
-                        'location' => 'multipart/recover/2.xml',
+                        'location' => 'multipart/invalid/2.xml',
                         'expected' => false,
                     ],
                     [
@@ -163,10 +163,19 @@ final class NaadSocketClientTest extends TestCase
                     ],
                 ],
             ],
+            // Should skip schema validation and return true.
             'Invalid - Incorrect namespace'        => [
                 [
                     [
                         'location' => 'incorrect-namespace.xml',
+                        'expected' => true,
+                    ],
+                ],
+            ],
+            'Invalid - Fails schema validation'    => [
+                [
+                    [
+                        'location' => 'schema-validation-failure.xml',
                         'expected' => false,
                     ],
                 ],

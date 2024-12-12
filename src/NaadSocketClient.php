@@ -4,6 +4,7 @@ namespace Bcgov\NaadConnector;
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\Entity\Alert;
 use Bcgov\NaadConnector\NaadVars;
+use DOMDocument;
 use Monolog\Logger;
 use SimpleXMLElement;
 use Exception;
@@ -28,6 +29,14 @@ class NaadSocketClient
      * @var string
      */
     protected const XML_NAMESPACE = 'urn:oasis:names:tc:emergency:cap:1.2';
+
+    /**
+     * The name of the schema file to use for validation of alert XML documents.
+     * This should correspond to an .xsd file in the schema/ directory.
+     *
+     * @var string
+     */
+    protected const SCHEMA_NAME = 'cap12';
 
     protected const HEARTBEAT_FILE_PATH = 'heartbeat.log';
 
@@ -204,13 +213,11 @@ class NaadSocketClient
             return $this->handleInvalidXml();
         }
 
-        // Validate the XML namespace.
-        if (!$this->isValidNamespace($xml)) {
+        if (!$this->isValidSchema($xml)) {
             return false;
         }
 
         return $xml; // Return the valid SimpleXMLElement.
-
     }
 
     /**
@@ -237,28 +244,36 @@ class NaadSocketClient
     }
 
     /**
-     * Validates the XML namespace.
+     * Validates an alert xml against the schema.
+     * If the alert has a namespace that doesn't match the expected schema namespace
+     * skip validation and treat the document as valid.
      *
-     * @param SimpleXMLElement $xml The XML element to check.
-
-     * @return bool Returns true if the namespace is valid, false otherwise.
+     * @param SimpleXMLElement $xml Alert xml.
+     *
+     * @return boolean
      */
-    private function isValidNamespace(SimpleXMLElement $xml): bool
+    protected function isValidSchema(SimpleXMLElement $xml): bool
     {
         $namespaces = $xml->getNamespaces();
-        $currentNamespace = $namespaces[''];
+        if (array_search(self::XML_NAMESPACE, $namespaces) !== false) {
+            // Load XML into DOMDocument class.
+            $domDocument = new DOMDocument();
+            $domDocument->loadXml($this->currentOutput);
 
-        if (self::XML_NAMESPACE !== $currentNamespace) {
-            $this->logger->info(
-                "Unexpected namespace: {capNamespace}. Expected: {xmlNamespace}.",
+            // Validate schema.
+            $schemaPath = sprintf('schema/%s.xsd', self::SCHEMA_NAME);
+            if (!$domDocument->schemaValidate($schemaPath)) {
+                return false;
+            }
+        } else {
+            $this->logger->warning(
+                'Unknown namespace received, skipping schema validation. '
+                . 'Expected "{selfNamespace}".',
                 [
-                    'capNamespace' => $currentNamespace,
-                    'xmlNamespace' => self::XML_NAMESPACE,
+                    'selfNamespace' => self::XML_NAMESPACE,
                 ]
             );
-            return false;
         }
-
         return true;
     }
 

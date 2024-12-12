@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <alert
 	xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier></identifier>
 	<sender>cap-pac@canada.ca</sender>
 	<sent>2024-01-19T00:31:20-00:00</sent>
 	<status>Actual</status>

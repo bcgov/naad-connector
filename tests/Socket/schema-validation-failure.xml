@@ -7,7 +7,7 @@
     <msgType>Alert</msgType>
     <source>Earthquakes Canada/Séismes Canada</source>
     <scope>Public</scope>
-    <code>profile:CAP-CP:0.4</code>
+    <codes>profile:CAP-CP:0.4</codes>
     <code>layer:SOREM:1.0</code>
     <code>layer:SOREM:2.0</code>
     <code>layer:WPAM:1.0</code>
