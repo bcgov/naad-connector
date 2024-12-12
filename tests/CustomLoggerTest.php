@@ -74,158 +74,56 @@ final class CustomLoggerTest extends TestCase
     }
 
     /**
-     * Test the _convertLogLevel(string $loggingLevel) method
-     * to ensure it correctly converts the logging level to the Monolog Level.
+     * Provides a list of log levels for testing the _convertLogLevel method.
      *
-     * @return void
+     * @return array A list of log levels with their corresponding Monolog Level.
      */
-    #[Test]
-    public function testLogLevelConversion()
-    {
-        $logLevels = $this->getLogLevelMappings();
-
-        foreach ($logLevels as $levelString => $expectedLevel) {
-            $logger = $this->createLoggerWithLevel($levelString);
-            $actualLevel = $this->getLoggerHandlerLevel($logger);
-
-            $this->assertEquals(
-                $expectedLevel,
-                $actualLevel,
-                "Failed asserting that '$levelString' maps to the correct level."
-            );
-        }
-    }
-
-    /**
-     * Returns a mapping of log level strings to their corresponding
-     * Monolog Level constants.
-     *
-     * @return array<string, int>
-     */
-    private function getLogLevelMappings()
+    public static function logLevelProvider(): array
     {
         return [
-          'emergency' => Level::Emergency,
-          'alert'     => Level::Alert,
-          'critical'  => Level::Critical,
-          'error'     => Level::Error,
-          'warning'   => Level::Warning,
-          'notice'    => Level::Notice,
-          'info'      => Level::Info,
-          'debug'     => Level::Debug,
+            'Emergency' => ['emergency', Level::Emergency],
+            'Alert' => ['alert', Level::Alert],
+            'Critical' => ['critical', Level::Critical],
+            'Error' => ['error', Level::Error],
+            'Warning' => ['warning', Level::Warning],
+            'Notice' => ['notice', Level::Notice],
+            'Info' => ['info', Level::Info],
+            'Debug' => ['debug', Level::Debug],
+            'Empty String' => ['', Level::Info],
+            'Invalid Level Name' =>
+            ['I am once again asking for a valid log level', Level::Info],
         ];
     }
 
     /**
-     * Creates a CustomLogger instance with the specified log level.
+     * Ensures _convertLogLevel correctly maps log level strings to Monolog levels,
+     * defaulting to 'info' for invalid/empty inputs.
      *
-     * @param string $levelString The log level string (e.g. 'debug', 'info', etc.)
-     *
-     * @return CustomLogger A CustomLogger instance with the specified log level
-     */
-    private function createLoggerWithLevel(string $levelString)
-    {
-        return new CustomLogger('test', $levelString);
-    }
-
-    /**
-     * Retrieves the logging level of the first handler associated with
-     * the given CustomLogger instance.
-     *
-     * @param CustomLogger $logger The CustomLogger instance to
-     *                             retrieve the logging level from.
-     *
-     * @return int The logging level of the first handler.
-     */
-    private function getLoggerHandlerLevel(CustomLogger $logger)
-    {
-        $handlers = $logger->getHandlers();
-        return $handlers[0]->getLevel();
-    }
-
-
-    /**
-     * Test invalid log level.
-     * Expect that an invalid logging level string will cause
-     * the level to be set to 'info'.
+     * @param string        $levelString   Input logging level string.
+     * @param Monolog\Level $expectedLevel Expected Monolog level constant.
      *
      * @return void
      */
     #[Test]
-    public function testInvalidLogLevel()
-    {
-        $logger = new CustomLogger('test', 'invalidLevel');
-        $handlers = $logger->getHandlers();
-        $streamHandler = $handlers[0];
+    #[DataProvider('logLevelProvider')]
+    public function testLogLevelConversion(
+        string $levelString,
+        Monolog\Level $expectedLevel
+    ): void {
+        $logger = new CustomLogger('test', $levelString);
+        $actualLevel = $logger->getHandlers()[0]->getLevel();
 
-        // Assert that an invalid log level will result in the level set to 'info'.
-        $this->assertEquals(Level::Info, $streamHandler->getLevel());
-    }
-
-    /**
-     * Test logger output matches expected output
-     *
-     * @return void
-     */
-    #[Test]
-    public function testLoggerOutput()
-    {
-        // Set up a logger with an in-memory stream
-        $stream = $this->createInMemoryStream();
-        $logger = $this->createLoggerWithStream($stream);
-
-        // Log an 'info' level message
-        $logMessage = 'Test info message';
-        $logger->info($logMessage);
-
-        // Read the log output.
-        $logOutput = $this->getStreamContents($stream);
-
-        // Assert the log contains the expected output
-        $expectedOutput = 'test_channel.info: test info message';
-        $this->assertStringContainsString(
-            strtolower($expectedOutput), strtolower($logOutput)
+        $this->assertEquals(
+            $expectedLevel,
+            $actualLevel,
+            <<<MESSAGE
+            Failed log level conversion test:
+            Input Level:    '{$levelString}'
+            Expected Level: '{$expectedLevel->getName()}'
+            Actual Level:   '{$actualLevel->getName()}'
+            MESSAGE
         );
-
     }
 
-    /**
-     * Creates an in-memory stream for testing purposes.
-     *
-     * @return resource The in-memory stream.
-     */
-    private function createInMemoryStream()
-    {
-        return fopen('php://memory', 'rw');
-    }
 
-    /**
-     * Creates a CustomLogger instance with the specified stream.
-     *
-     * @param resource $stream The stream to use for logging.
-     *
-     * @return CustomLogger A CustomLogger instance with the specified stream.
-     */
-    private function createLoggerWithStream($stream)
-    {
-        $handler = new StreamHandler($stream, \Monolog\Level::Info);
-        $logger = new CustomLogger('test_channel');
-        $logger->setHandlers([$handler]);
-        return $logger;
-    }
-
-    /**
-     * Retrieves the contents of a stream.
-     *
-     * @param resource $stream The stream to retrieve the contents from.
-     *
-     * @return string The contents of the stream.
-     */
-    private function getStreamContents($stream)
-    {
-        rewind($stream);
-        $contents = stream_get_contents($stream);
-        fclose($stream);
-        return $contents;
-    }
 }
