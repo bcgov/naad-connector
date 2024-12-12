@@ -5,6 +5,7 @@ use Bcgov\NaadConnector\Entity\Alert;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
+use Monolog\Logger;
 
 /**
  * DestinationClient class makes requests to a destination URL
@@ -48,6 +49,13 @@ class DestinationClient
     protected Client $client;
 
     /**
+     * Monolog Logger.
+     *
+     * @var Logger
+     */
+    protected Logger $logger;
+
+    /**
      * The alert Database.
      *
      * @var Database
@@ -60,20 +68,24 @@ class DestinationClient
      * @param string   $url                 The destination API endpoint.
      * @param string   $username            The username for authentication.
      * @param string   $applicationPassword The password for authentication.
+     * @param Logger   $logger              An instance of Monolog/Logger.
      * @param Database $database            Instance of Database for alerts.
+     * @param Client   $client              The Guzzle HTTP client (optional).
      */
     public function __construct(
         string $url,
         string $username,
         string $applicationPassword,
-        Database $database
+        Logger $logger,
+        Database $database,
+        ?Client $client = null
     ) {
         $this->url                 = $url;
         $this->username            = $username;
         $this->applicationPassword = $applicationPassword;
+        $this->logger            = $logger;
         $this->database            = $database;
-
-        $this->client = new Client(
+        $this->client = $client ?? new Client(
             [
                 'base_uri' => $this->url,
                 'auth'     => [$this->username, $this->applicationPassword],
@@ -91,32 +103,30 @@ class DestinationClient
     {
         $unsentAlerts = $this->database->getUnsentAlerts();
         $allSuccessful = true;
-
-        try {
-            foreach ( $unsentAlerts as $alert ) {
-                try {
-                    $response = $this->sendRequest($alert->getBody());
-            
-                    if (200 === $response['status_code']) {
-                        $alert->setSuccess(true);
-                        
-                    } else {
-                        $alert->incrementFailures();
-                        $alert->setSuccess(false);
-                        $allSuccessful = false;
-                    }
     
-                    $alert->setSendAttempted(new \DateTime());
-                    $this->database->updateAlert($alert);
-                } catch ( Exception $e ) {
+        foreach ($unsentAlerts as $alert) {
+            try {
+                $response = $this->sendRequest($alert->getBody());
+    
+                if (200 === $response['status_code']) {
+                    $alert->setSuccess(true);
+                } else {
+                    $alert->incrementFailures();
+                    $alert->setSuccess(false);
                     $allSuccessful = false;
-                    throw $e;
                 }
-            }
-        } catch (\Exception $e ) {
-            $allSuccessful = false;
-        }
+    
+                $alert->setSendAttempted(new \DateTime());
+                $this->database->updateAlert($alert);
+            } catch (\Exception $e) {
+                $allSuccessful = false;
+                $this->logger->critical(
+                    'Could not send or update Alert ({id}): {error}',
+                    [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
+                );
 
+            }
+        }
         return $allSuccessful;
     }
 

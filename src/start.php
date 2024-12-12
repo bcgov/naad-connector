@@ -14,18 +14,19 @@ $naadVars = new NaadVars();
 // Create a new Database instance.
 $database = new Database();
 
+// Create a custom logger for the NaadSocketConnection.
+$socketLogger = new CustomLogger(
+    'NaadSocketConnection',
+    'info',
+);
+
 // Create a new DestinationClient instance with the provided configuration.
 $destinationClient = new DestinationClient(
     $naadVars->destinationURL,
     $naadVars->destinationUser,
     $naadVars->destinationPassword,
+    $socketLogger,
     $database
-);
-
-// Create a custom logger for the NaadSocketConnection
-$socketLogger = new CustomLogger(
-    'NaadSocketConnection',
-    'info',
 );
 
 $socketClient = new NaadSocketClient(
