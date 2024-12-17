@@ -14,6 +14,13 @@ use GuzzleHttp\Exception\RequestException;
  */
 class NaadRepositoryClient
 {
+    /**
+     * Constants used by these methods
+     * - Url template for generating an URL string based on inputs
+     * - Sanitize rules to translate a reference to an URL-friendly string
+     */
+    protected const URL_TEMPLATE = 'http://%s/%s/%sI%s.xml';
+    protected const SANITIZE_RULES = ['-' => '_', '+' => 'p', ':' => '_'];
 
     /**
      * Guzzle HTTP client.
@@ -30,11 +37,19 @@ class NaadRepositoryClient
     protected string $baseUrl;
 
     /**
-     * Constructor for NaadRepositoryClient.
+     * Initializes a new instance of the NaadRepositoryClient class.
+     *
+     * @param Client|null   $client   The Guzzle HTTP client to use.
+     *                                Defaults to a new Client instance.
+     * @param NaadVars|null $naadVars The NaadVars instance to use.
+     *                                Defaults to a new NaadVars instance.
      */
-    public function __construct()
-    {
-        $naadVars       = new NaadVars();
+    public function __construct(
+        Client $client     = null,
+        NaadVars $naadVars = null
+    ) {
+        $this->client   = $client ?: new Client();
+        $naadVars       = $naadVars ?: new NaadVars();
         $this->baseUrl  = $naadVars->naadRepoUrl;
     }
 
@@ -50,11 +65,10 @@ class NaadRepositoryClient
     public function fetchAlert(array $reference): string
     {
         try {
-            $url = $this->getURL($reference);
-            $this->client = new Client();
+            $url = $this->constructURL($reference);
             $response = $this->client->get($url);
-            $responseBody = (string) $response->getBody();
-            return $responseBody;
+
+            return (string) $response->getBody();
         } catch (RequestException $e) {
             throw new \Exception("Request failed: " . $e->getMessage());
         }
@@ -69,33 +83,46 @@ class NaadRepositoryClient
      *
      * @return string The constructed URL.
      */
-    protected function getURL(array $reference)
+    public function constructURL(array $reference): string
     {
-        // Extract and sanitize values from the reference array.
+        // Extract date and sanitize values for URL construction.
         $date = strtok($reference['sent'], 'T');
-        $sent = $this->replaceUrlCharacters($reference['sent']);
-        $id = $this->replaceUrlCharacters($reference['id']);
+        $sanitize = fn(string $value): string => strtr(
+            $value,
+            self::SANITIZE_RULES
+        );
 
-        // Build the URL.
+        // Build and return the URL.
         return sprintf(
-            'http://%s/%s/%sI%s.xml',
+            self::URL_TEMPLATE,
             $this->baseUrl,
             $date,
-            $sent,
-            $id
+            $sanitize($reference['sent']),
+            $sanitize($reference['id'])
         );
     }
 
     /**
-     * Replaces specific characters in a string as per NAAD URL requirements.
+     * Magic getter method to retrieve the value of a property.
      *
-     * @param string $s The input string.
+     * It checks if the requested property exists in the object.
+     * If it does, it returns the value of that property;
+     * otherwise, it throws an InvalidArgumentException.
      *
-     * @return string The modified string.
+     * @param string $property The name of the property to retrieve.
+     *
+     * @return string The value of the requested property.
+     *
+     * @throws \InvalidArgumentException If the property does not exist.
      */
-    protected function replaceUrlCharacters(string $s): string
+    public function __get($property): string
     {
-        return strtr($s, ['-' => '_', '+' => 'p', ':' => '_']);
-    }
+        if (!property_exists($this, $property)) {
+            throw new \InvalidArgumentException(
+                "Property '$property' does not exist."
+            );
+        }
 
+        return $this->$property;
+    }
 }

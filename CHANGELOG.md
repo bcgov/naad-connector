@@ -2,6 +2,10 @@
 
 ## 1.0.0
 
+### DEC 17, 2024
+
+- Add tests for NaadRepositoryClient [DESCW-2797](https://citz-gdx.atlassian.net/browse/DESCW-2797)
+
 ### DEC 12, 2024
 
 - Add tests for CustomLogger class [DESCW-2795](https://citz-gdx.atlasssian.net/browse/DESCW-2795)
