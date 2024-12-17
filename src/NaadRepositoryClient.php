@@ -39,18 +39,14 @@ class NaadRepositoryClient
     /**
      * Initializes a new instance of the NaadRepositoryClient class.
      *
-     * @param Client|null   $client   The Guzzle HTTP client to use.
-     *                                Defaults to a new Client instance.
-     * @param NaadVars|null $naadVars The NaadVars instance to use.
-     *                                Defaults to a new NaadVars instance.
+     * @param Client $client      - The Guzzle HTTP client to use.
+     * @param string $naadRepoUrl - The base URL used to construct an
+     *                            URL for the Alerts repo.
      */
-    public function __construct(
-        Client $client     = null,
-        NaadVars $naadVars = null
-    ) {
-        $this->client   = $client ?: new Client();
-        $naadVars       = $naadVars ?: new NaadVars();
-        $this->baseUrl  = $naadVars->naadRepoUrl;
+    public function __construct(Client $client, string $naadRepoUrl)
+    {
+        $this->client   = $client;
+        $this->baseUrl  = $naadRepoUrl;
     }
 
     /**
@@ -87,42 +83,31 @@ class NaadRepositoryClient
     {
         // Extract date and sanitize values for URL construction.
         $date = strtok($reference['sent'], 'T');
-        $sanitize = fn(string $value): string => strtr(
-            $value,
-            self::SANITIZE_RULES
-        );
 
         // Build and return the URL.
         return sprintf(
             self::URL_TEMPLATE,
             $this->baseUrl,
             $date,
-            $sanitize($reference['sent']),
-            $sanitize($reference['id'])
+            strtr($reference['sent'], self::SANITIZE_RULES),
+            strtr($reference['id'], self::SANITIZE_RULES),
         );
     }
 
     /**
-     * Magic getter method to retrieve the value of a property.
+     * A debugger method that returns the class instance properties
+     * as a string
      *
-     * It checks if the requested property exists in the object.
-     * If it does, it returns the value of that property;
-     * otherwise, it throws an InvalidArgumentException.
+     * Example use: `error_log(print_r($client->__debugInfo(), true));`
      *
-     * @param string $property The name of the property to retrieve.
-     *
-     * @return string The value of the requested property.
-     *
-     * @throws \InvalidArgumentException If the property does not exist.
+     * @return array    an associative array of defined object accessible
+     *                  non-static properties for the specified object in scope.
+     *                  If a property have not been assigned a value,
+     *                  it will be returned with a null value.
      */
-    public function __get($property): string
+    public function __debugInfo(): array
     {
-        if (!property_exists($this, $property)) {
-            throw new \InvalidArgumentException(
-                "Property '$property' does not exist."
-            );
-        }
-
-        return $this->$property;
+        return get_object_vars($this);
     }
+
 }

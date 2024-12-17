@@ -7,12 +7,18 @@ use Bcgov\NaadConnector\DestinationClient;
 use Bcgov\NaadConnector\NaadSocketClient;
 use Bcgov\NaadConnector\NaadSocketConnection;
 use Bcgov\NaadConnector\NaadVars;
+use Bcgov\NaadConnector\NaadRepositoryClient;
+
+use GuzzleHttp\Client;
 
 // Get environment variables for configuring a socket connection.
 $naadVars = new NaadVars();
 
 // Create a new Database instance.
 $database = new Database();
+
+// Create a new Guzzle Client.
+$guzzleClient = new Client();
 
 // Create a custom logger for the NaadSocketConnection.
 $socketLogger = new CustomLogger(
@@ -29,11 +35,18 @@ $destinationClient = new DestinationClient(
     $database
 );
 
+// Create a new RepositoryClient instance with the provided configuration.
+$repositoryClient = new NaadRepositoryClient(
+    $guzzleClient,
+    $naadVars->naadRepoUrl
+);
+
 $socketClient = new NaadSocketClient(
     $naadVars->naadName,
     $destinationClient,
     $socketLogger,
-    $database
+    $database,
+    $repositoryClient,
 );
 
 $reactConnector = new React\Socket\Connector();

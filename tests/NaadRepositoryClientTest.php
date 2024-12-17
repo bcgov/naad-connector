@@ -11,11 +11,7 @@ use PHPUnit\Framework\Attributes\{
     DataProvider
 };
 
-use Bcgov\NaadConnector\{
-    NaadRepositoryClient,
-    NaadVars
-};
-
+use Bcgov\NaadConnector\NaadRepositoryClient;
 /**
  * NaadRepositoryTest Class
  * This will test the class constructor, and these methods:
@@ -31,8 +27,8 @@ use Bcgov\NaadConnector\{
 #[CoversClass(NaadRepositoryClient::class)]
 final class NaadRepositoryClientTest extends TestCase
 {
-    private NaadVars $naadVarsMock;
     private Client $guzzleClientMock;
+    private  string $naadRepoUrl;
 
     /**
      * Centralized setup for reusable mocks.
@@ -41,43 +37,31 @@ final class NaadRepositoryClientTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->naadVarsMock = $this->createMock(NaadVars::class);
         $this->guzzleClientMock = $this->createMock(Client::class);
+        $this->naadRepoUrl = 'https://mock-naad-repo.com';
     }
 
     /**
      * Tests that the NaadRepositoryClient constructor initializes the
      * baseUrl property correctly.
      *
-     * @return void
-     */
-    #[Test]
-    public function testConstructorInitializesBaseUrl(): void
-    {
-        $this->naadVarsMock->naadRepoUrl = 'https://mock-naad-repo.com';
-
-        $client = new NaadRepositoryClient(null, $this->naadVarsMock);
-
-        $this->assertSame('https://mock-naad-repo.com', $client->baseUrl);
-    }
-
-    /**
-     * Tests that the NaadRepositoryClient constructURL method
-     * returns the expected URL.
-     *
-     * @param array $reference - The URL sent/id reference data
-     *                         used to generate an URL.
+     * @param array $reference test data used to construct an URL
      *
      * @return void
      */
     #[Test]
     #[DataProvider('referenceData')]
-    public function testConstructURL(array $reference): void
+    public function testConstructorInitializesBaseUrl(array $reference): void
     {
-        $this->naadVarsMock->naadRepoUrl = 'test.com';
-        $client = new NaadRepositoryClient(null, $this->naadVarsMock);
+        $client = new NaadRepositoryClient(
+            $this->guzzleClientMock,
+            $this->naadRepoUrl
+        );
 
         $expectedUrl = $client->constructURL($reference);
+
+        // debug this instance
+        error_log(print_r($client->__debugInfo(), true));
 
         $this->assertEquals($expectedUrl, $client->constructURL($reference));
     }
@@ -95,14 +79,13 @@ final class NaadRepositoryClientTest extends TestCase
     #[DataProvider('referenceData')]
     public function testFetchAlert(array $reference): void
     {
-        $this->naadVarsMock->naadRepoUrl = 'mock-repo-url.com';
         $this->guzzleClientMock
             ->method('get')
             ->willReturn(new Response(200, [], 'Mock Alert Response'));
 
         $client = new NaadRepositoryClient(
             $this->guzzleClientMock,
-            $this->naadVarsMock
+            $this->naadRepoUrl
         );
 
         $response = $client->fetchAlert($reference);
@@ -123,7 +106,6 @@ final class NaadRepositoryClientTest extends TestCase
     #[DataProvider('referenceData')]
     public function testFetchAlertThrowsException(array $reference): void
     {
-        $this->naadVarsMock->naadRepoUrl = 'mock-repo-url.com';
         $this->guzzleClientMock
             ->method('get')
             ->willThrowException(
@@ -134,41 +116,14 @@ final class NaadRepositoryClientTest extends TestCase
             );
 
         $client = new NaadRepositoryClient(
-            $this->guzzleClientMock, $this->naadVarsMock
+            $this->guzzleClientMock,
+            $this->naadRepoUrl
         );
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Request failed: Error');
 
         $client->fetchAlert($reference);
-    }
-
-    /**
-     * Tests that the NaadRepositoryClient magic getter returns the expected
-     * property value or throws an exception for non-existent properties.
-     *
-     * @param string $property    - The object property we want to '__get'.
-     * @param bool   $shouldThrow - Whether to throw an Exception
-     *
-     * @return void
-     */
-    #[Test]
-    #[DataProvider('getterData')]
-    public function testMagicGetter(string $property, bool $shouldThrow): void
-    {
-        $this->naadVarsMock->naadRepoUrl = $property;
-        $client = new NaadRepositoryClient(
-            $this->guzzleClientMock, $this->naadVarsMock
-        );
-
-        if ($shouldThrow) {
-            $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage("Property '$property' does not exist.");
-
-            $client->nonExistentProperty;
-        } else {
-            $this->assertSame($property, $client->baseUrl);
-        }
     }
 
     /**
