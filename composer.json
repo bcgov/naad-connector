@@ -76,6 +76,7 @@
     "doctrine/orm": "^3.2",
     "symfony/cache": "^6.2",
     "symfony/yaml": "^6.2",
+    "react/socket": "^1.16",
     "guzzlehttp/guzzle": "^7.9",
     "vlucas/phpdotenv": "^5.6"
   }
