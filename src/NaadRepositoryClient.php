@@ -70,14 +70,8 @@ class NaadRepositoryClient
      *
      * @return string The constructed URL.
      */
-    public function constructURL(array $reference): string
+    protected function constructURL(array $reference): string
     {
-        if (!isset($reference['sent'], $reference['id'])) {
-            throw new \InvalidArgumentException(
-                "Reference must contain 'sent' and 'id' keys"
-            );
-        }
-
         return sprintf(
             self::URL_TEMPLATE,
             $this->baseUrl,

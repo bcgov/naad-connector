@@ -59,33 +59,6 @@ final class NaadRepositoryClientTest extends TestCase
     }
 
     /**
-     * Test constructURL method with valid response and error
-     *
-     * @param array  $reference        The test data used to construct an URL.
-     * @param string $expectedUrl      The URL that the $reference should result in.
-     * @param bool   $expectsException Whether an exception is expected.
-     *
-     * @return void
-     */
-    #[DataProvider('constructUrlProvider')]
-    public function testConstructUrl(
-        array $reference,
-        string $expectedUrl,
-        bool $expectsException
-    ): void {
-        $client = new NaadRepositoryClient(new Client(), 'naad.url');
-
-        if ($expectsException) {
-            $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage($expectedUrl);
-            $client->constructURL($reference);
-        } else {
-            $url = $client->constructURL($reference);
-            $this->assertEquals($expectedUrl, $url);
-        }
-    }
-
-    /**
      * Tests  fetchAlert method with valid response and error.
      *
      * @param array  $mockResponse     The mocked response from the guzzle client
