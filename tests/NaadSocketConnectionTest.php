@@ -3,8 +3,6 @@
 use PHPUnit\Framework\Attributes\{
     Test,
     CoversClass,
-    DataProvider,
-    UsesClass
 };
 use PHPUnit\Framework\TestCase;
 
@@ -14,14 +12,11 @@ use Bcgov\NaadConnector\{
     NaadSocketConnection,
 };
 use React\Promise\Promise;
+use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
-use React\Socket\Server;
-use React\Socket\SocketServer;
-use React\Stream\DuplexResourceStream;
 
 /**
- * NaadSocketClientTest Class for testing NaadSocketClient.
- * Uses the \Entity\Alert class.
+ * NaadSocketConnectionTest Class for testing NaadSocketConnection.
  *
  * @category Client
  * @package  NaadConnector
@@ -32,78 +27,131 @@ use React\Stream\DuplexResourceStream;
 #[CoversClass('Bcgov\NaadConnector\NaadSocketConnection')]
 final class NaadSocketConnectionTest extends TestCase
 {
+    protected $connector;
+    protected $socketClient;
+    protected $logger;
+    protected $naadSocketConnection;
+    protected $connection;
 
-    #[Test]
-    public function testConnect()
+    /**
+     * Sets up dependency mocks and the class to be tested.
+     *
+     * @return void
+     */
+    protected function setUp(): void
     {
-        $socketClient = $this->createStub(NaadSocketClient::class);
-        $logger = $this->createStub(CustomLogger::class);
+        $this->connector = $this->createMock(ConnectorInterface::class);
+        $this->socketClient = $this->createMock(NaadSocketClient::class);
+        $this->logger = $this->createMock(CustomLogger::class);
+        $this->connection = $this->createMock(ConnectionInterface::class);
 
-        $connector = $this->createMock(ConnectorInterface::class);
-        $connector
-            ->expects($this->once())
-            ->method('connect')
-            ->with('test:1000')
-            ->willReturn(new Promise(function () { }));
-
-        $client = new NaadSocketConnection(
-            'test',
-            $connector,
-            $socketClient,
-            $logger,
-            1000
+        $this->naadSocketConnection = new NaadSocketConnection(
+            'ws://localhost',
+            $this->connector,
+            $this->socketClient,
+            $this->logger
         );
-
-        $result = $client->connect();
-
-        $this->assertEquals(1, $result);
     }
 
-    public function testConnectFailure()
+    #[Test]
+    /**
+     * Tests a successful connection to socket.
+     *
+     * @return void
+     */
+    public function testConnectSuccess()
     {
-        $socketClient = $this->createMock(NaadSocketClient::class);
-        $socketClient
-            ->expects($this->once())
-            ->method('handleResponse')
-            ->with('test');
+        $write1 = 'test data 1';
+        $write2 = 'test data 2';
+        $write3 = 'test data 3';
 
-        $logger = $this->createStub(CustomLogger::class);
-
-        $s = fopen('php://memory', 'r+');
-        $stream = new DuplexResourceStream($s);
-        $connector = $this->createMock(ConnectorInterface::class);
-        $connector
-            ->expects($this->once())
-            ->method('connect')
-            ->with('test:1000')
-            ->willReturn(new Promise(
-                function ($resolve, $reject) use($stream) {
-                    $buffer = 'test';
-                    $stream->on('data', function ($chunk) use (&$buffer) {
-                        $buffer .= $chunk;
-                    });
-    
-                    $stream->on('error', $reject);
-    
-                    $stream->on('close', function () use (&$buffer, $resolve) {
-                        $resolve($buffer);
-                    });
-                },
-                function () {
-                    throw new \RuntimeException();
+        $this->connector->method('connect')->willReturn(
+            new Promise(
+                function ($resolve) {
+                    $resolve($this->connection);
                 }
-            ));
-
-        $client = new NaadSocketConnection(
-            'test',
-            $connector,
-            $socketClient,
-            $logger,
-            1000
+            )
         );
 
-        $result = $client->connect();
+        $this->logger
+            ->expects($this->exactly(5))
+            ->method('info');
 
-        $this->assertEquals(1, $result);
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with($this->stringContains('Exception during socket connection:'));
+
+        // SocketClient->handleResponse should be called 3 times with the data
+        // from the $write variables.
+        $invokedCount = $this->exactly(3);
+        $this->socketClient
+            ->expects($invokedCount)
+            ->method('handleResponse')
+            ->willReturnCallback(
+                function (string $value) use (
+                    $invokedCount,
+                    $write1,
+                    $write2,
+                    $write3
+                ) {
+                    match ($invokedCount->numberOfInvocations()) {
+                        1 => $this->assertEquals($write1, $value),
+                        2 => $this->assertEquals($write2, $value),
+                        3 => $this->assertEquals($write3, $value),
+                    };
+                    return true;
+                }
+            );
+
+        // Simulate receiving data on the connection
+        $this->connection->method('on')->willReturnCallback(
+            function ($event, $callback) use ($write1, $write2, $write3) {
+                // Data (write) event.
+                if ($event === 'data') {
+                    $callback($write1);
+                    $callback($write2);
+                    $callback($write3);
+                }
+
+                if ($event === 'end') {
+                    $callback();
+                }
+
+                if ($event === 'close') {
+                    $callback();
+                }
+
+                if ($event === 'error') {
+                    $callback(new Exception('Test exception'));
+                }
+            }
+        );
+
+        $exitCode = $this->naadSocketConnection->connect();
+        $this->assertEquals(1, $exitCode);
+    }
+
+    #[Test]
+    /**
+     * Tests a failure to connect to socket.
+     *
+     * @return void
+     */
+    public function testConnectFailure()
+    {
+        $this->connector->method('connect')->willReturn(
+            new Promise(
+                function ($resolve, $reject) {
+                    $reject(new \Exception('Connection failed'));
+                }
+            )
+        );
+
+        $this->logger->expects($this->once())
+            ->method('critical')
+            ->with($this->stringContains('Could not connect to socket:'));
+
+        $exitCode = $this->naadSocketConnection->connect();
+        $this->assertEquals(1, $exitCode);
     }
 }
