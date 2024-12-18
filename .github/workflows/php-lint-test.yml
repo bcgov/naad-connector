@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run phpcs
+      - name: Linting (PHPCS)
         run: composer run phpcs
       
-      - name: Run phpunit
-        run: composer run test
+      - name: Test coverage (PHPUnit)
+        run: composer run test-coverage
