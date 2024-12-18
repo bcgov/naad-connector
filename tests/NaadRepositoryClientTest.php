@@ -105,32 +105,6 @@ final class NaadRepositoryClientTest extends TestCase
     // DATA PROVIDERS
 
     /**
-     * Provides constructURL test data.
-     *
-     * @return array
-     */
-    public static function constructUrlProvider(): array
-    {
-        return [
-            'valid reference 1' => [
-                ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],
-                'http://naad.url/2024-06-17/2024_06_17T12_00_00ZI123.xml',
-                false,
-            ],
-            'valid reference 2' => [
-                ['sent' => '2024-06-18T14:30:00Z', 'id' => '456'],
-                'http://naad.url/2024-06-18/2024_06_18T14_30_00ZI456.xml',
-                false,
-            ],
-            'invalid reference' => [
-                [], // invalid reference
-                "Reference must contain 'sent' and 'id' keys",
-                true,
-            ],
-        ];
-    }
-
-    /**
      * Provides fetchAlert() Data.
      *
      * @return array
