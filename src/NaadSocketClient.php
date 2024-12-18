@@ -74,13 +74,13 @@ class NaadSocketClient
         DestinationClient $destinationClient,
         Logger $logger,
         Database $database,
-        NaadRepositoryClient $repositoryClient = null
+        NaadRepositoryClient $repositoryClient,
     ) {
         $this->name              = $name;
         $this->destinationClient = $destinationClient;
         $this->logger            = $logger;
         $this->database          = $database;
-        $this->repositoryClient  = $repositoryClient ?? new NaadRepositoryClient();
+        $this->repositoryClient  = $repositoryClient;
     }
 
     /**

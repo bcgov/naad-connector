@@ -1,8 +1,9 @@
 <?php
 namespace Bcgov\NaadConnector;
-use Bcgov\NaadConnector\NaadVars;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+
+
 /**
  * NaadRepositoryClient class makes requests to the NAAD alert repository.
  *
@@ -15,33 +16,34 @@ use GuzzleHttp\Exception\RequestException;
 class NaadRepositoryClient
 {
 
-    /**
-     * Guzzle HTTP client.
-     *
-     * @var Client
-     */
-    protected Client $client;
+    protected const URL_TEMPLATE = 'http://%s/%s/%sI%s.xml';
+    protected const SANITIZE_RULES = ['-' => '_', '+' => 'p', ':' => '_'];
 
-    /**
-     * The url of the NAAD alert repository.
-     *
-     * @var string
-     */
+    protected Client $client;
     protected string $baseUrl;
 
     /**
-     * Constructor for NaadRepositoryClient.
+     * Initializes a new instance of the NaadRepositoryClient class.
+     *
+     * @param Client $client      - The Guzzle HTTP client to use.
+     * @param string $naadRepoUrl - The base URL used to construct an
+     *                            URL for the Alerts repo.
      */
-    public function __construct()
+    public function __construct(Client $client, string $naadRepoUrl)
     {
-        $naadVars       = new NaadVars();
-        $this->baseUrl  = $naadVars->naadRepoUrl;
+
+        if (empty($naadRepoUrl)) {
+            throw new \InvalidArgumentException("Base URL cannot be empty");
+        }
+
+        $this->client   = $client;
+        $this->baseUrl  = $naadRepoUrl;
     }
 
     /**
      * Fetches an alert from the NAAD alert repository.
      *
-     * @param array $reference Heartbeat references array parts (sender, id, sent).
+     * @param array $reference - The reference data (sender, id, sent).
      *
      * @return string The alert response body.
      *
@@ -49,53 +51,34 @@ class NaadRepositoryClient
      */
     public function fetchAlert(array $reference): string
     {
+        $url = $this->constructURL($reference);
+
         try {
-            $url = $this->getURL($reference);
-            $this->client = new Client();
             $response = $this->client->get($url);
-            $responseBody = (string) $response->getBody();
-            return $responseBody;
+            return (string) $response->getBody();
         } catch (RequestException $e) {
-            throw new \Exception("Request failed: " . $e->getMessage());
+            throw new \RuntimeException(
+                "Failed to fetch alert: " . $e->getMessage()
+            );
         }
     }
 
     /**
-     * Builds the URL for the specific set of alerts by date and id
-     * that are located in a date-stamped filename in the NAAD alert repository
-     * based on the provided reference.
+     * Constructs the URL using the provide reference
      *
      * @param array $reference Heartbeat references array parts (sender, id, sent).
      *
      * @return string The constructed URL.
      */
-    protected function getURL(array $reference)
+    protected function constructURL(array $reference): string
     {
-        // Extract and sanitize values from the reference array.
-        $date = strtok($reference['sent'], 'T');
-        $sent = $this->replaceUrlCharacters($reference['sent']);
-        $id = $this->replaceUrlCharacters($reference['id']);
-
-        // Build the URL.
         return sprintf(
-            'http://%s/%s/%sI%s.xml',
+            self::URL_TEMPLATE,
             $this->baseUrl,
-            $date,
-            $sent,
-            $id
+            strtok($reference['sent'], 'T'), // date
+            strtr($reference['sent'], self::SANITIZE_RULES), // sent
+            strtr($reference['id'], self::SANITIZE_RULES), // id
         );
-    }
-
-    /**
-     * Replaces specific characters in a string as per NAAD URL requirements.
-     *
-     * @param string $s The input string.
-     *
-     * @return string The modified string.
-     */
-    protected function replaceUrlCharacters(string $s): string
-    {
-        return strtr($s, ['-' => '_', '+' => 'p', ':' => '_']);
     }
 
 }

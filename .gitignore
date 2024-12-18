@@ -17,6 +17,7 @@ heartbeat.log
 .vscode
 .env
 .devcontainer/override.env
+.phpactor.json
 
 # Ignore documentation files
 /docs/
