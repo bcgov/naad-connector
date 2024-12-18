@@ -1,8 +1,9 @@
 <?php
 namespace Bcgov\NaadConnector;
-use Bcgov\NaadConnector\NaadVars;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+
+
 /**
  * NaadRepositoryClient class makes requests to the NAAD alert repository.
  *
@@ -14,26 +15,11 @@ use GuzzleHttp\Exception\RequestException;
  */
 class NaadRepositoryClient
 {
-    /**
-     * Constants used by these methods
-     * - Url template for generating an URL string based on inputs
-     * - Sanitize rules to translate a reference to an URL-friendly string
-     */
+
     protected const URL_TEMPLATE = 'http://%s/%s/%sI%s.xml';
     protected const SANITIZE_RULES = ['-' => '_', '+' => 'p', ':' => '_'];
 
-    /**
-     * Guzzle HTTP client.
-     *
-     * @var Client
-     */
     protected Client $client;
-
-    /**
-     * The url of the NAAD alert repository.
-     *
-     * @var string
-     */
     protected string $baseUrl;
 
     /**
@@ -45,6 +31,11 @@ class NaadRepositoryClient
      */
     public function __construct(Client $client, string $naadRepoUrl)
     {
+
+        if (empty($naadRepoUrl)) {
+            throw new \InvalidArgumentException("Base URL cannot be empty");
+        }
+
         $this->client   = $client;
         $this->baseUrl  = $naadRepoUrl;
     }
@@ -52,7 +43,7 @@ class NaadRepositoryClient
     /**
      * Fetches an alert from the NAAD alert repository.
      *
-     * @param array $reference Heartbeat references array parts (sender, id, sent).
+     * @param array $reference - The reference data (sender, id, sent).
      *
      * @return string The alert response body.
      *
@@ -60,20 +51,20 @@ class NaadRepositoryClient
      */
     public function fetchAlert(array $reference): string
     {
-        try {
-            $url = $this->constructURL($reference);
-            $response = $this->client->get($url);
+        $url = $this->constructURL($reference);
 
+        try {
+            $response = $this->client->get($url);
             return (string) $response->getBody();
         } catch (RequestException $e) {
-            throw new \Exception("Request failed: " . $e->getMessage());
+            throw new \RuntimeException(
+                "Failed to fetch alert: " . $e->getMessage()
+            );
         }
     }
 
     /**
-     * Builds the URL for the specific set of alerts by date and id
-     * that are located in a date-stamped filename in the NAAD alert repository
-     * based on the provided reference.
+     * Constructs the URL using the provide reference
      *
      * @param array $reference Heartbeat references array parts (sender, id, sent).
      *
@@ -81,33 +72,22 @@ class NaadRepositoryClient
      */
     public function constructURL(array $reference): string
     {
-        // Extract date and sanitize values for URL construction.
-        $date = strtok($reference['sent'], 'T');
+        if (!isset($reference['sent'], $reference['id'])) {
+            throw new \InvalidArgumentException(
+                "Reference must contain 'sent' and 'id' keys"
+            );
+        }
 
-        // Build and return the URL.
+        $date          = strtok($reference['sent'], 'T');
+        $sanitizedSent = strtr($reference['sent'], self::SANITIZE_RULES);
+        $sanitizedId   = strtr($reference['id'], self::SANITIZE_RULES);
+
         return sprintf(
             self::URL_TEMPLATE,
             $this->baseUrl,
             $date,
-            strtr($reference['sent'], self::SANITIZE_RULES),
-            strtr($reference['id'], self::SANITIZE_RULES),
+            $sanitizedSent,
+            $sanitizedId
         );
     }
-
-    /**
-     * A debugger method that returns the class instance properties
-     * as a string
-     *
-     * Example use: `error_log(print_r($client->__debugInfo(), true));`
-     *
-     * @return array    an associative array of defined object accessible
-     *                  non-static properties for the specified object in scope.
-     *                  If a property have not been assigned a value,
-     *                  it will be returned with a null value.
-     */
-    public function __debugInfo(): array
-    {
-        return get_object_vars($this);
-    }
-
 }

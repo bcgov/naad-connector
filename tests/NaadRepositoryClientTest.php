@@ -1,22 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
 
 use PHPUnit\Framework\Attributes\{
-    Test,
     CoversClass,
     DataProvider
 };
 
 use Bcgov\NaadConnector\NaadRepositoryClient;
+
 /**
  * NaadRepositoryTest Class
- * This will test the class constructor, and these methods:
- * - fetchAlert()
- * - getURL()
+ * This will test the class constructor, and its methods
  *
  * @category Client
  * @package  NaadConnector
@@ -27,145 +28,142 @@ use Bcgov\NaadConnector\NaadRepositoryClient;
 #[CoversClass(NaadRepositoryClient::class)]
 final class NaadRepositoryClientTest extends TestCase
 {
-    private Client $guzzleClientMock;
-    private  string $naadRepoUrl;
-
     /**
-     * Centralized setup for reusable mocks.
+     * Test NaadRepositoryClient constructor throws exception on invalid URL
      *
      * @return void
      */
-    protected function setUp(): void
+    public function testConstructorThrowsExceptionOnInvalidUrl(): void
     {
-        $this->guzzleClientMock = $this->createMock(Client::class);
-        $this->naadRepoUrl = 'https://mock-naad-repo.com';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Base URL cannot be empty');
+
+        new NaadRepositoryClient(new Client(), ''); // Invalid URL
     }
 
     /**
-     * Tests that the NaadRepositoryClient constructor initializes the
-     * baseUrl property correctly.
+     * Test constructURL method with valid response and error
      *
-     * @param array $reference test data used to construct an URL
+     * @param array  $reference        The test data used to construct an URL.
+     * @param string $expectedUrl      The URL that the $reference should result in.
+     * @param bool   $expectsException Whether an exception is expected.
      *
      * @return void
      */
-    #[Test]
-    #[DataProvider('referenceData')]
-    public function testConstructorInitializesBaseUrl(array $reference): void
-    {
-        $client = new NaadRepositoryClient(
-            $this->guzzleClientMock,
-            $this->naadRepoUrl
-        );
+    #[DataProvider('constructURLData')]
+    public function testConstructURL(
+        array $reference,
+        string $expectedUrl,
+        bool $expectsException
+    ): void {
+        $client = new NaadRepositoryClient(new Client(), 'naad.url');
 
-        $expectedUrl = $client->constructURL($reference);
-
-        // debug this instance
-        error_log(print_r($client->__debugInfo(), true));
-
-        $this->assertEquals($expectedUrl, $client->constructURL($reference));
+        if ($expectsException) {
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage($expectedUrl);
+            $client->constructURL($reference);
+        } else {
+            $url = $client->constructURL($reference);
+            $this->assertEquals($expectedUrl, $url);
+        }
     }
 
     /**
-     * Tests that the NaadRepositoryClient fetchAlert method
-     * returns the expected response from the mock Guzzle client.
+     * Tests  fetchAlert method with valid response and error.
      *
-     * @param array $reference - The URL sent/id reference data
-     *                         used to generate an URL.
-     *
-     * @return void
-     */
-    #[Test]
-    #[DataProvider('referenceData')]
-    public function testFetchAlert(array $reference): void
-    {
-        $this->guzzleClientMock
-            ->method('get')
-            ->willReturn(new Response(200, [], 'Mock Alert Response'));
-
-        $client = new NaadRepositoryClient(
-            $this->guzzleClientMock,
-            $this->naadRepoUrl
-        );
-
-        $response = $client->fetchAlert($reference);
-
-        $this->assertEquals('Mock Alert Response', $response);
-    }
-
-    /**
-     * Tests that the NaadRepositoryClient fetchAlert method throws an exception
-     * when the Guzzle client throws a RequestException.
-     *
-     * @param array $reference - The URL sent/id reference data
-     *                         used to generate an URL.
+     * @param array  $mockResponse     The mocked response from the guzzle client
+     * @param array  $reference        The test data used to construct an URL.
+     * @param string $expectedBody     The request response body that
+     *                                 should be returned in the fetched Alert.
+     * @param bool   $expectsException Whether an exception is expected.
      *
      * @return void
      */
-    #[Test]
-    #[DataProvider('referenceData')]
-    public function testFetchAlertThrowsException(array $reference): void
-    {
-        $this->guzzleClientMock
-            ->method('get')
-            ->willThrowException(
+    #[DataProvider('fetchAlertData')]
+    public function testFetchAlert(
+        $mockResponse,
+        array $reference,
+        string $expectedBody,
+        bool $expectsException
+    ): void {
+        $mockClient = $this->createMock(Client::class);
+        if ($expectsException) {
+            $mockClient->method('get')->willThrowException(
                 new RequestException(
-                    'Error',
-                    new \GuzzleHttp\Psr7\Request('GET', 'test')
+                    "Error",
+                    $this->createMock(RequestInterface::class)
                 )
             );
+        } else {
+            $mockClient->method('get')->willReturn($mockResponse);
+        }
 
-        $client = new NaadRepositoryClient(
-            $this->guzzleClientMock,
-            $this->naadRepoUrl
-        );
+        $client = new NaadRepositoryClient($mockClient, 'naad.url');
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Request failed: Error');
+        if ($expectsException) {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage($expectedBody);
+            $client->fetchAlert($reference);
+        } else {
+            $response = $client->fetchAlert($reference);
+            $this->assertEquals($expectedBody, $response);
+        }
 
-        $client->fetchAlert($reference);
     }
 
+
+    // DATA PROVIDERS
+
     /**
-     * Returns an array of reference data used for testing the NaadRepositoryClient.
+     * Provides constructURL test data.
      *
-     * The array contains key-value pairs where the key is a descriptive name for the
-     * reference data and the value is an array of arrays containing 'sent' and 'id'
-     * values used to generate URLs for testing.
+     * Each reference contains two units of test data:
+     * 1. sent/id pair for references to create an URL
+     * 2. expected URL - The URL that constructURL should generate.
      *
      * @return array
      */
-    public static function referenceData(): array
+    public static function constructURLData(): array
     {
         return [
-            'Reference #1' =>
-            [['sent' => '2024-12-16T10:00:00', 'id' => '1234567890']],
-            'Reference #2' =>
-            [['sent' => '2023-11-15T08:30:00', 'id' => '0987654321']],
-            'Midnight Edge Case' =>
-            [['sent' => '2024-01-01T00:00:00', 'id' => '1122334455']],
-            'Long ID' =>
-            [['sent' => '2025-05-25T12:45:00', 'id' => '12345678901234567890']],
-            'Special Characters' =>
-            [['sent' => '2022-07-04T14:30:00', 'id' => 'abc-123:456+789']],
+            'valid reference 1' => [
+                ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],
+                'http://naad.url/2024-06-17/2024_06_17T12_00_00ZI123.xml',
+                false,
+            ],
+            'valid reference 2' => [
+                ['sent' => '2024-06-18T14:30:00Z', 'id' => '456'],
+                'http://naad.url/2024-06-18/2024_06_18T14_30_00ZI456.xml',
+                false,
+            ],
+            'invalid reference' => [
+                [], // invalid reference
+                "Reference must contain 'sent' and 'id' keys",
+                true,
+            ],
         ];
     }
 
     /**
-     * Returns an array of data used for testing the NaadRepositoryClient's
-     * magic getter.
-     *
-     * The array contains key-value pairs where the key is a descriptive name for the
-     * test case and the value is an array containing the property name and a boolean
-     * indicating whether the property should throw an exception.
+     * Provides fetchAlert() Data.
      *
      * @return array
      */
-    public static function getterData(): array
+    public static function fetchAlertData(): array
     {
         return [
-            'Valid baseUrl' => ['https://example.com', false],
-            'Non-existent property' => ['nonExistentProperty', true],
+            'successful fetch' => [
+                new Response(200, [], 'Alert Body'),
+                ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],
+                'Alert Body',
+                false,
+            ],
+            'request error' => [
+                'Request error scenario',
+                ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],
+                'Failed to fetch alert: Error',
+                true,
+            ],
         ];
     }
 }
