@@ -78,16 +78,12 @@ class NaadRepositoryClient
             );
         }
 
-        $date          = strtok($reference['sent'], 'T');
-        $sanitizedSent = strtr($reference['sent'], self::SANITIZE_RULES);
-        $sanitizedId   = strtr($reference['id'], self::SANITIZE_RULES);
-
         return sprintf(
             self::URL_TEMPLATE,
             $this->baseUrl,
-            $date,
-            $sanitizedSent,
-            $sanitizedId
+            strtok($reference['sent'], 'T'), // date
+            strtr($reference['sent'], self::SANITIZE_RULES), // sent
+            strtr($reference['id'], self::SANITIZE_RULES), // id
         );
     }
 

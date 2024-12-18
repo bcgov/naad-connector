@@ -29,16 +29,33 @@ use Bcgov\NaadConnector\NaadRepositoryClient;
 final class NaadRepositoryClientTest extends TestCase
 {
     /**
-     * Test NaadRepositoryClient constructor throws exception on invalid URL
+     * Test NaadRepositoryClient constructor with various URLs
+     *
+     * @param string $url         The base URL to initialize the class.
+     * @param bool   $shouldThrow Whether to throw an exception.
      *
      * @return void
      */
-    public function testConstructorThrowsExceptionOnInvalidUrl(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Base URL cannot be empty');
+    #[DataProvider('urlProvider')]
+    public function testConstructorWithVariousUrls(
+        string $url,
+        bool $shouldThrow
+    ): void {
+        if ($shouldThrow) {
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('Base URL cannot be empty');
+        }
 
-        new NaadRepositoryClient(new Client(), ''); // Invalid URL
+        $client = new Client(); // Assuming Client is a valid class
+        $naadRepositoryClient = new NaadRepositoryClient($client, $url);
+
+        if (!$shouldThrow) {
+            // Assert that the instance is created successfully
+            $this->assertInstanceOf(
+                NaadRepositoryClient::class,
+                $naadRepositoryClient
+            );
+        }
     }
 
     /**
@@ -50,8 +67,8 @@ final class NaadRepositoryClientTest extends TestCase
      *
      * @return void
      */
-    #[DataProvider('constructURLData')]
-    public function testConstructURL(
+    #[DataProvider('constructUrlProvider')]
+    public function testConstructUrl(
         array $reference,
         string $expectedUrl,
         bool $expectsException
@@ -79,7 +96,7 @@ final class NaadRepositoryClientTest extends TestCase
      *
      * @return void
      */
-    #[DataProvider('fetchAlertData')]
+    #[DataProvider('fetchAlertProvider')]
     public function testFetchAlert(
         $mockResponse,
         array $reference,
@@ -117,13 +134,9 @@ final class NaadRepositoryClientTest extends TestCase
     /**
      * Provides constructURL test data.
      *
-     * Each reference contains two units of test data:
-     * 1. sent/id pair for references to create an URL
-     * 2. expected URL - The URL that constructURL should generate.
-     *
      * @return array
      */
-    public static function constructURLData(): array
+    public static function constructUrlProvider(): array
     {
         return [
             'valid reference 1' => [
@@ -149,7 +162,7 @@ final class NaadRepositoryClientTest extends TestCase
      *
      * @return array
      */
-    public static function fetchAlertData(): array
+    public static function fetchAlertProvider(): array
     {
         return [
             'successful fetch' => [
@@ -164,6 +177,19 @@ final class NaadRepositoryClientTest extends TestCase
                 'Failed to fetch alert: Error',
                 true,
             ],
+        ];
+    }
+
+    /**
+     * Data provider for testConstructorWithVariousUrls
+     *
+     * @return array
+     */
+    public static function urlProvider(): array
+    {
+        return [
+            'valid URL' => ['https://api.example.com', false],
+            'invalid URL' => ['', true],
         ];
     }
 }
