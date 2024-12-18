@@ -36,11 +36,9 @@ $socketClient = new NaadSocketClient(
     $database
 );
 
-$connector = new React\Socket\Connector();
-
 $connector = new NaadSocketConnection(
     $naadVars->naadUrl,
-    $connector,
+    new React\Socket\Connector(),
     $socketClient,
     $socketLogger,
 );

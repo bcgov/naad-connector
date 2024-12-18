@@ -62,7 +62,13 @@ class NaadSocketConnection
      */
     public function connect(): int
     {
-        $this->logger->info('Connecting to socket.');
+        $this->logger->info(
+            "Attempting to connect to '{address}' on port '{port}'...",
+            [
+                'address' => $this->address,
+                'port'    => $this->port,
+            ]
+        );
         $fullAddress = sprintf('%s:%d', $this->address, $this->port);
         $this->connector->connect($fullAddress)->then(
             // Successful connection, get a Connection object.
