@@ -100,6 +100,44 @@ final class DestinationClientTest extends TestCase
         $this->assertTrue($destinationClient->sendAlerts());
     }
 
+        /**
+     * Tests sendAlerts method when all alerts are successfully sent.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testSendAlertsFailure()
+    {
+        $alert = $this->createMock(Alert::class);
+        $alert->method('getBody')->willReturn('<alert>data</alert>');
+        $alert->expects($this->once())->method('setSuccess')->with(false);
+        $alert->expects($this->once())->method('setSendAttempted');
+        $alert->expects($this->once())->method('incrementFailures');
+
+        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
+        $this->mockDatabase->expects($this->once())
+            ->method('updateAlert')->with($alert);
+
+        $exception = new ConnectException(
+            'Connection error',
+            new \GuzzleHttp\Psr7\Request('POST', 'test')
+        );
+        $this->mockHttpClient->method('post')
+            ->willThrowException($exception);
+        $this->mockLogger->expects($this->once())->method('error');
+
+        $destinationClient = new DestinationClient(
+            'http://example.com',
+            'user',
+            'pass',
+            $this->mockLogger,
+            $this->mockDatabase,
+            $this->mockHttpClient
+        );
+
+        $this->assertFalse($destinationClient->sendAlerts());
+    }
+
     /**
      * Tests sendAlerts method when there is a database exception.
      *
@@ -111,18 +149,19 @@ final class DestinationClientTest extends TestCase
         $mockAlert = $this->createMock(Alert::class);
         $mockAlert->method('getBody')->willReturn('<xml></xml>');
         $mockAlert->method('getId')->willReturn('alert-id');
+        $exceptionMessage = 'Database error';
 
         $this->mockDatabase->method('getUnsentAlerts')->willReturn([$mockAlert]);
         $this->mockDatabase->method('updateAlert')
-            ->willThrowException(new \RuntimeException('Database error'));
+            ->willThrowException(new \RuntimeException($exceptionMessage));
 
         $this->mockLogger->expects($this->once())
             ->method('critical')
             ->with(
-                'Could not send or update Alert ({id}): {error}',
+                'Could not update Alert ({id}): {error}',
                 $this->callback(
                     fn($context) => $context['id'] === 'alert-id' &&
-                    str_contains($context['error'], 'Database error')
+                    str_contains($context['error'], $exceptionMessage)
                 )
             );
 
@@ -134,8 +173,8 @@ final class DestinationClientTest extends TestCase
             $this->mockDatabase,
             $this->mockHttpClient
         );
-
-        $this->assertFalse($client->sendAlerts());
+        $this->expectExceptionMessage($exceptionMessage);
+        $client->sendAlerts();
     }
 
     /**

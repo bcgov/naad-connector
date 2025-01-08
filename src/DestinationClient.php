@@ -107,24 +107,44 @@ class DestinationClient
         foreach ($unsentAlerts as $alert) {
             try {
                 $response = $this->sendRequest($alert->getBody());
-    
-                if (200 === $response['status_code']) {
-                    $alert->setSuccess(true);
-                } else {
-                    $alert->incrementFailures();
-                    $alert->setSuccess(false);
-                    $allSuccessful = false;
-                }
-    
-                $alert->setSendAttempted(new \DateTime());
+                $this->logger->info(
+                    'Sent Alert ({id}) to destination.',
+                    [ 'id' => $alert->getId() ]
+                );
+            } catch (\Exception $e) {
+                $allSuccessful = false;
+                $this->logger->error(
+                    'Could not send Alert ({id}): {error}',
+                    [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
+                );
+            }
+                
+            if (200 === $response['status_code']) {
+                $alert->setSuccess(true);
+            } else {
+                $alert->incrementFailures();
+                $alert->setSuccess(false);
+                $allSuccessful = false;
+                $this->logger->error(
+                    'HTTP response for Alert ({id}): Status {code}: {body}',
+                    [
+                        'code' => $response['status_code'],
+                        'body' => $response['body'],
+                        'id' => $alert->getId()
+                    ]
+                );
+            }
+
+            $alert->setSendAttempted(new \DateTime());
+            try {
                 $this->database->updateAlert($alert);
             } catch (\Exception $e) {
                 $allSuccessful = false;
                 $this->logger->critical(
-                    'Could not send or update Alert ({id}): {error}',
+                    'Could not update Alert ({id}): {error}',
                     [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
                 );
-
+                throw $e;
             }
         }
         return $allSuccessful;
