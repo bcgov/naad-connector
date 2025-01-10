@@ -136,17 +136,8 @@ class DestinationClient
             }
 
             $alert->setSendAttempted(new \DateTime());
-            try {
-                $this->database->updateAlert($alert);
-            } catch (\Exception $e) {
-                $allSuccessful = false;
-                $this->logger->critical(
-                    'Could not update Alert ({id}): {error}',
-                    [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
-                );
-                throw $e;
-            }
         }
+        $this->database->flush();
         return $allSuccessful;
     }
 
