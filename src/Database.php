@@ -122,10 +122,12 @@ class Database
         $query = $qb->select(array('a'))
             ->from(Alert::class, 'a')
             ->where('a.success = false')
-            ->andWhere($qb->expr()->orX(
-                'a.send_attempted IS NULL',
-                'a.send_attempted < :retryThreshold'
-            ))
+            ->andWhere(
+                $qb->expr()->orX(
+                    'a.send_attempted IS NULL',
+                    'a.send_attempted < :retryThreshold'
+                )
+            )
             ->orderBy('a.received', 'DESC')
             ->setMaxResults(5)
             ->setParameter('retryThreshold', $retryThreshold)

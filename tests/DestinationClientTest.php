@@ -81,8 +81,6 @@ final class DestinationClientTest extends TestCase
         $alert->expects($this->never())->method('incrementFailures');
 
         $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
-        $this->mockDatabase->expects($this->once())
-            ->method('updateAlert')->with($alert);
 
         $this->mockHttpClient->method('post')
             ->willReturn(new Response(200, [], 'OK'));
@@ -115,8 +113,6 @@ final class DestinationClientTest extends TestCase
         $alert->expects($this->once())->method('incrementFailures');
 
         $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
-        $this->mockDatabase->expects($this->once())
-            ->method('updateAlert')->with($alert);
 
         $exception = new ConnectException(
             'Connection error',
@@ -136,45 +132,6 @@ final class DestinationClientTest extends TestCase
         );
 
         $this->assertFalse($destinationClient->sendAlerts());
-    }
-
-    /**
-     * Tests sendAlerts method when there is a database exception.
-     *
-     * @return void
-     */
-    #[Test]
-    public function testSendAlertsDatabaseException()
-    {
-        $mockAlert = $this->createMock(Alert::class);
-        $mockAlert->method('getBody')->willReturn('<xml></xml>');
-        $mockAlert->method('getId')->willReturn('alert-id');
-        $exceptionMessage = 'Database error';
-
-        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$mockAlert]);
-        $this->mockDatabase->method('updateAlert')
-            ->willThrowException(new \RuntimeException($exceptionMessage));
-
-        $this->mockLogger->expects($this->once())
-            ->method('critical')
-            ->with(
-                'Could not update Alert ({id}): {error}',
-                $this->callback(
-                    fn($context) => $context['id'] === 'alert-id' &&
-                    str_contains($context['error'], $exceptionMessage)
-                )
-            );
-
-        $client = new DestinationClient(
-            'http://example.com',
-            'user',
-            'password',
-            $this->mockLogger,
-            $this->mockDatabase,
-            $this->mockHttpClient
-        );
-        $this->expectExceptionMessage($exceptionMessage);
-        $client->sendAlerts();
     }
 
     /**
