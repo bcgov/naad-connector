@@ -63,22 +63,6 @@ class Database
     }
 
     /**
-     * Persists an alert to the database.
-     *
-     * @param Alert $alert The alert to persist.
-     *
-     * @return string
-     *
-     * @see https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/working-with-objects.html#persisting-entities
-     */
-    protected function persistAlert(
-        Alert $alert
-    ): string {
-        $this->entityManager->persist($alert);
-        return $alert->getId();
-    }
-
-    /**
      * Inserts an alert into the database.
      *
      * @param Alert $alert The alert to insert.
@@ -88,34 +72,20 @@ class Database
     public function insertAlert( Alert $alert ): void
     {
         try {
-            $this->persistAlert($alert);
-            $this->entityManager->flush();
+            $this->entityManager->persist($alert);
+            $this->flush();
         } catch ( UniqueConstraintViolationException $e ) {
             $this->entityManager = $this->getEntityManager();
         }
     }
 
     /**
-     * Updates an alert's status in the database.
-     *
-     * @param Alert $alert The alert to update.
+     * Flushes EntityManager causing database queries to be executed.
      *
      * @return void
      */
-    public function updateAlert(Alert $alert): void
+    public function flush(): void
     {
-        $existingAlert = $this->entityManager->find(Alert::class, $alert->getId());
-
-        if ($existingAlert) {
-            $existingAlert->setSuccess($alert->getSuccess());
-            $existingAlert->setSendAttempted($alert->getSendAttempted());
-            $existingAlert->setFailures($alert->getFailures());
-        } else {
-            throw new \RuntimeException(
-                'Alert not found for update: ' . $alert->getId()
-            );
-        }
-
         $this->entityManager->flush();
     }
 
@@ -130,7 +100,7 @@ class Database
     {
         $alertRepository = $this->entityManager->getRepository(Alert::class);
         $alerts          = $alertRepository->findBy([ 'id' => $ids ]);
-        $this->entityManager->flush();
+        $this->flush();
         return $alerts;
     }
 
@@ -144,25 +114,27 @@ class Database
         $retryIntervalMinutes = 5;
         $now = new \DateTime();
 
-        $query = $this->entityManager->createQuery(
-            'SELECT a
-            FROM Bcgov\NaadConnector\Entity\Alert a
-            WHERE a.success = false
-            AND (
-                a.send_attempted IS NULL OR
-                a.send_attempted < :retryThreshold
-            )'
-        );
-
         // Calculate the retry threshold based on failure count.
         $retryThreshold = clone $now;
         $retryThreshold->modify('-' . $retryIntervalMinutes . ' minutes');
 
-        $query->setParameter('retryThreshold', $retryThreshold);
+        $qb = $this->entityManager->createQueryBuilder();
+        $query = $qb->select(array('a'))
+            ->from(Alert::class, 'a')
+            ->where('a.success = false')
+            ->andWhere(
+                $qb->expr()->orX(
+                    'a.send_attempted IS NULL',
+                    'a.send_attempted < :retryThreshold'
+                )
+            )
+            ->orderBy('a.received', 'DESC')
+            ->setMaxResults(5)
+            ->setParameter('retryThreshold', $retryThreshold)
+            ->getQuery();
 
         // Execute the query and return results.
         $alerts = $query->getResult();
-        $this->entityManager->clear();
         
         return $alerts;
     }

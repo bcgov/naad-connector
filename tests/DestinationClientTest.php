@@ -81,8 +81,6 @@ final class DestinationClientTest extends TestCase
         $alert->expects($this->never())->method('incrementFailures');
 
         $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
-        $this->mockDatabase->expects($this->once())
-            ->method('updateAlert')->with($alert);
 
         $this->mockHttpClient->method('post')
             ->willReturn(new Response(200, [], 'OK'));
@@ -100,42 +98,40 @@ final class DestinationClientTest extends TestCase
         $this->assertTrue($destinationClient->sendAlerts());
     }
 
-    /**
-     * Tests sendAlerts method when there is a database exception.
+        /**
+     * Tests sendAlerts method when all alerts are successfully sent.
      *
      * @return void
      */
     #[Test]
-    public function testSendAlertsDatabaseException()
+    public function testSendAlertsFailure()
     {
-        $mockAlert = $this->createMock(Alert::class);
-        $mockAlert->method('getBody')->willReturn('<xml></xml>');
-        $mockAlert->method('getId')->willReturn('alert-id');
+        $alert = $this->createMock(Alert::class);
+        $alert->method('getBody')->willReturn('<alert>data</alert>');
+        $alert->expects($this->once())->method('setSuccess')->with(false);
+        $alert->expects($this->once())->method('setSendAttempted');
+        $alert->expects($this->once())->method('incrementFailures');
 
-        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$mockAlert]);
-        $this->mockDatabase->method('updateAlert')
-            ->willThrowException(new \RuntimeException('Database error'));
+        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
 
-        $this->mockLogger->expects($this->once())
-            ->method('critical')
-            ->with(
-                'Could not send or update Alert ({id}): {error}',
-                $this->callback(
-                    fn($context) => $context['id'] === 'alert-id' &&
-                    str_contains($context['error'], 'Database error')
-                )
-            );
+        $exception = new ConnectException(
+            'Connection error',
+            new \GuzzleHttp\Psr7\Request('POST', 'test')
+        );
+        $this->mockHttpClient->method('post')
+            ->willThrowException($exception);
+        $this->mockLogger->expects($this->once())->method('error');
 
-        $client = new DestinationClient(
+        $destinationClient = new DestinationClient(
             'http://example.com',
             'user',
-            'password',
+            'pass',
             $this->mockLogger,
             $this->mockDatabase,
             $this->mockHttpClient
         );
 
-        $this->assertFalse($client->sendAlerts());
+        $this->assertFalse($destinationClient->sendAlerts());
     }
 
     /**
