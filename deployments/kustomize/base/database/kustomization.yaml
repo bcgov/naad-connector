@@ -4,7 +4,6 @@ resources:
 - deployment.yaml
 - services.yaml
 - volume.yaml
-- migration-job.yaml
 
 # Updates the labels for all containers.
 commonLabels:

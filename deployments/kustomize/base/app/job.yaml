@@ -2,10 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never
       containers:
         - name: naad-database-migration
           image: bcgovgdx/naad-app
@@ -22,5 +25,5 @@ spec:
             limits:
               cpu: 500m
               memory: 1Gi
-          command: ['vendor/bin/doctrine-migrations', 'migrate']
+          command: ['vendor/bin/doctrine-migrations', 'migrate', '--no-interaction', '--allow-no-migration']
   backoffLimit: 100
