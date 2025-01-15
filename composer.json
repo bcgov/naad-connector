@@ -29,6 +29,8 @@
       "open $(pwd)/docs/index.html"
     ],
     "start": [
+      "echo 'Disable 300 sec timeout of the start script'",
+      "Composer\\Config::disableProcessTimeout",
       "php src/start.php"
     ],
     "k8s-start": [

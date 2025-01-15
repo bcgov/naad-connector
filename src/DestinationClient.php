@@ -1,7 +1,6 @@
 <?php
 namespace Bcgov\NaadConnector;
 
-use Bcgov\NaadConnector\Entity\Alert;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
@@ -63,6 +62,11 @@ class DestinationClient
     protected Database $database;
 
     /**
+     * The headers for sending alerts and sending requests
+     */
+    protected array $headers;
+
+    /**
      * Constructor for DestinationClient.
      *
      * @param string   $url                 The destination API endpoint.
@@ -71,6 +75,7 @@ class DestinationClient
      * @param Logger   $logger              An instance of Monolog/Logger.
      * @param Database $database            Instance of Database for alerts.
      * @param Client   $client              The Guzzle HTTP client (optional).
+     * @param array    $headers             The client response headers.
      */
     public function __construct(
         string $url,
@@ -78,24 +83,21 @@ class DestinationClient
         string $applicationPassword,
         Logger $logger,
         Database $database,
-        ?Client $client = null
+        Client $client,
+        array $headers,
     ) {
         $this->url                 = $url;
         $this->username            = $username;
         $this->applicationPassword = $applicationPassword;
-        $this->logger            = $logger;
+        $this->logger              = $logger;
         $this->database            = $database;
-        $this->client = $client ?? new Client(
-            [
-                'base_uri' => $this->url,
-                'auth'     => [$this->username, $this->applicationPassword],
-            ]
-        );
+        $this->headers             = $headers;
+        $this->client              = $client;
     }
 
     /**
      * Sends unsent alerts to the destination and updates their statuses.
-     * 
+     *
      * @return bool Returns `true` if all alerts were sent successfully,
      *              `false` if any alert failed to be sent.
      */
@@ -103,7 +105,7 @@ class DestinationClient
     {
         $unsentAlerts = $this->database->getUnsentAlerts();
         $allSuccessful = true;
-    
+
         foreach ($unsentAlerts as $alert) {
             try {
                 $response = $this->sendRequest($alert->getBody());
@@ -118,7 +120,7 @@ class DestinationClient
                     [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
                 );
             }
-                
+
             if (200 === $response['status_code']) {
                 $alert->setSuccess(true);
             } else {
@@ -157,13 +159,13 @@ class DestinationClient
         try {
             $response = $this->client->post(
                 '', [
-                    'json'    => ['xml' => $xml],
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                    ],
+                'base_uri' => $this->url,
+                'auth'     => [$this->username, $this->applicationPassword],
+                'headers' => $this->headers,
+                'json'    => ['xml' => $xml],
                 ]
             );
-    
+
             return [
                 'status_code' => $response->getStatusCode(),
                 'body'        => (string) $response->getBody(),
