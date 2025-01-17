@@ -108,8 +108,14 @@ class DestinationClient
             $response = $this->client->post('', $options);
 
             // log Request and Response headers when the log level is set to 'debug'
-            $this->logger->debug( 'Request Headers: ', [$this->client->getConfig('headers')]);
-            $this->logger->debug( 'Response Headers: ', [$response->getHeaders()]);
+            $this->logger->debug(
+                'Request Headers: ',
+                [$this->client->getConfig('headers')]
+            );
+            $this->logger->debug(
+                'Response Headers: ',
+                [$response->getHeaders()]
+            );
 
             return [
                 'status_code' => $response->getStatusCode(),
