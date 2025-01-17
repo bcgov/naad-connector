@@ -6,21 +6,17 @@ namespace Bcgov\NaadConnector;
  *
  * For Best Practices, see:
  * https://owasp.org/www-project-secure-headers/index.html#div-bestpractices_configuration-proposal
+ *
+ * Many headers do not apply, since this POST request does not reach a browser,
+ * but another API.
  */
 $headers = [
-    'Strict-Transport-Security' => 'max-age=63072000; includeSubDomains',
-    'X-Frame-Options' => 'deny',
-    'X-Content-Type-Options' => 'nosniff',
+    'Accept' => 'application/json',
+    'Accept-Encoding' => 'gzip, deflate',
     'Content-Type' => 'application/json',
-    'Content-Security-Policy' => "default-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content", // Added default-src
-    'X-Permitted-Cross-Domain-Policies' => 'none',
-    'Referrer-Policy' => 'no-referrer',
-    'Clear-site-Data' => "cache", "cookies", "storage",
-    'Cross-Origin-Embedder-Policy' => 'require-corp',
-    'Cross-Origin-Opener-Policy' => 'same-origin',
-    'Cross-Origin-Resource-Policy' => 'same-origin',
-    'Permissions-Policy' => 'ccelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()',
-    'Cache-Control' => 'no-store, max-age=0'
+    'User-Agent' => 'bcgov/naad-connector/1.0.0',
+    'X-Content-Type-Options' => 'nosniff',
+    'X-Requested-With' => 'XMLHttpRequest', // Signals this is non-browser request.
 ];
 
 return $headers;

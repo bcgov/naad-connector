@@ -2,6 +2,15 @@
 
 ## 1.0.0
 
+## JAN 16, 2025
+
+[DESCW-2744](https://citz-gdx.atlassian.net/browse/DESCW-2744)
+- Add secure headers to the POST Request headers of DestinationClient
+- This involved adding a test to confirm the headers (with mocks)
+- Also, the DestinationClient constructor now takes fewer arguments
+- start.php passes a configured instance of the Client DestinationClient
+  - it contains authentication, base_uri, and headers now.
+
 ### DEC 18, 2024
 
 - Add tests for NaadRepositoryClient [DESCW-2797](https://citz-gdx.atlassian.net/browse/DESCW-2797)

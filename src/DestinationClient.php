@@ -19,79 +19,26 @@ use Monolog\Logger;
 class DestinationClient
 {
 
-    /**
-     * The url of the destination (including full API endpoint).
-     *
-     * @var string
-     */
-    protected string $url;
-
-    /**
-     * The username of the user to authenticate with.
-     *
-     * @var string
-     */
-    protected string $username;
-
-    /**
-     * The application password of the user to authenticate with.
-     *
-     * @var string
-     */
-    protected string $applicationPassword;
-
-    /**
-     * Guzzle HTTP client.
-     *
-     * @var Client
-     */
     protected Client $client;
-
-    /**
-     * Monolog Logger.
-     *
-     * @var Logger
-     */
     protected Logger $logger;
-
-    /**
-     * The alert Database.
-     *
-     * @var Database
-     */
     protected Database $database;
-
-    /**
-     * The headers for sending alerts and sending requests
-     */
-    protected array $headers;
+    protected const DEBUG_MODE = false; // for logging HTTP headers.
 
     /**
      * Constructor for DestinationClient.
      *
-     * @param string   $url                 The destination API endpoint.
-     * @param string   $username            The username for authentication.
-     * @param string   $applicationPassword The password for authentication.
-     * @param Logger   $logger              An instance of Monolog/Logger.
-     * @param Database $database            Instance of Database for alerts.
-     * @param Client   $client              The Guzzle HTTP client (optional).
-     * @param array    $headers             The client response headers.
+     * @param Logger   $logger   An instance of Monolog/Logger.
+     * @param Database $database Instance of Database for alerts.
+     * @param Client   $client   An instance of a guzzle client with:
+     *                           auth, url, and headers.
      */
     public function __construct(
-        string $url,
-        string $username,
-        string $applicationPassword,
         Logger $logger,
         Database $database,
         Client $client,
-        array $headers,
     ) {
-        $this->url                 = $url;
-        $this->username            = $username;
-        $this->applicationPassword = $applicationPassword;
         $this->logger              = $logger;
         $this->database            = $database;
-        $this->headers             = $headers;
         $this->client              = $client;
     }
 
@@ -152,23 +99,34 @@ class DestinationClient
      *               - 'status_code' (int): The HTTP status code of the response.
      *               - 'body' (string): The body of the response.
      *
-     * @throws RequestException If the request fails and no response is available.
+     * @throws RequestException If the request fails.and no response is available.
      */
     public function sendRequest(string $xml): array
     {
+        $options = [ 'json' => ['xml' => $xml]];
+
         try {
-            $response = $this->client->post(
-                '', [
-                'base_uri' => $this->url,
-                'auth'     => [$this->username, $this->applicationPassword],
-                'headers' => $this->headers,
-                'json'    => ['xml' => $xml],
-                ]
-            );
+            $response = $this->client->post('', $options);
+
+            // log Request and Response headers for debugging
+            if (self::DEBUG_MODE ) {
+                // Log the client's request headers before the post is sent
+                $this->logger->info(
+                    'Request Headers: ',
+                    [$this->client->getConfig('headers')]
+                );
+
+                // Log the response headers
+                $this->logger->info(
+                    'Response Headers: ',
+                    [$response->getHeaders()]
+                );
+            }
 
             return [
                 'status_code' => $response->getStatusCode(),
                 'body'        => (string) $response->getBody(),
+                'headers'     => $response->getHeaders(),
             ];
         } catch ( ConnectException $e ) {
             return [

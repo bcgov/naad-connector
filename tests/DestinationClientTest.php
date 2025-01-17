@@ -1,24 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Bcgov\NaadConnector;
-
-// Unit test includes
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\{
     Test,
     CoversClass,
-    UsesClass,
+    UsesClass
 };
-
-// NaadConnector class includes
+use PHPUnit\Framework\TestCase;
 use Bcgov\NaadConnector\{
     CustomLogger,
     Database,
     DestinationClient
 };
 use Bcgov\NaadConnector\Entity\Alert;
-
-// Guzzle HTTP client includes
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -33,8 +26,8 @@ use GuzzleHttp\Psr7\Response;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-#[CoversClass('Bcgov\NaadConnector\DestinationClient'::class)]
-#[UsesClass('Bcgov\NaadConnector\Entity\Alert'::class)]
+#[CoversClass('Bcgov\NaadConnector\DestinationClient')]
+#[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
 final class DestinationClientTest extends TestCase
 {
     private $mockDatabase;
@@ -49,25 +42,17 @@ final class DestinationClientTest extends TestCase
      */
     protected function setUp(): void
     {
-        error_log(realpath(__DIR__ . '/../src/headers.php'));
-        global $headers;
         $this->mockDatabase = $this->createMock(Database::class);
         $this->mockLogger = $this->createMock(CustomLogger::class);
         $this->mockHttpClient = $this->createMock(Client::class);
-        $this->expectedHeaders =[
-            'Strict-Transport-Security' => 'max-age=63072000; includeSubDomains', // Increased max-age and added preload
-            'X-Frame-Options' => 'deny',
-            'X-Content-Type-Options' => 'nosniff',
-            'Content-Type' => 'application/json',
-            'Content-Security-Policy' => "default-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content", // Added default-src
-            'X-Permitted-Cross-Domain-Policies' => 'none',
-            'Referrer-Policy' => 'no-referrer',
-            'Clear-site-Data' => "cache", "cookies", "storage",
-            'Cross-Origin-Embedder-Policy' => 'require-corp',
-            'Cross-Origin-Opener-Policy' => 'same-origin',
-            'Cross-Origin-Resource-Policy' => 'same-origin',
-            'Permissions-Policy' => 'ccelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()',
-            'Cache-Control' => 'no-store, max-age=0'
+        $this->expectedHeaders = [
+            'Accept' => ['application/json'],
+            'Accept-Encoding' => ['gzip, deflate'],
+            'Content-Type' => ['application/json'],
+            'User-Agent' => ['bcgov/naad-connector/1.0.0'],
+            'X-Content-Type-Options' => ['nosniff'],
+            // Signals this is a non-browser request.
+            'X-Requested-With' => ['XMLHttpRequest'],
         ];
     }
 
@@ -80,13 +65,9 @@ final class DestinationClientTest extends TestCase
     public function testConstructor()
     {
         $destinationClient = new DestinationClient(
-            'http://example.com',
-            'username',
-            'password',
             $this->mockLogger,
             $this->mockDatabase,
-            $this->mockHttpClient,
-            $this->expectedHeaders,
+            $this->mockHttpClient
         );
 
         $this->assertInstanceOf(DestinationClient::class, $destinationClient);
@@ -113,13 +94,9 @@ final class DestinationClientTest extends TestCase
         $this->mockLogger->expects($this->never())->method('critical');
 
         $destinationClient = new DestinationClient(
-            'http://example.com',
-            'user',
-            'pass',
             $this->mockLogger,
             $this->mockDatabase,
-            $this->mockHttpClient,
-            $this->expectedHeaders,
+            $this->mockHttpClient
         );
 
         $this->assertTrue($destinationClient->sendAlerts());
@@ -150,13 +127,9 @@ final class DestinationClientTest extends TestCase
         $this->mockLogger->expects($this->once())->method('error');
 
         $destinationClient = new DestinationClient(
-            'http://example.com',
-            'user',
-            'pass',
             $this->mockLogger,
             $this->mockDatabase,
-            $this->mockHttpClient,
-            $this->expectedHeaders,
+            $this->mockHttpClient
         );
 
         $this->assertFalse($destinationClient->sendAlerts());
@@ -177,13 +150,9 @@ final class DestinationClientTest extends TestCase
         $this->mockHttpClient->method('post')->willThrowException($exception);
 
         $client = new DestinationClient(
-            'http://example.com',
-            'user',
-            'password',
             $this->mockLogger,
             $this->mockDatabase,
-            $this->mockHttpClient,
-            $this->expectedHeaders,
+            $this->mockHttpClient
         );
 
         $result = $client->sendRequest('<xml></xml>');
@@ -210,13 +179,9 @@ final class DestinationClientTest extends TestCase
         $mockClient->method('post')->willThrowException($exception);
 
         $client = new DestinationClient(
-            'http://example.com',
-            'user',
-            'password',
             $this->createMock(CustomLogger::class),
             $this->createMock(Database::class),
-            $mockClient,
-            $this->expectedHeaders,
+            $mockClient
         );
 
         $result = $client->sendRequest('<xml></xml>');
@@ -247,63 +212,63 @@ final class DestinationClientTest extends TestCase
         $this->expectException(RequestException::class);
 
         $client = new DestinationClient(
-            'http://example.com',
-            'user',
-            'password',
             $this->mockLogger,
             $this->mockDatabase,
-            $this->mockHttpClient,
-            $this->expectedHeaders,
+            $this->mockHttpClient
         );
 
         $client->sendRequest('<xml></xml>');
     }
 
     /**
-     * Tests that a send request includes the expected headers.
+     * Tests sendRequest method throws an exception when no response is available.
      *
      * @return void
      */
     #[Test]
-    public function testSendRequestIncludesExpectedHeaders()
+    public function testSendRequestHeadersAreCorrect()
     {
+        // Define the expected XML payload
+        $xmlPayload = '<xml>test</xml>';
 
-        $testHeaders = $this->expectedHeaders;
 
+        // Mock the HTTP client to verify the post method is called
+        // with the correct URL and body
         $this->mockHttpClient->expects($this->once())
             ->method('post')
             ->with(
-                $this->equalTo(''),
+                '', // Empty URL (as per the implementation)
                 $this->callback(
-                    function ($options) use ($testHeaders) {
-                        // Print the options to see the headers
-                        echo "Options->headers:\n";
-                        print_r($options['headers']);
-
-                        // Check if the headers match the expected headers
-                        foreach ($testHeaders as $key => $value) {
-                            if (!isset($options['headers'][$key])
-                                || $options['headers'][$key] !== $value
-                            ) {
-                                return false;
-                            }
-                        }
-                        return $options['base_uri'] === 'http://example.com' &&
-                        $options['auth'] === ['user', 'password'];
+                    function ($options) use ($xmlPayload) {
+                        $this->assertArrayHasKey('json', $options);
+                        $this->assertEquals(
+                            ['xml' => $xmlPayload],
+                            $options['json']
+                        );
+                        return true;
                     }
                 )
-            );
+            )
+        ->willReturn(new Response(200, $this->expectedHeaders, 'OK'));
 
-        $client = new DestinationClient(
-            'http://example.com',
-            'user',
-            'password',
+        // Instantiate the DestinationClient with the mocked dependencies
+        $destinationClient = new DestinationClient(
             $this->mockLogger,
             $this->mockDatabase,
-            $this->mockHttpClient,
-            $this->expectedHeaders,
+            $this->mockHttpClient
         );
 
-        $client->sendRequest('<xml></xml>');
+        // Call the sendRequest method with the sample XML payload
+        $result = $destinationClient->sendRequest($xmlPayload);
+
+        // Assert that the response is as expected (status_code, body, and headers)
+        $this->assertSame(
+            [
+            'status_code' => 200,
+            'body'        => 'OK',
+            'headers'     => $this->expectedHeaders,
+            ],
+            $result
+        );
     }
 }

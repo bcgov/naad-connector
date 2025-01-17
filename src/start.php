@@ -23,6 +23,15 @@ $database = new Database();
 // Create a new Guzzle Client.
 $guzzleClient = new Client();
 
+// configure the guzzle client for the DestinationClient
+$destinationGuzzleclient = new Client(
+    [
+    'base_uri' => $naadVars->destinationURL,
+    'auth'     => [$naadVars->destinationUser, $naadVars->destinationPassword],
+    'headers'  => $headers // secure headers for api requests
+    ]
+);
+
 // Create a custom logger for the NaadSocketConnection.
 $socketLogger = new CustomLogger(
     'NaadSocketConnection',
@@ -31,13 +40,9 @@ $socketLogger = new CustomLogger(
 
 // Create a new DestinationClient instance with the provided configuration.
 $destinationClient = new DestinationClient(
-    $naadVars->destinationURL,
-    $naadVars->destinationUser,
-    $naadVars->destinationPassword,
     $socketLogger,
     $database,
-    $guzzleClient,
-    $headers // secure headers for api requests
+    $destinationGuzzleclient,
 );
 
 // Create a new RepositoryClient instance with the provided configuration.
