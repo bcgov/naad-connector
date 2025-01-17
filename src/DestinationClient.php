@@ -22,7 +22,6 @@ class DestinationClient
     protected Client $client;
     protected Logger $logger;
     protected Database $database;
-    protected const DEBUG_MODE = false; // for logging HTTP headers.
 
     /**
      * Constructor for DestinationClient.
@@ -108,20 +107,9 @@ class DestinationClient
         try {
             $response = $this->client->post('', $options);
 
-            // log Request and Response headers for debugging
-            if (self::DEBUG_MODE ) {
-                // Log the client's request headers before the post is sent
-                $this->logger->info(
-                    'Request Headers: ',
-                    [$this->client->getConfig('headers')]
-                );
-
-                // Log the response headers
-                $this->logger->info(
-                    'Response Headers: ',
-                    [$response->getHeaders()]
-                );
-            }
+            // log Request and Response headers when the log level is set to 'debug'
+            $this->logger->debug( 'Request Headers: ', [$this->client->getConfig('headers')]);
+            $this->logger->debug( 'Response Headers: ', [$response->getHeaders()]);
 
             return [
                 'status_code' => $response->getStatusCode(),
