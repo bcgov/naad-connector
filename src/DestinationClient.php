@@ -55,32 +55,35 @@ class DestinationClient
         foreach ($unsentAlerts as $alert) {
             try {
                 $response = $this->sendRequest($alert->getBody());
-                $this->logger->info(
-                    'Sent Alert ({id}) to destination.',
-                    [ 'id' => $alert->getId() ]
-                );
+
+                if (200 === $response['status_code']) {
+                    $alert->setSuccess(true);
+                    $this->logger->info(
+                        'Sent Alert ({id}) to destination.',
+                        [ 'id' => $alert->getId() ]
+                    );
+                } else {
+                    throw new \Exception('Non-200 status code recieved.');
+                }
             } catch (\Exception $e) {
+                $alert->incrementFailures();
+                $alert->setSuccess(false);
                 $allSuccessful = false;
                 $this->logger->error(
                     'Could not send Alert ({id}): {error}',
                     [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
                 );
-            }
 
-            if (200 === $response['status_code']) {
-                $alert->setSuccess(true);
-            } else {
-                $alert->incrementFailures();
-                $alert->setSuccess(false);
-                $allSuccessful = false;
-                $this->logger->error(
-                    'HTTP response for Alert ({id}): Status {code}: {body}',
-                    [
-                        'code' => $response['status_code'],
-                        'body' => $response['body'],
-                        'id' => $alert->getId()
-                    ]
-                );
+                if (isset($response)) {
+                    $this->logger->error(
+                        'HTTP response for Alert ({id}): Status {code}: {body}',
+                        [
+                            'code' => $response['status_code'],
+                            'body' => $response['body'],
+                            'id' => $alert->getId()
+                        ]
+                    );
+                }
             }
 
             $alert->setSendAttempted(new \DateTime());

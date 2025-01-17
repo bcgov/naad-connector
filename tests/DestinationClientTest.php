@@ -33,7 +33,6 @@ final class DestinationClientTest extends TestCase
     private $mockDatabase;
     private $mockLogger;
     private $mockHttpClient;
-    private $expectedHeaders;
 
     /**
      * Set up the test environment before each test.
@@ -45,15 +44,6 @@ final class DestinationClientTest extends TestCase
         $this->mockDatabase = $this->createMock(Database::class);
         $this->mockLogger = $this->createMock(CustomLogger::class);
         $this->mockHttpClient = $this->createMock(Client::class);
-        $this->expectedHeaders = [
-            'Accept' => ['application/json'],
-            'Accept-Encoding' => ['gzip, deflate'],
-            'Content-Type' => ['application/json'],
-            'User-Agent' => ['bcgov/naad-connector/1.0.0'],
-            'X-Content-Type-Options' => ['nosniff'],
-            // Signals this is a non-browser request.
-            'X-Requested-With' => ['XMLHttpRequest'],
-        ];
     }
 
     /**
@@ -64,13 +54,9 @@ final class DestinationClientTest extends TestCase
     #[Test]
     public function testConstructor()
     {
-        $destinationClient = new DestinationClient(
-            $this->mockLogger,
-            $this->mockDatabase,
-            $this->mockHttpClient
-        );
+        $client = $this->createDestinationClient();
 
-        $this->assertInstanceOf(DestinationClient::class, $destinationClient);
+        $this->assertInstanceOf(DestinationClient::class, $client);
     }
 
     /**
@@ -93,17 +79,14 @@ final class DestinationClientTest extends TestCase
             ->willReturn(new Response(200, [], 'OK'));
         $this->mockLogger->expects($this->never())->method('critical');
 
-        $destinationClient = new DestinationClient(
-            $this->mockLogger,
-            $this->mockDatabase,
-            $this->mockHttpClient
-        );
+        // Act
+        $client = $this->createDestinationClient();
 
-        $this->assertTrue($destinationClient->sendAlerts());
+        $this->assertTrue($client->sendAlerts());
     }
 
-        /**
-     * Tests sendAlerts method when all alerts are successfully sent.
+     /**
+     * Tests sendAlerts method when it fails and throws an error.
      *
      * @return void
      */
@@ -124,15 +107,13 @@ final class DestinationClientTest extends TestCase
         );
         $this->mockHttpClient->method('post')
             ->willThrowException($exception);
-        $this->mockLogger->expects($this->once())->method('error');
 
-        $destinationClient = new DestinationClient(
-            $this->mockLogger,
-            $this->mockDatabase,
-            $this->mockHttpClient
-        );
+        // Allow the logger to be called more than once if neccesary
+        $this->mockLogger->expects($this->exactly(2))->method('error');
 
-        $this->assertFalse($destinationClient->sendAlerts());
+        $client = $this->createDestinationClient();
+
+        $this->assertFalse($client->sendAlerts());
     }
 
     /**
@@ -149,11 +130,7 @@ final class DestinationClientTest extends TestCase
         );
         $this->mockHttpClient->method('post')->willThrowException($exception);
 
-        $client = new DestinationClient(
-            $this->mockLogger,
-            $this->mockDatabase,
-            $this->mockHttpClient
-        );
+        $client = $this->createDestinationClient();
 
         $result = $client->sendRequest('<xml></xml>');
         $this->assertSame(
@@ -211,12 +188,22 @@ final class DestinationClientTest extends TestCase
 
         $this->expectException(RequestException::class);
 
-        $client = new DestinationClient(
+        $client = $this->createDestinationClient();
+
+        $client->sendRequest('<xml></xml>');
+    }
+
+    /**
+     * Provide a client instance for tests
+     *
+     * @return DestinationClient $client
+     */
+    private function createDestinationClient()
+    {
+        return new DestinationClient(
             $this->mockLogger,
             $this->mockDatabase,
             $this->mockHttpClient
         );
-
-        $client->sendRequest('<xml></xml>');
     }
 }
