@@ -148,17 +148,23 @@ class Alert
      *
      * @param int $failures The number of times the alert has
      *                      failed to send to its destination.
+     *                      and set to 0 if negative.
      *
      * @return void
      */
     public function setFailures( int $failures ): void
     {
-        $this->failures = $failures;
+
+        if ($failures < 0) {
+            $this->failures = 0;
+        } else {
+            $this->failures = $failures;
+        }
     }
 
     /**
      * Increments the number of failures.
-     * 
+     *
      * @return void
      */
     public function incrementFailures(): void
@@ -205,7 +211,7 @@ class Alert
             $errorMessage = 'Invalid XML: The "identifier" field is required.';
             throw new Exception($errorMessage);
         }
-        
+
         $alert = new Alert();
         $alert->setId($identifier);
         $alert->setBody($xml->asXML());
