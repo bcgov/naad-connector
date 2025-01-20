@@ -114,7 +114,16 @@ class NaadSocketClient
                 );
 
                 // Fetch, validate, then process missed alerts.
-                $this->handleMissedAlerts($missedAlerts);
+                foreach ( $missedAlerts as $alert ) {
+                    $this->currentOutput = '';
+                    $rawXml = $this->repositoryClient->fetchAlert(
+                        $alert['id'], $alert['sent']
+                    );
+                    $xml = $this->validateResponse($rawXml);
+                    if ($xml) {
+                        $this->processAlert($xml);
+                    }
+                }
             }
         } else {
             $this->processAlert($xml);
@@ -133,34 +142,6 @@ class NaadSocketClient
 
         $this->currentOutput = '';
         return true;
-    }
-
-    /**
-     * Process missed alerts by fetching and validating their responses.
-     *
-     * @param array $missedAlerts Array of missed alerts with 'id' and 'sent' keys.
-     *
-     * @return array Array of processed alerts.
-     */
-    private function handleMissedAlerts($missedAlerts)
-    {
-        return array_map(
-            // Process the filtered, fetched alerts.
-            fn($xml) => $this->processAlert($xml),
-            // only SimpleXMLElement items remain.
-            array_filter(
-                array_map(
-                    function ($alert) {
-                        return $this->validateResponse(
-                            $this->repositoryClient->fetchAlert(
-                                $alert['id'], $alert['sent']
-                            )
-                        );
-                    },
-                    $missedAlerts
-                )
-            )
-        );
     }
 
     /**
