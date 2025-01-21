@@ -197,8 +197,9 @@ final class NaadSocketClientTest extends TestCase
      */
     public function testHandleResponseMissedAlerts()
     {
-        $database = $this->createStub(Database::class);
+        $database = $this->createMock(Database::class);
         $database->method('getAlertsById')->willReturn([]);
+        $database->expects($this->exactly(10))->method('insertAlert');
 
         $destinationClient = $this->createStub(DestinationClient::class);
         $logger = $this->createStub(CustomLogger::class);
@@ -249,10 +250,11 @@ final class NaadSocketClientTest extends TestCase
             self::XML_TEST_FILE_LOCATION . 'complete-alert.xml'
         );
 
-        $database = $this->createStub(Database::class);
+        $database = $this->createMock(Database::class);
         $database
             ->method('getAlertsById')
             ->willReturn([Alert::fromXml(new SimpleXMLElement($alertXml))]);
+        $database->expects($this->exactly(9))->method('insertAlert');
 
         $destinationClient = $this->createStub(DestinationClient::class);
         $logger = $this->createStub(CustomLogger::class);
@@ -261,7 +263,8 @@ final class NaadSocketClientTest extends TestCase
         // Should only fetch 9 times because one was already in the database.
         $repositoryClient
             ->expects($this->exactly(9))
-            ->method('fetchAlert');
+            ->method('fetchAlert')
+            ->willReturn($alertXml);
 
         $client = new NaadSocketClient(
             'test-naad',

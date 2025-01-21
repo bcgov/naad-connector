@@ -112,9 +112,13 @@ class NaadSocketClient
                     . 'Fetching from NAAD repository ({repoUrl}).',
                     [ 'count' => count($missedAlerts), 'repoUrl' => $repoUrl ]
                 );
+
+                // Fetch, validate, then process missed alerts.
                 foreach ( $missedAlerts as $alert ) {
                     $this->currentOutput = '';
-                    $rawXml = $this->repositoryClient->fetchAlert($alert);
+                    $rawXml = $this->repositoryClient->fetchAlert(
+                        $alert['id'], $alert['sent']
+                    );
                     $xml = $this->validateResponse($rawXml);
                     if ($xml) {
                         $this->processAlert($xml);
