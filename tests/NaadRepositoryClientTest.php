@@ -62,7 +62,7 @@ final class NaadRepositoryClientTest extends TestCase
      * Tests  fetchAlert method with valid response and error.
      *
      * @param array  $mockResponse     The mocked response from the guzzle client
-     * @param array  $reference        The test data used to construct an URL.
+     * @param array  $alert            The test alert data used to construct an URL.
      * @param string $expectedBody     The request response body that
      *                                 should be returned in the fetched Alert.
      * @param bool   $expectsException Whether an exception is expected.
@@ -72,7 +72,7 @@ final class NaadRepositoryClientTest extends TestCase
     #[DataProvider('fetchAlertProvider')]
     public function testFetchAlert(
         $mockResponse,
-        array $reference,
+        array $alert,
         string $expectedBody,
         bool $expectsException
     ): void {
@@ -89,13 +89,15 @@ final class NaadRepositoryClientTest extends TestCase
         }
 
         $client = new NaadRepositoryClient($mockClient, 'naad.url');
+        $id = $alert['id'];
+        $sent = $alert['sent'];
 
         if ($expectsException) {
             $this->expectException(\RuntimeException::class);
             $this->expectExceptionMessage($expectedBody);
-            $client->fetchAlert($reference);
+            $client->fetchAlert($id, $sent);
         } else {
-            $response = $client->fetchAlert($reference);
+            $response = $client->fetchAlert($id, $sent);
             $this->assertEquals($expectedBody, $response);
         }
 

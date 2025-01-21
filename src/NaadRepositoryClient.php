@@ -43,22 +43,23 @@ class NaadRepositoryClient
     /**
      * Fetches an alert from the NAAD alert repository.
      *
-     * @param array $reference - The reference data (sender, id, sent).
+     * @param string $id   The Id of the alert.
+     * @param string $sent The sender of the alert.
      *
      * @return string The alert response body.
      *
      * @throws Exception if an error occurs during the GET request.
      */
-    public function fetchAlert(array $reference): string
+    public function fetchAlert(string $id, string $sent): string
     {
-        $url = $this->constructURL($reference);
-
         try {
-            $response = $this->client->get($url);
-            return (string) $response->getBody();
+            $response = $this->client->get($this->constructURL($id, $sent));
+            return $response->getBody()->getContents();
         } catch (RequestException $e) {
             throw new \RuntimeException(
-                "Failed to fetch alert: " . $e->getMessage()
+                "Failed to fetch alert: " . $e->getMessage(),
+                $e->getCode(),
+                $e
             );
         }
     }
@@ -66,18 +67,19 @@ class NaadRepositoryClient
     /**
      * Constructs the URL using the provide reference
      *
-     * @param array $reference Heartbeat references array parts (sender, id, sent).
+     * @param string $id   The Id of the alert.
+     * @param string $sent The sender of the alert.
      *
-     * @return string The constructed URL.
+     * @return string The constructed URL: datestamp, sent, id.
      */
-    protected function constructURL(array $reference): string
+    protected function constructURL(string $id, string $sent): string
     {
         return sprintf(
             self::URL_TEMPLATE,
             $this->baseUrl,
-            strtok($reference['sent'], 'T'), // date
-            strtr($reference['sent'], self::SANITIZE_RULES), // sent
-            strtr($reference['id'], self::SANITIZE_RULES), // id
+            strtok($sent, 'T'),
+            strtr($sent, self::SANITIZE_RULES),
+            strtr($id, self::SANITIZE_RULES),
         );
     }
 
