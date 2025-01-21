@@ -148,17 +148,23 @@ class Alert
      *
      * @param int $failures The number of times the alert has
      *                      failed to send to its destination.
+     *                      and set to 0 if negative.
      *
      * @return void
      */
     public function setFailures( int $failures ): void
     {
-        $this->failures = $failures;
+
+        if ($failures < 0) {
+            $this->failures = 0;
+        } else {
+            $this->failures = $failures;
+        }
     }
 
     /**
      * Increments the number of failures.
-     * 
+     *
      * @return void
      */
     public function incrementFailures(): void
@@ -194,19 +200,20 @@ class Alert
      *
      * @param SimpleXMLElement $xml XML to create alert from.
      *
-     * @return Alert
+     * @return self
      * @throws Exception if the identifier field is missing or empty.
      */
-    public static function fromXml( SimpleXMLElement $xml ): Alert
+    public static function fromXml( SimpleXMLElement $xml ): self
     {
         // Ensure the identifier field is not empty.
-        $identifier = (string) $xml->identifier;
-        if (empty($identifier)) {
-            $errorMessage = 'Invalid XML: The "identifier" field is required.';
-            throw new Exception($errorMessage);
+        $identifier = trim((string) $xml->identifier);
+
+        $err = 'Invalid XML: "identifier" field is required and must not be empty.';
+        if ('' === $identifier) {
+            throw new \InvalidArgumentException($err);
         }
-        
-        $alert = new Alert();
+
+        $alert = new self();
         $alert->setId($identifier);
         $alert->setBody($xml->asXML());
         $alert->setReceived(new DateTime());
