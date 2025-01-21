@@ -214,10 +214,9 @@ class Alert
         }
 
         $alert = new self();
-        // Avoiding unnecessary calls to getters and setters
-        $alert->id = $identifier;
-        $alert->body = $xml->asXML();
-        $alert->received = new DateTime();
+        $alert->setId($identifier);
+        $alert->setBody($xml->asXML());
+        $alert->setReceived(new DateTime());
 
         return $alert;
     }

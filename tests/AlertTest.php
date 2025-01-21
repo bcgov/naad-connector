@@ -22,6 +22,7 @@ use Bcgov\NaadConnector\Entity\Alert;
 final class AlertTest extends TestCase
 {
     private Alert $alert;
+    const XML_TEST_FILE = './tests/Socket/complete-alert.xml';
 
     /**
      * Set up the test environment before each test method is run.
@@ -111,7 +112,7 @@ final class AlertTest extends TestCase
      */
     public function testFromXmlWithValidData(): void
     {
-        $xmlString = $this->getValidXmlString();
+        $xmlString = file_get_contents(self::XML_TEST_FILE);
         $xml = new \SimpleXMLElement($xmlString);
 
         $beforeCreation = new \DateTime();
@@ -120,9 +121,9 @@ final class AlertTest extends TestCase
 
         $this->assertGreaterThanOrEqual($beforeCreation, $alert->getReceived());
         $this->assertLessThanOrEqual($afterCreation, $alert->getReceived());
-        $this->assertEquals('12345', $alert->getId());
+        $this->assertEquals('nrcan:eew:1726439000.0', $alert->getId());
         $this->assertStringContainsString(
-            '<identifier>12345</identifier>',
+            '<identifier>nrcan:eew:1726439000.0</identifier>',
             $alert->getBody()
         );
     }
@@ -148,23 +149,5 @@ final class AlertTest extends TestCase
         $this->expectExceptionMessage($err);
 
         Alert::fromXml($xml);
-    }
-
-    /**
-     * Get a valid XML string for testing
-     *
-     * @return string
-     */
-    private function getValidXmlString(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8"?>
-        <alert>
-            <identifier>12345</identifier>
-            <sender>Example Sender</sender>
-            <sent>2023-05-01T12:00:00-00:00</sent>
-            <status>Actual</status>
-            <msgType>Alert</msgType>
-            <scope>Public</scope>
-        </alert>';
     }
 }
