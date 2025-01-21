@@ -200,22 +200,24 @@ class Alert
      *
      * @param SimpleXMLElement $xml XML to create alert from.
      *
-     * @return Alert
+     * @return self
      * @throws Exception if the identifier field is missing or empty.
      */
-    public static function fromXml( SimpleXMLElement $xml ): Alert
+    public static function fromXml( SimpleXMLElement $xml ): self
     {
         // Ensure the identifier field is not empty.
-        $identifier = (string) $xml->identifier;
-        if (empty($identifier)) {
-            $errorMessage = 'Invalid XML: The "identifier" field is required.';
-            throw new Exception($errorMessage);
+        $identifier = trim((string) $xml->identifier);
+
+        $err = 'Invalid XML: "identifier" field is required and must not be empty.';
+        if ('' === $identifier) {
+            throw new \InvalidArgumentException($err);
         }
 
-        $alert = new Alert();
-        $alert->setId($identifier);
-        $alert->setBody($xml->asXML());
-        $alert->setReceived(new DateTime());
+        $alert = new self();
+        // Avoiding unnecessary calls to getters and setters
+        $alert->id = $identifier;
+        $alert->body = $xml->asXML();
+        $alert->received = new DateTime();
 
         return $alert;
     }

@@ -6,6 +6,7 @@ namespace Bcgov\NaadConnector\Tests\Entity;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Bcgov\NaadConnector\Entity\Alert;
 
 /**
@@ -13,7 +14,7 @@ use Bcgov\NaadConnector\Entity\Alert;
  *
  * @category Entity
  * @package  NaadConnector
- * @author   Michael Haswell <Michael.Haswell@gov.bc.ca>
+ * @author   Richard O'Brien <Richard.OBrien@gov.bc.ca>
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://www.doctrine-project.org/
  */
@@ -38,6 +39,7 @@ final class AlertTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('alertPropertiesProvider')]
     /**
      * Test the properties and methods of the Alert class.
      *
@@ -46,29 +48,51 @@ final class AlertTest extends TestCase
      * and success status.
      * It also tests edge cases for the failure count.
      *
+     * @param string $id       The alert ID
+     * @param string $body     The alert body
+     * @param int    $failures The number of failures
+     * @param bool   $success  The success status
+     *
      * @return void
      */
-    public function testAlertProperties(): void
-    {
-        $this->alert->setId('12345');
-        $this->alert->setBody('<alert>data</alert>');
+    public function testAlertProperties(
+        string $id,
+        string $body,
+        int $failures,
+        bool $success
+    ): void {
+        $this->alert->setId($id);
+        $this->alert->setBody($body);
         $this->alert->setReceived(new \DateTime());
         $this->alert->setSendAttempted(new \DateTime());
-        $this->alert->incrementFailures();
-        $this->alert->setSuccess(true);
+        $this->alert->setFailures($failures);
+        $this->alert->setSuccess($success);
 
-        $this->assertEquals('12345', $this->alert->getId());
-        $this->assertEquals('<alert>data</alert>', $this->alert->getBody());
+        $this->assertEquals($id, $this->alert->getId());
+        $this->assertEquals($body, $this->alert->getBody());
         $this->assertInstanceOf(\DateTime::class, $this->alert->getReceived());
         $this->assertInstanceOf(\DateTime::class, $this->alert->getSendAttempted());
-        $this->assertEquals(1, $this->alert->getFailures());
-        $this->assertTrue($this->alert->getSuccess());
+        $this->assertEquals(max(0, $failures), $this->alert->getFailures());
+        $this->assertEquals($success, $this->alert->getSuccess());
 
-        // Test failure count edge cases
-        $this->alert->setFailures(-1);
-        $this->assertEquals(0, $this->alert->getFailures());
-        $this->alert->setFailures(100);
-        $this->assertEquals(100, $this->alert->getFailures());
+        // Test incrementFailures
+        $initialFailures = $this->alert->getFailures();
+        $this->alert->incrementFailures();
+        $this->assertEquals($initialFailures + 1, $this->alert->getFailures());
+    }
+
+    /**
+     * Data provider for testAlertProperties
+     *
+     * @return array
+     */
+    public static function alertPropertiesProvider(): array
+    {
+        return [
+            ['12345', '<alert>data</alert>', 1, true],
+            ['67890', '<alert>other data</alert>', -1, false],
+            ['abcde', '<alert>more data</alert>', 100, true],
+        ];
     }
 
     #[Test]
@@ -87,16 +111,7 @@ final class AlertTest extends TestCase
      */
     public function testFromXmlWithValidData(): void
     {
-        $xmlString = '<?xml version="1.0" encoding="UTF-8"?>
-        <alert>
-            <identifier>12345</identifier>
-            <sender>Example Sender</sender>
-            <sent>2023-05-01T12:00:00-00:00</sent>
-            <status>Actual</status>
-            <msgType>Alert</msgType>
-            <scope>Public</scope>
-        </alert>';
-
+        $xmlString = $this->getValidXmlString();
         $xml = new \SimpleXMLElement($xmlString);
 
         $beforeCreation = new \DateTime();
@@ -126,18 +141,30 @@ final class AlertTest extends TestCase
      */
     public function testFromXmlThrowsExceptionWhenIdentifierIsEmpty(): void
     {
-        $xmlString = '<?xml version="1.0" encoding="UTF-8"?>
-        <alert>
-            <identifier></identifier>
-        </alert>';
-
-        $xml = new \SimpleXMLElement($xmlString);
+        $xml = new \SimpleXMLElement('<alert><identifier></identifier></alert>');
+        $err = 'Invalid XML: "identifier" field is required and must not be empty.';
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage(
-            'Invalid XML: The "identifier" field is required.'
-        );
+        $this->expectExceptionMessage($err);
 
         Alert::fromXml($xml);
+    }
+
+    /**
+     * Get a valid XML string for testing
+     *
+     * @return string
+     */
+    private function getValidXmlString(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8"?>
+        <alert>
+            <identifier>12345</identifier>
+            <sender>Example Sender</sender>
+            <sent>2023-05-01T12:00:00-00:00</sent>
+            <status>Actual</status>
+            <msgType>Alert</msgType>
+            <scope>Public</scope>
+        </alert>';
     }
 }
