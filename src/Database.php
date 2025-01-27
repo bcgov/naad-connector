@@ -23,7 +23,7 @@ use Monolog\Logger;
 class Database
 {
 
-    public EntityManager $entityManager;
+    protected EntityManager $entityManager;
 
     protected Logger $logger;
 
@@ -78,7 +78,6 @@ class Database
      */
     public function insertAlert(Alert $alert): void
     {
-
         // Try to persist the alert, catching duplicate key violations gracefully.
         try {
             $this->entityManager->persist($alert);
@@ -87,7 +86,7 @@ class Database
             $this->logger->error('Unique constraint violation: ' . $e->getMessage());
             $this->entityManager = $this->getEntityManager();
         } catch (EntityIdentityCollisionException $e) {
-            $this->logger->critical(
+            $this->logger->error(
                 'Entity identity collision: ' . $e->getMessage()
             );
             $this->entityManager->detach($alert);
