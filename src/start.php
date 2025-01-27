@@ -17,8 +17,16 @@ use GuzzleHttp\Client;
 // Get environment variables for configuring a socket connection.
 $naadVars = new NaadVars();
 
+// Create custom loggers for each component.
+$logger = new CustomLogger('custom', 'info',);
+$naadSocketConnectionLogger = $logger->withName('NaadSocketConnection');
+$destinationClientLogger = $logger->withName('DestinationClient');
+$naadSocketClientLogger = $logger->withName('NaadSocketClient');
+$databaseLogger = $logger->withName('Database');
+$repositoryClientLogger = $logger->withName('NaadRepositoryClient');
+
 // Create a new Database instance.
-$database = new Database();
+$database = new Database($databaseLogger);
 
 // Create a new Guzzle Client.
 $guzzleClient = new Client();
@@ -32,15 +40,10 @@ $destinationGuzzleclient = new Client(
     ]
 );
 
-// Create a custom logger for the NaadSocketConnection.
-$socketLogger = new CustomLogger(
-    'NaadSocketConnection',
-    'info',
-);
 
 // Create a new DestinationClient instance with the provided configuration.
 $destinationClient = new DestinationClient(
-    $socketLogger,
+    $destinationClientLogger,
     $database,
     $destinationGuzzleclient,
 );
@@ -54,7 +57,7 @@ $repositoryClient = new NaadRepositoryClient(
 $socketClient = new NaadSocketClient(
     $naadVars->naadName,
     $destinationClient,
-    $socketLogger,
+    $naadSocketClientLogger,
     $database,
     $repositoryClient,
 );
@@ -64,7 +67,7 @@ $connector = new NaadSocketConnection(
     $naadVars->naadUrl,
     $reactConnector,
     $socketClient,
-    $socketLogger,
+    $naadSocketConnectionLogger,
 );
 
 return $connector->connect();

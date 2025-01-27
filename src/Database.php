@@ -6,8 +6,10 @@ use Bcgov\NaadConnector\Entity\Alert;
 use Bcgov\NaadConnector\NaadVars;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\Exception\EntityIdentityCollisionException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
+use Monolog\Logger;
 
 /**
  * Database class for interacting with the database.
@@ -23,12 +25,17 @@ class Database
 
     protected EntityManager $entityManager;
 
+    protected Logger $logger;
+
     /**
      * Constructor for Database class.
+     *
+     * @param Logger $logger An instance of Monolog/Logger.
      */
-    public function __construct()
+    public function __construct(Logger $logger)
     {
         $this->entityManager = $this->getEntityManager();
+        $this->logger = $logger;
     }
 
     /**
@@ -69,13 +76,20 @@ class Database
      *
      * @return void
      */
-    public function insertAlert( Alert $alert ): void
+    public function insertAlert(Alert $alert): void
     {
+        // Try to persist the alert, catching duplicate key violations gracefully.
         try {
             $this->entityManager->persist($alert);
             $this->flush();
-        } catch ( UniqueConstraintViolationException $e ) {
+        } catch (UniqueConstraintViolationException $e) {
+            $this->logger->error('Unique constraint violation: ' . $e->getMessage());
             $this->entityManager = $this->getEntityManager();
+        } catch (EntityIdentityCollisionException $e) {
+            $this->logger->error(
+                'Entity identity collision: ' . $e->getMessage()
+            );
+            $this->entityManager->detach($alert);
         }
     }
 
@@ -135,7 +149,8 @@ class Database
 
         // Execute the query and return results.
         $alerts = $query->getResult();
-        
+
         return $alerts;
     }
+
 }
