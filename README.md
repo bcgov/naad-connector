@@ -23,18 +23,6 @@ To run in the devcontainer (see .devcontainer/ directory):
     - `composer migrate` to run database migrations
     - `composer phpdoc` to generate project documentation
 
-#### Docker Compose deployment
-
-- Prerequisites: rename the `./sample-env` to `.env` and fill in the values for local use only.
-
-```shell
-# build and run
-docker compose up --build
-
-# run using known good app image build
-docker compose up
-```
-
 #### Docker Desktop Kubernetes deployment
 
 To build and run in Kubernetes via Docker Desktop, follow these steps:
