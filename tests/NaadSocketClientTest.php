@@ -7,9 +7,9 @@ use PHPUnit\Framework\Attributes\{
     UsesClass
 };
 use PHPUnit\Framework\TestCase;
+use Monolog\Logger;
 
 use Bcgov\NaadConnector\{
-    CustomLogger,
     Database,
     DestinationClient,
     NaadRepositoryClient,
@@ -53,7 +53,7 @@ final class NaadSocketClientTest extends TestCase
     {
         $database = $this->createStub(Database::class);
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createStub(CustomLogger::class);
+        $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
@@ -202,7 +202,7 @@ final class NaadSocketClientTest extends TestCase
         $database->expects($this->exactly(10))->method('insertAlert');
 
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createStub(CustomLogger::class);
+        $logger = $this->createStub(Logger::class);
 
         $repositoryClient = $this->createMock(NaadRepositoryClient::class);
         // Should fetch 10 times because all 10 heartbeat reference ids are new.
@@ -257,7 +257,7 @@ final class NaadSocketClientTest extends TestCase
         $database->expects($this->exactly(9))->method('insertAlert');
 
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createStub(CustomLogger::class);
+        $logger = $this->createStub(Logger::class);
 
         $repositoryClient = $this->createMock(NaadRepositoryClient::class);
         // Should only fetch 9 times because one was already in the database.
@@ -300,7 +300,7 @@ final class NaadSocketClientTest extends TestCase
         $database = $this->createStub(Database::class);
         $database->method('insertAlert')->willThrowException(new Exception());
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createStub(CustomLogger::class);
+        $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
@@ -337,7 +337,7 @@ final class NaadSocketClientTest extends TestCase
     {
         $database = $this->createStub(Database::class);
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createStub(CustomLogger::class);
+        $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
         $err = 'Invalid XML: "identifier" field is required and must not be empty.';
 

@@ -4,7 +4,7 @@ require_once 'vendor/autoload.php';
 // Require headers.php from /src directory
 $headers = include dirname(__DIR__) . '/src/headers.php';
 
-use Bcgov\NaadConnector\CustomLogger;
+use Bcgov\NaadConnector\LoggerFactory;
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\DestinationClient;
 use Bcgov\NaadConnector\NaadSocketClient;
@@ -17,13 +17,13 @@ use GuzzleHttp\Client;
 // Get environment variables for configuring a socket connection.
 $naadVars = new NaadVars();
 
-// Create custom loggers for each component.
-$logger = new CustomLogger('custom', 'info',);
+// Create loggers for each component.
+$logger = LoggerFactory::createLogger($naadVars->logLevel);
 $naadSocketConnectionLogger = $logger->withName('NaadSocketConnection');
-$destinationClientLogger = $logger->withName('DestinationClient');
-$naadSocketClientLogger = $logger->withName('NaadSocketClient');
-$databaseLogger = $logger->withName('Database');
-$repositoryClientLogger = $logger->withName('NaadRepositoryClient');
+$destinationClientLogger    = $logger->withName('DestinationClient');
+$naadSocketClientLogger     = $logger->withName('NaadSocketClient');
+$databaseLogger             = $logger->withName('Database');
+$repositoryClientLogger     = $logger->withName('NaadRepositoryClient');
 
 // Create a new Database instance.
 $database = new Database($databaseLogger);
@@ -51,7 +51,8 @@ $destinationClient = new DestinationClient(
 // Create a new RepositoryClient instance with the provided configuration.
 $repositoryClient = new NaadRepositoryClient(
     $guzzleClient,
-    $naadVars->naadRepoUrl
+    $naadVars->naadRepoUrl,
+    $repositoryClientLogger
 );
 
 $socketClient = new NaadSocketClient(

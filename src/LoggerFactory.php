@@ -6,7 +6,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 /**
- * A class for setting up a custom Monolog logger instance
+ * A class for creating Monolog logger instances
  * with configurable channel name and logging level.
  *
  * @category Logging
@@ -15,19 +15,17 @@ use Monolog\Processor\PsrLogMessageProcessor;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-class CustomLogger extends Logger
+class LoggerFactory
 {
 
     /**
-     * Construct a CustomLogger.
+     * Create a Monolog/Logger instance.
      *
-     * @param string $channelName The name of the logging channel.
-     * @param string $level       The minimum logging level to record.
+     * @param string $level The minimum logging level to record.
      *
      * @return Logger
      */
-    public function __construct(
-        string $channelName = 'monolog',
+    public static function createLogger(
         string $level = 'info'
     ) {
         $processors = [
@@ -39,7 +37,7 @@ class CustomLogger extends Logger
             new StreamHandler('php://stdout', $logLevel),
         ];
 
-        parent::__construct($channelName, $handlers, $processors);
+        return new Logger('monolog', $handlers, $processors);
     }
 
     /**

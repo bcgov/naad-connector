@@ -3,7 +3,6 @@ namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\Entity\Alert;
-use Bcgov\NaadConnector\NaadVars;
 use DOMDocument;
 use Monolog\Logger;
 use SimpleXMLElement;
@@ -92,7 +91,6 @@ class NaadSocketClient
      */
     public function handleResponse( string $response ): bool
     {
-        $naadVars = new NaadVars();
         $xml = $this->validateResponse($response);
 
         if (! $xml ) {
@@ -105,12 +103,11 @@ class NaadSocketClient
             $this->logger->info('Heartbeat received.');
             $this->touchHeartbeatFile();
             $missedAlerts = $this->findMissedAlerts($xml);
-            if (count($missedAlerts) > 0 ) {
-                $repoUrl = $naadVars->naadRepoUrl;
+            if (count($missedAlerts) > 0) {
                 $this->logger->info(
                     'Found {count} missing alerts in heartbeat. '
-                    . 'Fetching from NAAD repository ({repoUrl}).',
-                    [ 'count' => count($missedAlerts), 'repoUrl' => $repoUrl ]
+                        . 'Fetching from NAAD repository.',
+                    ['count' => count($missedAlerts)]
                 );
 
                 // Fetch, validate, then process missed alerts.
@@ -336,9 +333,9 @@ class NaadSocketClient
                 array_column($references, 'id')
             );
         } catch (Exception $e) {
-            $this->logger->critical($e->getMessage());
             $this->logger->critical(
-                'Could not retrieve existing alerts from database.'
+                'Error retrieving alerts form database: {message}',
+                ['message' => $e->getMessage()]
             );
             throw $e;
         }
