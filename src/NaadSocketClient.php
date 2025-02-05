@@ -100,7 +100,7 @@ class NaadSocketClient
         $xml->registerXPathNamespace('x', self::XML_NAMESPACE);
 
         if ($this->isHeartbeat($xml) ) {
-            $this->logger->info('Heartbeat received.');
+            $this->logger->debug('Heartbeat received.');
             $this->touchHeartbeatFile();
             $missedAlerts = $this->findMissedAlerts($xml);
             if (count($missedAlerts) > 0) {
