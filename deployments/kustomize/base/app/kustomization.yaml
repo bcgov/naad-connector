@@ -25,6 +25,7 @@ configMapGenerator:
     literals:
     - DESTINATION_URL="http://local:38080/embc/wp-json/naad/v1/alert"
     - DESTINATION_USER=naadbot
+    - LOG_LEVEL=info
 
 secretGenerator:
   - name: naad-secrets

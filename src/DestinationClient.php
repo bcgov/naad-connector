@@ -60,7 +60,11 @@ class DestinationClient
                     $alert->setSuccess(true);
                     $this->logger->info(
                         'Sent Alert ({id}) to destination.',
-                        [ 'id' => $alert->getId() ]
+                        ['id' => $alert->getId()]
+                    );
+                    $this->logger->debug(
+                        'Response: {body}',
+                        ['body' => $response['body']]
                     );
                 } else {
                     throw new \Exception('Non-200 status code recieved.');
@@ -113,6 +117,7 @@ class DestinationClient
             // log Request and Response headers when the log level is set to 'debug'
             $this->logger->debug(
                 'Request Headers: ',
+                // TODO: Replace as getConfig() is deprecated.
                 [$this->client->getConfig('headers')]
             );
             $this->logger->debug(

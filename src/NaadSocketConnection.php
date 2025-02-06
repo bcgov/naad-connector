@@ -73,9 +73,9 @@ class NaadSocketConnection
         $this->connector->connect($fullAddress)->then(
             // Successful connection, get a Connection object.
             function (ConnectionInterface $connection) {
-                $this->logger->info('Socket connected.');
-                $this->logger->info('Listening for socket messages...');
-
+                $this->logger->info(
+                    'Socket connected. Listening for socket messages...'
+                );
                 $this->setEventHandlers($connection);
             },
             // Unsuccessful connection, get an Exception.
@@ -83,6 +83,7 @@ class NaadSocketConnection
                 $this->logger->critical(
                     'Could not connect to socket: ' . $e->getMessage()
                 );
+                return 0;
             }
         );
 

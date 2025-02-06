@@ -40,6 +40,7 @@ namespace Bcgov\NaadConnector;
  * is pulling data from, eg. "streaming1.naad-adna.pelmorex.com".
  * @property-read string $naadRepoUrl The URL of the NAAD Repository, which we
  * fetch missing alerts from, eg. "capcp1.naad-adna.pelmorex.com".
+ * @property-read string $logLevel The minimum level of logs the Logger will send.
  */
 class NaadVars
 {
@@ -57,6 +58,7 @@ class NaadVars
     private ?string $naadName;
     private ?string $naadUrl;
     private ?string $naadRepoUrl;
+    private ?string $logLevel;
 
 
     /**
@@ -73,6 +75,7 @@ class NaadVars
         'naadName' => 'NAAD_NAME',
         'naadUrl' => 'NAAD_URL',
         'naadRepoUrl' => 'NAAD_REPO_URL',
+        'logLevel' => 'LOG_LEVEL',
     ];
 
     /**
@@ -82,7 +85,8 @@ class NaadVars
     private static array $defaultValues = [
         'naadName'     => 'NAAD-1',
         'naadUrl'      => 'streaming1.naad-adna.pelmorex.com',
-        'naadRepoUrl'  => 'capcp1.naad-adna.pelmorex.com'
+        'naadRepoUrl'  => 'capcp1.naad-adna.pelmorex.com',
+        'logLevel'     => 'info',
     ];
 
     /**

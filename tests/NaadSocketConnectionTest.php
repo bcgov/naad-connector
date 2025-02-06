@@ -5,9 +5,9 @@ use PHPUnit\Framework\Attributes\{
     CoversClass,
 };
 use PHPUnit\Framework\TestCase;
+use Monolog\Logger;
 
 use Bcgov\NaadConnector\{
-    CustomLogger,
     NaadSocketClient,
     NaadSocketConnection,
 };
@@ -42,7 +42,7 @@ final class NaadSocketConnectionTest extends TestCase
     {
         $this->connector = $this->createMock(ConnectorInterface::class);
         $this->socketClient = $this->createMock(NaadSocketClient::class);
-        $this->logger = $this->createMock(CustomLogger::class);
+        $this->logger = $this->createMock(Logger::class);
         $this->connection = $this->createMock(ConnectionInterface::class);
 
         $this->naadSocketConnection = new NaadSocketConnection(
@@ -74,7 +74,7 @@ final class NaadSocketConnectionTest extends TestCase
         );
 
         $this->logger
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(4))
             ->method('info');
 
         $this->logger->expects($this->once())

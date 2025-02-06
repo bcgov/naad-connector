@@ -10,12 +10,11 @@ use PHPUnit\Framework\Attributes\{
 use PHPUnit\Framework\TestCase;
 use Monolog\Level;
 use Monolog\Handler\StreamHandler;
-use Bcgov\NaadConnector\CustomLogger;
+use Bcgov\NaadConnector\LoggerFactory;
 
 /**
- * CustomLogger Class for testing CustomLogger class.
- * This will test the class constructor, and _convertLogLevel
- * which is a private method
+ * Tests LoggerFactory class.
+ * This will test the createLogger and _convertLogLevel functions.
  *
  * @category Client
  * @package  NaadConnector
@@ -23,20 +22,20 @@ use Bcgov\NaadConnector\CustomLogger;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-#[CoversClass('Bcgov\NaadConnector\CustomLogger')]
-#[UsesClass('Bcgov\NaadConnector\CustomLogger')]
-final class CustomLoggerTest extends TestCase
+#[CoversClass('Bcgov\NaadConnector\LoggerFactory')]
+#[UsesClass('Bcgov\NaadConnector\LoggerFactory')]
+final class LoggerFactoryTest extends TestCase
 {
 
     /**
-     * Test the CustomLogger Constructor.
+     * Test the createLogger() function.
      *
      * @return void
      */
     #[Test]
     public function testDefaultConstructor()
     {
-        $logger = new CustomLogger();
+        $logger = LoggerFactory::createLogger();
 
         // Check if the handlers are configured as expected.
         $handlers = $logger->getHandlers();
@@ -52,8 +51,8 @@ final class CustomLoggerTest extends TestCase
     }
 
     /**
-     * Test the CustomLogger Constructor with parameters.
-     * this will instantiate the CustomLogger with:
+     * Test the createLogger() function with parameters.
+     * this will instantiate the Logger with:
      * - channelName: 'my_channel'
      * - logLevel: 'debug'
      *
@@ -62,7 +61,8 @@ final class CustomLoggerTest extends TestCase
     #[Test]
     public function testCustomConstructor()
     {
-        $logger = new CustomLogger('my_channel', 'debug');
+        $logger = LoggerFactory::createLogger('debug');
+        $logger = $logger->withName('my_channel');
 
         // Assert that the channel name has been set to 'my_channel'.
         $this->assertEquals('my_channel', $logger->getName());
@@ -110,7 +110,7 @@ final class CustomLoggerTest extends TestCase
         string $levelString,
         Monolog\Level $expectedLevel
     ): void {
-        $logger = new CustomLogger('test', $levelString);
+        $logger = LoggerFactory::createLogger($levelString);
         $actualLevel = $logger->getHandlers()[0]->getLevel();
 
         $this->assertEquals(

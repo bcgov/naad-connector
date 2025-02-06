@@ -2,7 +2,7 @@
 namespace Bcgov\NaadConnector;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-
+use Monolog\Logger;
 
 /**
  * NaadRepositoryClient class makes requests to the NAAD alert repository.
@@ -16,28 +16,31 @@ use GuzzleHttp\Exception\RequestException;
 class NaadRepositoryClient
 {
 
-    protected const URL_TEMPLATE = 'http://%s/%s/%sI%s.xml';
+    protected const URL_TEMPLATE = 'https://%s/%s/%sI%s.xml';
     protected const SANITIZE_RULES = ['-' => '_', '+' => 'p', ':' => '_'];
 
     protected Client $client;
     protected string $baseUrl;
+    protected Logger $logger;
 
     /**
      * Initializes a new instance of the NaadRepositoryClient class.
      *
-     * @param Client $client      - The Guzzle HTTP client to use.
-     * @param string $naadRepoUrl - The base URL used to construct an
+     * @param Client $client      The Guzzle HTTP client to use.
+     * @param string $naadRepoUrl The base URL used to construct an
      *                            URL for the Alerts repo.
+     * @param Logger $logger      An instance of Monolog/Logger.
      */
-    public function __construct(Client $client, string $naadRepoUrl)
+    public function __construct(Client $client, string $naadRepoUrl, Logger $logger)
     {
 
         if (empty($naadRepoUrl)) {
             throw new \InvalidArgumentException("Base URL cannot be empty");
         }
 
-        $this->client   = $client;
-        $this->baseUrl  = $naadRepoUrl;
+        $this->client  = $client;
+        $this->baseUrl = $naadRepoUrl;
+        $this->logger  = $logger;
     }
 
     /**
@@ -53,9 +56,18 @@ class NaadRepositoryClient
     public function fetchAlert(string $id, string $sent): string
     {
         try {
-            $response = $this->client->get($this->constructURL($id, $sent));
+            $url = $this->constructURL($id, $sent);
+            $this->logger->info(
+                'Fetching alert ({id}) from {url}',
+                ['id' => $id, 'url' => $url]
+            );
+            $response = $this->client->get($url);
             return $response->getBody()->getContents();
         } catch (RequestException $e) {
+            $this->logger->critical(
+                'Failed to fetch alert: {message}',
+                ['message' => $e->getMessage()]
+            );
             throw new \RuntimeException(
                 "Failed to fetch alert: " . $e->getMessage(),
                 $e->getCode(),

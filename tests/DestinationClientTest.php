@@ -6,8 +6,9 @@ use PHPUnit\Framework\Attributes\{
     UsesClass
 };
 use PHPUnit\Framework\TestCase;
+use Monolog\Logger;
+
 use Bcgov\NaadConnector\{
-    CustomLogger,
     Database,
     DestinationClient
 };
@@ -42,7 +43,7 @@ final class DestinationClientTest extends TestCase
     protected function setUp(): void
     {
         $this->mockDatabase = $this->createMock(Database::class);
-        $this->mockLogger = $this->createMock(CustomLogger::class);
+        $this->mockLogger = $this->createMock(Logger::class);
         $this->mockHttpClient = $this->createMock(Client::class);
     }
 
@@ -156,7 +157,7 @@ final class DestinationClientTest extends TestCase
         $mockClient->method('post')->willThrowException($exception);
 
         $client = new DestinationClient(
-            $this->createMock(CustomLogger::class),
+            $this->createMock(Logger::class),
             $this->createMock(Database::class),
             $mockClient
         );

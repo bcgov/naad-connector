@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
+use Monolog\Logger;
 
 use PHPUnit\Framework\Attributes\{
     CoversClass,
@@ -47,7 +48,8 @@ final class NaadRepositoryClientTest extends TestCase
         }
 
         $client = new Client(); // Assuming Client is a valid class
-        $naadRepositoryClient = new NaadRepositoryClient($client, $url);
+        $logger = $this->createStub(Logger::class);
+        $naadRepositoryClient = new NaadRepositoryClient($client, $url, $logger);
 
         if (!$shouldThrow) {
             // Assert that the instance is created successfully
@@ -88,7 +90,8 @@ final class NaadRepositoryClientTest extends TestCase
             $mockClient->method('get')->willReturn($mockResponse);
         }
 
-        $client = new NaadRepositoryClient($mockClient, 'naad.url');
+        $logger = $this->createStub(Logger::class);
+        $client = new NaadRepositoryClient($mockClient, 'naad.url', $logger);
         $id = $alert['id'];
         $sent = $alert['sent'];
 
