@@ -2,6 +2,7 @@
 namespace Bcgov\NaadConnector;
 
 use Monolog\{Level, Logger};
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
@@ -21,11 +22,16 @@ class LoggerFactory
     /**
      * Create a Monolog/Logger instance.
      *
-     * @param string $level The minimum logging level to record.
+     * @param string $logPath          The path to the log file to write to.
+     * @param int    $logRetentionDays The number of days to keep a
+     *                                 log file before rotating.
+     * @param string $level            The minimum logging level to record.
      *
      * @return Logger
      */
     public static function createLogger(
+        string $logPath,
+        int $logRetentionDays = 0,
         string $level = 'info'
     ) {
         $processors = [
@@ -35,6 +41,11 @@ class LoggerFactory
         $logLevel = self::_convertLogLevel($level);
         $handlers = [
             new StreamHandler('php://stdout', $logLevel),
+            new RotatingFileHandler(
+                filename: $logPath,
+                maxFiles: $logRetentionDays,
+                level: $logLevel
+            ),
         ];
 
         return new Logger('monolog', $handlers, $processors);

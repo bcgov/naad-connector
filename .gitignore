@@ -11,6 +11,7 @@ coverage/
 .phpunit.result.cache
 
 # Ignore logs
+logs/
 heartbeat.log
 
 # Ignore IDE files

@@ -18,7 +18,11 @@ use GuzzleHttp\Client;
 $naadVars = new NaadVars();
 
 // Create loggers for each component.
-$logger = LoggerFactory::createLogger($naadVars->logLevel);
+$logger = LoggerFactory::createLogger(
+    $naadVars->logPath,
+    $naadVars->logRetentionDays,
+    $naadVars->logLevel
+);
 $naadSocketConnectionLogger = $logger->withName('NaadSocketConnection');
 $destinationClientLogger    = $logger->withName('DestinationClient');
 $naadSocketClientLogger     = $logger->withName('NaadSocketClient');
