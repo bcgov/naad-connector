@@ -21,6 +21,7 @@ COPY ./ ./
 # Copy entrypoint script into /app and set permissions
 COPY ./entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/src/alert-cleanup.php
 
 # Create non-root user and set permissions
 RUN useradd -ms /bin/bash appuser \

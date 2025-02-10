@@ -62,27 +62,48 @@ After deployment, PHPMyAdmin will be accessible at the following local addresses
 
 ### Remote Deployment
 
-#### OpenShift Build
+#### OpenShift Image Build
+
+1. Log in to your OpenShift WEB console, and choose the naad-app namespace.
+2. copy the login command from the OpenShift Web console.
+3. paste the login command into your terminal.
+4. switch to the correct (12345-tools) namespace and apply the base configuration:
 
 ```shell
 # Change to the correct namespace
-oc project 12345-tools
+oc project 12345-tools # Replace with your namespace
 
 # Apply the image builds configuration
-oc apply -k deployments/kustomize/image-builds --namespace=12345-tools
+oc apply -k deployments/kustomize/image-builds
 
 # Start the build process and follow the output
-oc start-build naad-app --follow --namespace=12345-tools
+oc start-build naad-app --follow
 ```
+
+##### OPenshift build testing
+
+1. follow steps 1 - 3 above
+2. edit `deployments/kustomize/image-builds/app.yaml`:
+    - change `spec.source.git.ref` to your feature branch you want to test
+3. follow step 4 above
 
 #### OpenShift Deploy
 
+1. Log in to your OpenShift WEB console, and choose the naad-app namespace.
+2. copy the login command from the OpenShift Web console.
+3. cd to your `tenant-gitops-<12345>` repository in your terminal.
+4. paste the login command into your terminal.
+5. switch to the correct (12345-dev) namespace.
+6. (OPTIONAL - for testing) edit your kustomization file to replace the value of `resources:` to:
+    - `https://github.com/bcgov/naad-connector//deployments/kustomize/overlays/openshift?ref=<your-feature-branch>`
+7. apply the base configuration:
+
 ```shell
 # Change to the correct namespace
-oc project 12345-tools
+oc project 12345-dev # Replace with your namespace
 
-# Apply the base configuration
-oc apply -k deployments/kustomize/base --namespace=12345-tools
+# from your tenant root, apply the Kustomization file
+oc apply -k deployments/kustomize/dev
 ```
 
 ### Generate & View Documentation with phpDocumentor

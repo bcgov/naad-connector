@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: alert-cleanup
+spec:
+  schedule: "0 0 * * 0"  # Runs once a week on Sunday at midnight.
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: logs-volume
+              persistentVolumeClaim:
+                claimName: naad-logs
+          containers:
+          - name: alert-cleanup
+            image: bcgovgdx/naad-app
+            imagePullPolicy: IfNotPresent
+            envFrom:
+            - configMapRef:
+                name: cron-alert-cleanup-config
+            - configMapRef:
+                name: naad-shared-config
+            - configMapRef:
+                name: database-config
+            - secretRef:
+                name: naad-secrets
+            - secretRef:
+                name: database-secrets
+            volumeMounts:
+            - name: logs-volume
+              mountPath: /var/log/app
+              subPath: cron
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+            command: ["/bin/sh", "-c", "php src/alert-cleanup.php"]
