@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Monolog\Level;
 use Monolog\Handler\StreamHandler;
 use Bcgov\NaadConnector\LoggerFactory;
+use Monolog\Handler\RotatingFileHandler;
 
 /**
  * Tests LoggerFactory class.
@@ -33,14 +34,15 @@ final class LoggerFactoryTest extends TestCase
      * @return void
      */
     #[Test]
-    public function testDefaultConstructor()
+    public function testCreateLoggerDefaults()
     {
-        $logger = LoggerFactory::createLogger();
+        $logger = LoggerFactory::createLogger(logPath: 'fake/path');
 
         // Check if the handlers are configured as expected.
         $handlers = $logger->getHandlers();
-        $this->assertCount(1, $handlers);
+        $this->assertCount(2, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
+        $this->assertInstanceOf(RotatingFileHandler::class, $handlers[1]);
 
         // Assert the default logging level is 'info'
         $streamHandler = $handlers[0];
@@ -59,9 +61,9 @@ final class LoggerFactoryTest extends TestCase
      * @return void
      */
     #[Test]
-    public function testCustomConstructor()
+    public function testCreateLogger()
     {
-        $logger = LoggerFactory::createLogger('debug');
+        $logger = LoggerFactory::createLogger(logPath: 'fake/path', level: 'debug');
         $logger = $logger->withName('my_channel');
 
         // Assert that the channel name has been set to 'my_channel'.
@@ -110,7 +112,10 @@ final class LoggerFactoryTest extends TestCase
         string $levelString,
         Monolog\Level $expectedLevel
     ): void {
-        $logger = LoggerFactory::createLogger($levelString);
+        $logger = LoggerFactory::createLogger(
+            logPath: 'fake/path',
+            level: $levelString
+        );
         $actualLevel = $logger->getHandlers()[0]->getLevel();
 
         $this->assertEquals(

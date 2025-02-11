@@ -66,7 +66,7 @@ final class DestinationClientTest extends TestCase
      * @return void
      */
     #[Test]
-    public function testSendAlertsSuccess()
+    public function testSendAlertsSuccessPageNotCreated()
     {
         $alert = $this->createMock(Alert::class);
         $alert->method('getBody')->willReturn('<alert>data</alert>');
@@ -79,8 +79,36 @@ final class DestinationClientTest extends TestCase
         $this->mockHttpClient->method('post')
             ->willReturn(new Response(200, [], 'OK'));
         $this->mockLogger->expects($this->never())->method('critical');
+        $this->mockLogger->expects($this->once())->method('log')->with('debug');
 
         // Act
+        $client = $this->createDestinationClient();
+
+        $this->assertTrue($client->sendAlerts());
+    }
+
+    /**
+     * Tests sendAlerts method when all alerts are successfully sent and an
+     * Event page was created as a result of the alert.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testSendAlertsSuccessPageCreated()
+    {
+        $alert = $this->createMock(Alert::class);
+        $alert->method('getBody')->willReturn('<alert>data</alert>');
+        $alert->expects($this->once())->method('setSuccess')->with(true);
+        $alert->expects($this->once())->method('setSendAttempted');
+        $alert->expects($this->never())->method('incrementFailures');
+
+        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
+
+        $this->mockHttpClient->method('post')
+            ->willReturn(new Response(200, [], 'Event created successfully'));
+        $this->mockLogger->expects($this->never())->method('critical');
+        $this->mockLogger->expects($this->once())->method('log')->with('info');
+
         $client = $this->createDestinationClient();
 
         $this->assertTrue($client->sendAlerts());

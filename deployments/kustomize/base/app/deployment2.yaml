@@ -10,6 +10,10 @@ spec:
   replicas: 1
   template:
     spec:
+      volumes:
+        - name: logs-volume
+          persistentVolumeClaim:
+            claimName: naad-logs
       containers:
         - name: naad-app
           image: bcgovgdx/naad-app
@@ -25,6 +29,10 @@ spec:
               name: naad-secrets
           - secretRef:
               name: database-secrets
+          volumeMounts:
+          - name: logs-volume
+            mountPath: /var/log/app/
+            subPath: naad-2
           resources:
             requests:
               cpu: 100m

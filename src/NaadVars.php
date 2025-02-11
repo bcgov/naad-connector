@@ -41,6 +41,9 @@ namespace Bcgov\NaadConnector;
  * @property-read string $naadRepoUrl The URL of the NAAD Repository, which we
  * fetch missing alerts from, eg. "capcp1.naad-adna.pelmorex.com".
  * @property-read string $logLevel The minimum level of logs the Logger will send.
+ * @property-read string $logPath The path to the log file to write to.
+ * @property-read int    $logRetentionDays The number of days to keep a log file 
+ * before rotating.
  */
 class NaadVars
 {
@@ -59,6 +62,8 @@ class NaadVars
     private ?string $naadUrl;
     private ?string $naadRepoUrl;
     private ?string $logLevel;
+    private ?string $logPath;
+    private ?int    $logRetentionDays;
 
 
     /**
@@ -76,17 +81,20 @@ class NaadVars
         'naadUrl' => 'NAAD_URL',
         'naadRepoUrl' => 'NAAD_REPO_URL',
         'logLevel' => 'LOG_LEVEL',
+        'logPath' => 'LOG_PATH',
+        'logRetentionDays' => 'LOG_RETENTION_DAYS',
     ];
 
     /**
-     *  These default values are used  when the corresponding environment
+     * These default values are used  when the corresponding environment
      * variables are not defined.
      */
     private static array $defaultValues = [
-        'naadName'     => 'NAAD-1',
-        'naadUrl'      => 'streaming1.naad-adna.pelmorex.com',
-        'naadRepoUrl'  => 'capcp1.naad-adna.pelmorex.com',
-        'logLevel'     => 'info',
+        'naadName'         => 'NAAD-1',
+        'naadUrl'          => 'streaming1.naad-adna.pelmorex.com',
+        'naadRepoUrl'      => 'capcp1.naad-adna.pelmorex.com',
+        'logLevel'         => 'info',
+        'logRetentionDays' => 0 // No rotation.
     ];
 
     /**

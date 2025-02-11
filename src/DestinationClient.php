@@ -62,7 +62,15 @@ class DestinationClient
                         'Sent Alert ({id}) to destination.',
                         ['id' => $alert->getId()]
                     );
-                    $this->logger->debug(
+
+                    // If event page was created log at info-level, otherwise debug.
+                    $level = 'debug';
+                    if ($response['body'] === 'Event created successfully') {
+                        $level = 'info';
+                    }
+
+                    $this->logger->log(
+                        $level,
                         'Response: {body}',
                         ['body' => $response['body']]
                     );
