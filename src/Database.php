@@ -94,6 +94,38 @@ class Database
     }
 
     /**
+     * Delete all the alerts (minus ALERTS_TO_KEEP) from the database.
+     * ALERTS_TO_KEEP is defined .env or naad-shared-config configMap.
+     *
+     * @return void
+     */
+    public function deleteOldAlerts(): void
+    {
+        $alertRepository = $this->entityManager->getRepository(Alert::class);
+
+        // Retrieve the number of fresh alerts to keep from environment variables.
+        $naadVars = new NaadVars();
+        $freshAlertsToKeep = $naadVars->alertsToKeep;
+
+        // Retrieve all alerts ordered by 'received' date in descending order.
+        $alerts = $alertRepository->findBy([], ['received' => 'DESC']);
+        $alertsToDelete = array_slice($alerts, $freshAlertsToKeep);
+        $alertsDeleted = count($alertsToDelete);
+
+        // Announce the number of stale alerts being deleted.
+        $this->logger->info("Deleting {$alertsDeleted} stale alerts:");
+
+        // Delete all alerts to be deleted.
+        foreach ($alertsToDelete as $alert) {
+            $this->logger->info('Deleting alert: ' . $alert->getId());
+            $this->entityManager->remove($alert);
+        }
+
+        $this->flush();
+    }
+
+
+    /**
      * Flushes EntityManager causing database queries to be executed.
      *
      * @return void
