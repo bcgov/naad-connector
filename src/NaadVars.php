@@ -41,7 +41,6 @@ namespace Bcgov\NaadConnector;
  * @property-read string $naadRepoUrl The URL of the NAAD Repository, which we
  * fetch missing alerts from, eg. "capcp1.naad-adna.pelmorex.com".
  * @property-read string $logLevel The minimum level of logs the Logger will send.
- * before rotating.
  * @property-read int $alertsToKeep The number of alerts to keep in the database.
  * @property-read string $logPath The path to the log file to write to.
  * @property-read int    $logRetentionDays The number of days to keep a log file
