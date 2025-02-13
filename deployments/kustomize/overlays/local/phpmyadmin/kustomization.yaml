@@ -4,14 +4,16 @@ resources:
 - deployment.yaml
 - services.yaml
 
-# Updates the labels for all containers.
-commonLabels:
-  app.kubernetes.io/instance:	phpmyadmin
-  app.kubernetes.io/component: database-administration
-  app.kubernetes.io/part-of: naad-connector
 configMapGenerator:
-  - name: phpmyadmin-config
-    literals:
-      - PMA_HOST="mariadb"
-      - PMA_PORT="3306"
-      - PMA_USER="root"
+- name: phpmyadmin-config
+  literals:
+    - PMA_HOST="mariadb"
+    - PMA_PORT="3306"
+    - PMA_USER="root"
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/component: database-administration
+    app.kubernetes.io/instance: phpmyadmin
+    app.kubernetes.io/part-of: naad-connector
