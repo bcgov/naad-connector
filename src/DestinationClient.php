@@ -18,7 +18,7 @@ use Monolog\Logger;
  */
 class DestinationClient
 {
-
+    const FAILURE_THRESHOLD = 5;
     protected Client $client;
     protected Logger $logger;
     protected Database $database;
@@ -46,6 +46,8 @@ class DestinationClient
      *
      * @return bool Returns `true` if all alerts were sent successfully,
      *              `false` if any alert failed to be sent.
+     * @throws Exception If sending an alert fails and its failure threshold
+     *                   was reached.
      */
     public function sendAlerts(): bool
     {
@@ -96,11 +98,21 @@ class DestinationClient
                         ]
                     );
                 }
-            }
 
-            $alert->setSendAttempted(new \DateTime());
+                // Throw exception when failure threshold is reached.
+                if ($alert->getFailures() >= self::FAILURE_THRESHOLD) {
+                    throw new \Exception(
+                        sprintf(
+                            'Failure threshold of %d reached.',
+                            self::FAILURE_THRESHOLD
+                        )
+                    );
+                }
+            } finally {
+                $alert->setSendAttempted(new \DateTime());
+                $this->database->flush();
+            }
         }
-        $this->database->flush();
         return $allSuccessful;
     }
 
@@ -113,7 +125,7 @@ class DestinationClient
      *               - 'status_code' (int): The HTTP status code of the response.
      *               - 'body' (string): The body of the response.
      *
-     * @throws RequestException If the request fails.and no response is available.
+     * @throws RequestException If the request fails and no response is available.
      */
     public function sendRequest(string $xml): array
     {

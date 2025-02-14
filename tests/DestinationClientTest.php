@@ -146,6 +146,40 @@ final class DestinationClientTest extends TestCase
     }
 
     /**
+     * Tests sendAlerts method when and alert request fails and its
+     * failure threshold is reached.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testSendAlertsFailureThresholdReached()
+    {
+        $alert = $this->createMock(Alert::class);
+        $alert->method('getFailures')
+            ->willReturn(DestinationClient::FAILURE_THRESHOLD);
+        $alert->expects($this->once())->method('setSuccess')->with(false);
+        $alert->expects($this->once())->method('setSendAttempted');
+        $alert->expects($this->once())->method('incrementFailures');
+
+        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
+
+        $exception = new ConnectException(
+            'Connection error',
+            new \GuzzleHttp\Psr7\Request('POST', 'test')
+        );
+        $this->mockHttpClient->method('post')
+            ->willThrowException($exception);
+
+        // Allow the logger to be called more than once if neccesary
+        $this->mockLogger->expects($this->exactly(2))->method('error');
+
+        $client = $this->createDestinationClient();
+
+        $this->expectExceptionMessageMatches('/Failure threshold/');
+        $client->sendAlerts();
+    }
+
+    /**
      * Tests sendRequest method handles ConnectException properly.
      *
      * @return void
