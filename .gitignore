@@ -23,3 +23,6 @@ heartbeat.log
 # Ignore documentation files
 /docs/
 .phpdoc
+
+# Ignore development files
+/deployments/kustomize/overlays/development/

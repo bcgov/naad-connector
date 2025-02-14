@@ -14,6 +14,7 @@ use Bcgov\NaadConnector\{
 use React\Promise\Promise;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
+use React\EventLoop\LoopInterface;
 
 /**
  * NaadSocketConnectionTest Class for testing NaadSocketConnection.
@@ -44,12 +45,14 @@ final class NaadSocketConnectionTest extends TestCase
         $this->socketClient = $this->createMock(NaadSocketClient::class);
         $this->logger = $this->createMock(Logger::class);
         $this->connection = $this->createMock(ConnectionInterface::class);
+        $this->loop = $this->createMock(LoopInterface::class);
 
         $this->naadSocketConnection = new NaadSocketConnection(
             'ws://localhost',
             $this->connector,
             $this->socketClient,
-            $this->logger
+            $this->logger,
+            $this->loop,
         );
     }
 

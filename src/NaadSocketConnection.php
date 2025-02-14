@@ -7,6 +7,7 @@ use React\Socket\{
     ConnectionInterface,
     ConnectorInterface
 };
+use React\EventLoop\LoopInterface;
 
 /**
  * NaadSocketConnection class connects to the NAAD socket.
@@ -29,6 +30,10 @@ class NaadSocketConnection
 
     protected ConnectorInterface $connector;
 
+    protected int $reconnectAttempts = 0;
+
+    protected int $maxReconnectAttempts = 5;
+
     /**
      * Constructor for NaadClient.
      *
@@ -38,6 +43,7 @@ class NaadSocketConnection
      *                                         connect with.
      * @param NaadSocketClient   $socketClient An instance of NaadSocketClient.
      * @param Logger             $logger       An instance of Monolog/Logger.
+     * @param LoopInterface      $loop         An instance of React/EventLoop.
      * @param integer            $port         The port of the NAAD socket to
      *                                         connect to.
      */
@@ -46,6 +52,7 @@ class NaadSocketConnection
         ConnectorInterface $connector,
         NaadSocketClient $socketClient,
         Logger $logger,
+        LoopInterface $loop,
         int $port = 8080,
     ) {
         $this->address      = $socketUrl;
@@ -53,6 +60,7 @@ class NaadSocketConnection
         $this->socketClient = $socketClient;
         $this->logger       = $logger;
         $this->port         = $port;
+        $this->loop         = $loop;
     }
 
     /**
@@ -76,7 +84,16 @@ class NaadSocketConnection
                 $this->logger->info(
                     'Socket connected. Listening for socket messages...'
                 );
+    
+                // Set up a periodic ping every 30 seconds.
+                $this->loop->addPeriodicTimer(
+                    30, function () use ($connection) {
+                        $connection->write("\n");
+                    }
+                );
+    
                 $this->setEventHandlers($connection);
+                $this->loop->run();
             },
             // Unsuccessful connection, get an Exception.
             function (Exception $e) {
@@ -101,6 +118,8 @@ class NaadSocketConnection
      */
     protected function setEventHandlers(ConnectionInterface $connection)
     {
+        $this->reconnectAttempts = 0;
+
         $connection->on(
             'data', function (string $chunk) {
                 // Enables error XML error reporting (used by libxml_get_errors()).
@@ -115,7 +134,22 @@ class NaadSocketConnection
 
         $connection->on(
             'close', function () {
+                $this->reconnectAttempts++;
+
+                if ($this->reconnectAttempts >= $this->maxReconnectAttempts ) {
+                    $this->logger->critical(
+                        'Socket closed after {reconnectAttempts} attempts. Exiting.',
+                        ['reconnectAttempts' => $this->reconnectAttempts]
+                    );
+                    exit(1);
+                }
+
                 $this->logger->info('Socket closed.');
+                $this->loop->addTimer(
+                    5, function () {
+                        $this->connect();
+                    }
+                );
             }
         );
 

@@ -11,6 +11,8 @@ use Bcgov\NaadConnector\NaadSocketClient;
 use Bcgov\NaadConnector\NaadSocketConnection;
 use Bcgov\NaadConnector\NaadVars;
 use Bcgov\NaadConnector\NaadRepositoryClient;
+use React\EventLoop\LoopInterface;
+use React\EventLoop\Factory;
 
 use GuzzleHttp\Client;
 
@@ -67,13 +69,16 @@ $socketClient = new NaadSocketClient(
     $repositoryClient,
 );
 
-$reactConnector = new React\Socket\Connector();
+$loop = Factory::create();
+$reactConnector = new React\Socket\Connector($loop);
 $connector = new NaadSocketConnection(
     $naadVars->naadUrl,
     $reactConnector,
     $socketClient,
     $naadSocketConnectionLogger,
+    $loop,
 );
 
-return $connector->connect();
+$connector->connect();
 
+$loop->run();
