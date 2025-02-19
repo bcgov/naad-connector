@@ -74,16 +74,16 @@ final class NaadSocketConnectionTest extends TestCase
         );
 
         $this->logger
-            ->expects($this->exactly(4))
+            ->expects($this->exactly(6))
             ->method('info');
 
         $this->logger->expects($this->once())
             ->method('error')
             ->with($this->stringContains('Exception during socket connection:'));
 
-        // SocketClient->handleResponse should be called 3 times with the data
+        // SocketClient->handleResponse should be called 4 times with the data
         // from the $write variables.
-        $invokedCount = $this->exactly(3);
+        $invokedCount = $this->exactly(4);
         $this->socketClient
             ->expects($invokedCount)
             ->method('handleResponse')

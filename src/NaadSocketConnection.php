@@ -29,6 +29,10 @@ class NaadSocketConnection
 
     protected ConnectorInterface $connector;
 
+    protected int $reconnectAttempts = 0;
+
+    protected int $maxReconnectAttempts = 5;
+
     /**
      * Constructor for NaadClient.
      *
@@ -76,6 +80,7 @@ class NaadSocketConnection
                 $this->logger->info(
                     'Socket connected. Listening for socket messages...'
                 );
+    
                 $this->setEventHandlers($connection);
             },
             // Unsuccessful connection, get an Exception.
@@ -101,6 +106,8 @@ class NaadSocketConnection
      */
     protected function setEventHandlers(ConnectionInterface $connection)
     {
+        $this->reconnectAttempts = 0;
+
         $connection->on(
             'data', function (string $chunk) {
                 // Enables error XML error reporting (used by libxml_get_errors()).
@@ -115,7 +122,18 @@ class NaadSocketConnection
 
         $connection->on(
             'close', function () {
+                $this->reconnectAttempts++;
+
+                if ($this->reconnectAttempts >= $this->maxReconnectAttempts ) {
+                    $this->logger->critical(
+                        'Socket closed after {reconnectAttempts} attempts. Exiting.',
+                        ['reconnectAttempts' => $this->reconnectAttempts]
+                    );
+                    exit(1);
+                }
+
                 $this->logger->info('Socket closed.');
+                $this->connect();
             }
         );
 

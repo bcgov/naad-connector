@@ -8,7 +8,7 @@ metadata:
 spec:
   template:
     spec:
-      restartPolicy: Never
+      restartPolicy: OnFailure
       containers:
         - name: naad-database-migration
           image: bcgovgdx/naad-app

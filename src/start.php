@@ -76,4 +76,3 @@ $connector = new NaadSocketConnection(
 );
 
 return $connector->connect();
-
