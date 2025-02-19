@@ -45,4 +45,5 @@ spec:
               command:
               - /app/liveness.sh
             initialDelaySeconds: 60
-            periodSeconds: 60
+            periodSeconds: 120
+            failureThreshold: 3

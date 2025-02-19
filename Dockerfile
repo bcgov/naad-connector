@@ -20,14 +20,13 @@ COPY ./ ./
 
 # Copy entrypoint script into /app and set permissions
 COPY ./entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-RUN chmod +x /app/src/alert-cleanup.php
+RUN chmod +x /app/entrypoint.sh /app/src/alert-cleanup.php
 
-# Create non-root user and set permissions
+# Create non-root user, set permissions, and prepare the environment
 RUN useradd -ms /bin/bash appuser \
     && mkdir /app/vendor \
     && touch /app/heartbeat.log \
-    && chmod 777 /app/heartbeat.log \
+    && chmod 664 /app/heartbeat.log \
     && chown -R appuser:appuser /app
 
 # Switch to non-root user

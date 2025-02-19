@@ -66,7 +66,7 @@ final class NaadVarsTest extends TestCase
           'databaseHost' => 'test_database_host',
           'databasePort' => '3306',
           'databaseName' => 'test_database_name',
-          'destinationURL' => 'http://local:38080/test/wp-json/naad/v1/alert',
+          'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
           'destinationUser' => 'test_destination_user',
           'destinationPassword' => 'test_destination_password',
           'naadName' => 'TEST-NAAD-1',
