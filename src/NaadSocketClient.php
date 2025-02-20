@@ -295,15 +295,26 @@ class NaadSocketClient
 
     /**
      * Touches the heartbeat file in order to set its last modified date for
-     * liveness probe.
+     * liveness probe and logs the current user and group information.
      *
      * @return void
      */
     protected function touchHeartbeatFile()
     {
-        $processUser = posix_getpwuid(posix_geteuid());
-        $this->logger->info($processUser['name']);
-        $this->logger->info(get_current_user());
+
+        $userInfo = posix_getpwuid(posix_geteuid());
+        $groupInfo = posix_getgrgid(posix_getegid());
+
+        $this->logger->info(
+            'Current user and group information.',
+            [
+                'username' => $userInfo['name'],
+                'user_id' => $userInfo['uid'],
+                'groupname' => $groupInfo['name'],
+                'group_id' => $groupInfo['gid']
+            ]
+        );
+
         touch(self::HEARTBEAT_FILE_PATH);
     }
 
