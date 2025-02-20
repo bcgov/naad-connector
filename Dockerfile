@@ -23,12 +23,10 @@ COPY ./entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh /app/src/alert-cleanup.php
 
 # Create non-root user, set permissions, and prepare the environment
-RUN groupadd -g 0 appuser  && \
-    useradd -m -u 1001 -g appuser appuser  && \
-    mkdir /app/vendor && \
+RUN useradd -m -u 1001 appuser && \
+    mkdir -p /app/vendor && \
     touch /app/heartbeat.log && \
-    chown -R appuser:root /app && \
-    chmod -R g=u /app
+    chown -R 1001:0 /app &&
 
 # Switch to non-root user
 USER appuser
