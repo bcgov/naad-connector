@@ -27,7 +27,7 @@ RUN useradd -m -u 1001 appuser && \
     mkdir -p /app/vendor && \
     touch /app/heartbeat.log && \
     chown -R 1001:0 /app && \
-    chmod -R g+rw /app
+    chmod -R g+rw /app/heartbeat.log
 
 # Switch to non-root user
 USER appuser
