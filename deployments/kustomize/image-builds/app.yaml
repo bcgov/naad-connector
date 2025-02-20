@@ -29,7 +29,7 @@ spec:
   source:
     contextDir: ./
     git:
-      ref: bug/DESCW-2863_liveness-probe-inactive-openshift
+      ref: main
       uri: https://github.com/bcgov/naad-connector
     type: Git
   output:
