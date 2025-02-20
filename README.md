@@ -1,3 +1,6 @@
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)]()
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bcgov_naad-connector&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bcgov_naad-connector)
+
 # NAAD Connector
 
 A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD) System via TCP socket to a REST API.
