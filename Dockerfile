@@ -26,7 +26,7 @@ RUN chmod +x /app/entrypoint.sh /app/src/alert-cleanup.php
 RUN useradd -ms /bin/bash appuser \
     && mkdir /app/vendor \
     && touch /app/heartbeat.log \
-    && chmod 664 /app/heartbeat.log \
+    && chmod 777 /app/heartbeat.log \
     && chown -R appuser:appuser /app
 
 # Switch to non-root user
