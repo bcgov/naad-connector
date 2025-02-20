@@ -301,6 +301,9 @@ class NaadSocketClient
      */
     protected function touchHeartbeatFile()
     {
+        $processUser = posix_getpwuid(posix_geteuid());
+        $this->logger->info($processUser['name']);
+        $this->logger->info(get_current_user());
         touch(self::HEARTBEAT_FILE_PATH);
     }
 
