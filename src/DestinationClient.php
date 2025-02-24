@@ -67,7 +67,7 @@ class DestinationClient
 
                     // If event page was created log at info-level, otherwise debug.
                     $level = 'debug';
-                    if ($response['body'] === 'Event created successfully') {
+                    if (str_contains($response['body'], 'Event created successfully')) {
                         $level = 'info';
                     }
 

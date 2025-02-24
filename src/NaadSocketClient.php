@@ -123,18 +123,22 @@ class NaadSocketClient
                 }
             }
         } else {
-            $this->processAlert($xml);
+            $shouldSendAlerts = $this->processAlert($xml);
         }
 
         // Try to send alerts to the destination.
-        try {
-            $this->destinationClient->sendAlerts();
-        } catch (Exception $e) {
-            $this->logger->critical(
-                'Could not update alerts: {error}',
-                [ 'error' => $e->getMessage() ]
-            );
-            throw $e;
+        if ($shouldSendAlerts) {
+            try {
+                $this->destinationClient->sendAlerts();
+            } catch (Exception $e) {
+                $this->logger->critical(
+                    'Could not update alerts: {error}',
+                    [ 'error' => $e->getMessage() ]
+                );
+                throw $e;
+            }
+        } else {
+            $this->logger->debug('Skipping send (another pod received the alert first)');
         }
 
         $this->currentOutput = '';
@@ -158,7 +162,7 @@ class NaadSocketClient
      * @throws \Exception If the alert cannot be parsed
      * or inserted into the database.
      */
-    protected function processAlert( SimpleXMLElement $xml )
+    protected function processAlert( SimpleXMLElement $xml ): bool
     {
         $alert = null;
 
@@ -174,11 +178,12 @@ class NaadSocketClient
 
         // Try to insert the alert into the database.
         try {
-            $this->database->insertAlert($alert);
+            $insertedSuccessfully = $this->database->insertAlert($alert);
             $this->logger->info(
                 'Inserted Alert ({id}).',
                 [ 'id' => $alert->getId() ]
             );
+            return $insertedSuccessfully;
         } catch (Exception $e) {
             $this->logger->critical(
                 'Could not connect to database or insert Alert ({id}): {error}',

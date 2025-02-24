@@ -74,9 +74,9 @@ class Database
      *
      * @param Alert $alert The alert to insert.
      *
-     * @return void
+     * @return bool
      */
-    public function insertAlert(Alert $alert): void
+    public function insertAlert(Alert $alert): bool
     {
         // Try to persist the alert, catching duplicate key violations gracefully.
         try {
@@ -85,12 +85,15 @@ class Database
         } catch (UniqueConstraintViolationException $e) {
             $this->logger->error('Unique constraint violation: ' . $e->getMessage());
             $this->entityManager = $this->getEntityManager();
+            return false;
         } catch (EntityIdentityCollisionException $e) {
             $this->logger->error(
                 'Entity identity collision: ' . $e->getMessage()
             );
             $this->entityManager->detach($alert);
+            return false;
         }
+        return true;
     }
 
     /**
