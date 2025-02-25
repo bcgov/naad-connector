@@ -33,7 +33,7 @@ use Bcgov\NaadConnector\Entity\Alert;
 final class NaadSocketClientTest extends TestCase
 {
 
-    const XML_TEST_FILE_LOCATION = './tests/Socket/';
+    const XML_TEST_FILE_LOCATION = './tests/data/';
     /**
      * Tests the handleResponse method of the NaadSocketClient class.
      *

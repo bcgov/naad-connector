@@ -9,7 +9,7 @@ openshift
 phpcs.xml
 phpunit.xml
 sample-env
-tests
+tests/unit
 vendor
 .git
 node_modules

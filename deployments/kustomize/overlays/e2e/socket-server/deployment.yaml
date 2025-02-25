@@ -1,0 +1,27 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: e2e-socket-server
+  labels:
+    app.kubernetes.io/name: e2e-socket-server
+    app.kubernetes.io/instance: e2e-socket-server
+    app.openshift.io/runtime: php
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: naad-app
+          image: bcgovgdx/naad-app
+          imagePullPolicy: IfNotPresent
+          command: ["php"]
+          args: ["tests/e2e/start.php"]
+          ports:
+          - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi

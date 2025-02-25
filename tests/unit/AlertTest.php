@@ -22,7 +22,7 @@ use Bcgov\NaadConnector\Entity\Alert;
 final class AlertTest extends TestCase
 {
     private Alert $alert;
-    const XML_TEST_FILE = './tests/Socket/complete-alert.xml';
+    const XML_TEST_FILE = './tests/data/complete-alert.xml';
 
     /**
      * Set up the test environment before each test method is run.

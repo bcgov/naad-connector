@@ -83,7 +83,7 @@ oc apply -k deployments/kustomize/image-builds
 oc start-build naad-app --follow
 ```
 
-##### OPenshift build testing
+##### Openshift build testing
 
 1. follow steps 1 - 3 above
 2. edit `deployments/kustomize/image-builds/app.yaml`:
@@ -108,6 +108,17 @@ oc project 12345-dev # Replace with your namespace
 # from your tenant root, apply the Kustomization file
 oc apply -k deployments/kustomize/dev
 ```
+
+### E2E Testing
+
+End to end testing is done by using e2e testing socket server to replace the real NAADS socket allowing us to send any alert XML we want to test the entire NaadConnector system to ensure it's working as expected when receiving a given alert.
+
+#### Local
+
+1. Add an entry to `.devcontainer/override.env` to set `NAAD_URL=0.0.0.0` to cause the application to connect to the e2e testing socket server.
+1. Rebuild the devcontainer (`View > Command Pallette > Dev Containers: Rebuild Container`) so it's using the new env from step 1.
+1. In a devcontainer terminal, run `php tests/e2e/start.php` to start the e2e testing socket server.
+1. In another devcontainer, run `php src/start.php` to start the application which should connect to the testing socket server.
 
 ### Generate & View Documentation with phpDocumentor
 

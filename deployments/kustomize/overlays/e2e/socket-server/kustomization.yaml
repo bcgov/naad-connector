@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- deployment.yaml
+- services.yaml
+
+# Overrides the namespace
+namespace: default
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
