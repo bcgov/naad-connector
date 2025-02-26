@@ -115,10 +115,18 @@ End to end testing is done by using e2e testing socket server to replace the rea
 
 #### Local
 
+##### Devcontainer
+
 1. Add an entry to `.devcontainer/override.env` to set `NAAD_URL=0.0.0.0` to cause the application to connect to the e2e testing socket server.
 1. Rebuild the devcontainer (`View > Command Pallette > Dev Containers: Rebuild Container`) so it's using the new env from step 1.
 1. In a devcontainer terminal, run `php tests/e2e/start.php` to start the e2e testing socket server.
 1. In another devcontainer, run `php src/start.php` to start the application which should connect to the testing socket server.
+
+##### Kubernetes
+
+1. Build the image (`composer build`).
+1. Apply the e2e overlay (`kubectl apply -k deployments/kustomize/overlays/e2e`).
+  - Note: Not currently working due to connection issues between socket server and client.
 
 ### Generate & View Documentation with phpDocumentor
 
