@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: bdf349-dev
+
+images:
+- name: bcgovgdx/naad-app
+  newName: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app
+  newTag: latest
+
+configMapGenerator:
+- behavior: merge
+  name: naad-shared-config
+  literals:
+  - DESTINATION_URL=https://test.vanity.blog.gov.bc.ca/embc/wp-json/naad/v1/alert
+  - DESTINATION_USER=admin
+
+secretGenerator:
+- behavior: merge
+  name: naad-secrets
+  literals:
+  - DESTINATION_PASSWORD='IwO0 XTqC isv2 j9ei GINk 2Z1g'
+  type: Opaque
+- behavior: merge
+  name: database-secrets
+  literals:
+  - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
+  - MARIADB_SERVICE_HOST="mariadb"
+  - MARIADB_SERVICE_PORT=3306
+  type: Opaque
+
+resources:
+- ../openshift
+
+labels:
+- includeSelectors: true
+  pairs:
+    env: dev
+
+patches:
+#- path: vault-patch.yaml
+#- path: working-basic-patch.yaml
+- path: working-vault-patch.yaml
