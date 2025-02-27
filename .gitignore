@@ -25,4 +25,4 @@ heartbeat.log
 .phpdoc
 
 # Ignore development files
-/deployments/kustomize/overlays/development/
+#/deployments/kustomize/overlays/development/
