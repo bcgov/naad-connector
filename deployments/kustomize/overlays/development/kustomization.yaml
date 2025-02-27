@@ -38,6 +38,6 @@ labels:
     env: dev
 
 patches:
-#- path: vault-patch.yaml
+- path: vault-patch.yaml
 #- path: working-basic-patch.yaml
-- path: working-vault-patch.yaml
+#- path: working-vault-patch.yaml
