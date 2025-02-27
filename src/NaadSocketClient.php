@@ -3,6 +3,7 @@ namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\NaadVerifier;
 use DOMDocument;
 use Monolog\Logger;
 use SimpleXMLElement;
@@ -172,19 +173,27 @@ class NaadSocketClient
             throw $e;
         }
 
-        // Try to insert the alert into the database.
-        try {
-            $this->database->insertAlert($alert);
-            $this->logger->info(
-                'Inserted Alert ({id}).',
-                [ 'id' => $alert->getId() ]
-            );
-        } catch (Exception $e) {
-            $this->logger->critical(
-                'Could not connect to database or insert Alert ({id}): {error}',
-                [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
-            );
-            throw $e;
+        $verifier = new NaadVerifier();
+        $isSigned = $verifier->verifySignature($xml->asXML());
+            
+        if ($isSigned) {
+            $this->logger->info("✅ Alert signature is VALID.");
+            // Try to insert the alert into the database.
+            try {
+                $this->database->insertAlert($alert);
+                $this->logger->info(
+                    'Inserted Alert ({id}).',
+                    [ 'id' => $alert->getId() ]
+                );
+            } catch (Exception $e) {
+                $this->logger->critical(
+                    'Could not connect to database or insert Alert ({id}): {error}',
+                    [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
+                );
+                throw $e;
+            }
+        } else {
+            $this->logger->error("❌ Alert signature is INVALID.");
         }
     }
 
@@ -231,7 +240,7 @@ class NaadSocketClient
         // Check if the current output ends with the closing alert tag.
         if (str_ends_with(trim($this->currentOutput), '</alert>')) {
             $this->logger->error('Invalid XML document received.');
-            $this->currentOutput = ''; // Clear output for the next response.
+            $this->currentOutput = '';
         } else {
             $this->logger->debug(
                 'Partial XML document received. Attempting to build complete alert.'
