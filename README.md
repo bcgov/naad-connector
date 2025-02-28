@@ -109,6 +109,28 @@ oc project 12345-dev # Replace with your namespace
 oc apply -k deployments/kustomize/dev
 ```
 
+### OpenShift Tekton Pipeline
+
+#### Overview
+This pipeline automates the build process in OpenShift Pipelines. It detects changes in the `src/` directory and rebuilds the `naad-app` image only if needed.
+
+#### Workflow
+1. **Triggers**:
+   - Automatically runs when files in `src/` change (`.github/workflows/build.yml`).
+   - Can be manually triggered using GitHub Actions' "Run workflow" button.
+
+2. **Pipeline Execution**:
+   - The pipeline (`build-pipeline.yaml`) starts the `start-build` task.
+   - The task checks if changes require a rebuild.
+   - If changes are detected, `oc start-build naad-app --wait` runs.
+   - On success, the image is tagged as `dev`.
+
+3. **How to Manually Run the Pipeline**
+   - Run the following command in OpenShift:
+     ```
+     oc create -f openshift/tekton/pipelineruns/build-pipelinerun.yaml
+     ```
+
 ### E2E Testing
 
 End to end testing is done by using e2e testing socket server to replace the real NAADS socket allowing us to send any alert XML we want to test the entire NaadConnector system to ensure it's working as expected when receiving a given alert.
