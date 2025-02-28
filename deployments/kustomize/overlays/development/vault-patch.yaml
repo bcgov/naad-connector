@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   name: naad-socket-1
   annotations:
-    # image.openshift.io/triggers: '[{ "from": { "kind": "ImageStreamTag", "name": "naad-app:latest",
-    #   "namespace": "bdf349-tools" }, "fieldPath": "spec.template.spec.containers[?(@.name==\"naad-app\")].image"
-    #   };q]'
+    image.openshift.io/triggers: '[{ "from": { "kind": "ImageStreamTag", "name": "naad-app:latest",
+      "namespace": "bdf349-tools" }, "fieldPath": "spec.template.spec.containers[?(@.name==\"naad-app\")].image"
+      }]'
 spec:
   strategy:
     type: RollingUpdate
@@ -33,6 +33,7 @@ spec:
       containers:
       - name: naad-app
         image: bcgovgdx/naad-app
+        imagePullPolicy: Always
         #imagePullPolicy: IfNotPresent
         # command:
         # - /bin/sh
