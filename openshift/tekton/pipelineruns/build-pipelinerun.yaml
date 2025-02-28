@@ -1,0 +1,22 @@
+# .github/pipelines/pipelinerun.yaml
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: build-pipelinerun-
+  labels:
+    tekton.dev/pipeline: build-pipeline
+spec:
+  pipelineRef:
+    name: build-pipeline
+  serviceAccountName: pipeline
+  timeouts:
+    pipeline: 1h0m0s
+  workspaces:
+    - name: results-ws
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 64Mi

@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-pipeline
+spec:
+  workspaces:
+    - name: results-ws
+  tasks:
+    - name: start-build
+      taskRef:
+        kind: Task
+        name: start-build
+      workspaces:
+        - name: results-ws
+          workspace: results-ws

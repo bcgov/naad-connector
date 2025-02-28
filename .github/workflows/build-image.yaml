@@ -1,0 +1,32 @@
+name: Build Image on Push.
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'src/**'
+    workflow_dispatch:
+jobs:
+    deploy_naad_app:
+        if: github.repository_owner == 'bcgov'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Login to OpenShift and open the correct namespace
+              uses: redhat-developer/openshift-actions@v2.0
+              with:
+                version: 'latest'
+                openshift_server_url: ${{ secrets.OpenshiftServerURL }}
+                parameters: '{"apitoken": "${{ secrets.OpenShiftToken }}", "acceptUntrustedCerts": "true"}'
+                cmd: |
+                    oc project ${{ secrets.OpenShiftNamespace }}
+            
+            - name: Create PipelineRun
+              run: |
+                if ! oc get pipelinerun -l tekton.dev/pipeline=build-pipeline | grep -q Running; then
+                    oc create -f openshift/tekton/pipelineruns/build-pipelinerun.yaml
+                else
+                    echo "A pipeline is already running."
+                fi
