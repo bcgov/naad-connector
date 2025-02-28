@@ -26,8 +26,8 @@ spec:
         vault.hashicorp.com/agent-inject-secret-naad: bfd349-nonprod/dev
         vault.hashicorp.com/agent-inject-template-naad: |
           {{- with secret "bdf349-nonprod/dev" -}}
-          export DESTINATION_PASSWORD_V="{{ .Data.data.DESTINATION_PASSWORD }}"
-          export MARIADB_ROOT_PASSWORD_V="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export VAULT_DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
+          export VAULT_MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
           {{- end }}
     spec:
       containers:
