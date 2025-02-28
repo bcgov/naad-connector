@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# grab our secrets from the vault
+source /vault/secrets/naad
+
+# display the current contents of /vault/secrets/naad before updating
+echo 'Sourcing /vault/secrets/naad'
+cat /vault/secrets/naad
+
 # display the current contents of /vault/secrets/naad again
 echo 'AFTER Sourcing /vault/secrets/naad'
 printenv
