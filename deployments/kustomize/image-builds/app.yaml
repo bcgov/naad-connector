@@ -29,7 +29,7 @@ spec:
   source:
     contextDir: ./
     git:
-      ref: main
+      ref: feature/DESCW-2753_integrate-vault-secrets
       uri: https://github.com/bcgov/naad-connector
     type: Git
   output:
