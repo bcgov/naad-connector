@@ -2,7 +2,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: naad-socket-1
+  annotations:
+    # image.openshift.io/triggers: '[{ "from": { "kind": "ImageStreamTag", "name": "naad-app:latest",
+    #   "namespace": "bdf349-tools" }, "fieldPath": "spec.template.spec.containers[?(@.name==\"naad-app\")].image"
+    #   };q]'
 spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
   template:
     metadata:
       annotations:
@@ -24,11 +33,11 @@ spec:
       containers:
       - name: naad-app
         image: bcgovgdx/naad-app
-        imagePullPolicy: IfNotPresent
-        command:
-        - /bin/sh
-        args:
-        - -c
-        - . /vault/secrets/naad && env && /app/entrypoint.sh
+        #imagePullPolicy: IfNotPresent
+        # command:
+        # - /bin/sh
+        # args:
+        # - -c
+        # - . /vault/secrets/naad && env && /app/entrypoint.sh
       serviceAccountName: bdf349-vault
       serviceAccount: bdf349-vault
