@@ -34,11 +34,10 @@ spec:
       - name: naad-app
         image: bcgovgdx/naad-app
         imagePullPolicy: Always
-        #imagePullPolicy: IfNotPresent
-        # command:
-        # - /bin/sh
-        # args:
-        # - -c
-        # - . /vault/secrets/naad && env && /app/entrypoint.sh
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - . /vault/secrets/naad && /app/entrypoint.sh
       serviceAccountName: bdf349-vault
       serviceAccount: bdf349-vault
