@@ -26,13 +26,13 @@ secretGenerator:
   literals:
   - DESTINATION_PASSWORD='IwO0 XTqC isv2 j9ei GINk 2Z1g'
   type: Opaque
-# - behavior: merge
-#   name: database-secrets
-#   literals:
-#   - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
-#   - MARIADB_SERVICE_HOST="mariadb"
-#   - MARIADB_SERVICE_PORT=3306
-#   type: Opaque
+- behavior: merge
+  name: database-secrets
+  literals:
+  - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
+  - MARIADB_SERVICE_HOST="mariadb"
+  - MARIADB_SERVICE_PORT=3306
+  type: Opaque
 
 resources:
 - ../openshift
@@ -46,7 +46,7 @@ patches:
 - path: naad1.yaml
 - path: naad2.yaml
 - path: database-using-generated-configmap-script.yaml
-#- path: database-with-postStart-hook.yaml
+- path: remove-database-secrets.yaml  # Add this line to apply the patch
 # - path: database-with-init-container.yaml
 #- path: database.yaml
 #- path: working-basic-patch.yaml
