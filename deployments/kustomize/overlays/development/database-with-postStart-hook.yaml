@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/agent-inject-token: 'true'
+        vault.hashicorp.com/agent-pre-populate-only: 'true'
+        vault.hashicorp.com/auth-path: auth/k8s-silver
+        vault.hashicorp.com/namespace: platform-services
+        vault.hashicorp.com/secret-volume-path: /vault/secrets
+        vault.hashicorp.com/role: bdf349-nonprod
+        vault.hashicorp.com/agent-inject-secret-db-creds: bfd349-nonprod/dev
+        vault.hashicorp.com/agent-inject-template-db-creds: |
+          {{- with secret "bdf349-nonprod/dev" -}}
+          export VAULT_MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export VAULT_MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export VAULT_MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          {{- end }}
+    spec:
+      serviceAccountName: bdf349-vault
+      containers:
+      - name: mariadb
+        image: mariadb:11.5.2
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "test -f /vault/secrets/db-creds && . /vault/secrets/db-creds || echo 'Secrets file not found'"]
