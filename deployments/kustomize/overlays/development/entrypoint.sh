@@ -1,5 +1,5 @@
 #!/bin/sh
-echo 'Loading naad-app secrets'
+echo 'Loading database secrets...' >&2
 if [ -f /vault/secrets/naad ]; then
   . /vault/secrets/naad
   cat /vault/secrets/naad
@@ -12,5 +12,5 @@ else
   exit 1
 fi
 
-# All environment variables will be extracted from the .env inside start.php using getenv().
-/usr/local/bin/php /app/src/start.php
+# Call the default entrypoint to handle initialization
+exec /usr/local/bin/docker-entrypoint.sh mariadbd "$@"

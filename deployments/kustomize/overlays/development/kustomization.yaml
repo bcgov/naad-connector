@@ -14,6 +14,11 @@ configMapGenerator:
   literals:
   - DESTINATION_URL=https://test.vanity.blog.gov.bc.ca/embc/wp-json/naad/v1/alert
   - DESTINATION_USER=admin
+- name: mariadb-entrypoint
+  files:
+  - entrypoint.sh
+  options:
+    disableNameSuffixHash: true
 
 secretGenerator:
 - behavior: merge
@@ -21,13 +26,13 @@ secretGenerator:
   literals:
   - DESTINATION_PASSWORD='IwO0 XTqC isv2 j9ei GINk 2Z1g'
   type: Opaque
-- behavior: merge
-  name: database-secrets
-  literals:
-  - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
-  - MARIADB_SERVICE_HOST="mariadb"
-  - MARIADB_SERVICE_PORT=3306
-  type: Opaque
+# - behavior: merge
+#   name: database-secrets
+#   literals:
+#   - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
+#   - MARIADB_SERVICE_HOST="mariadb"
+#   - MARIADB_SERVICE_PORT=3306
+#   type: Opaque
 
 resources:
 - ../openshift
@@ -38,6 +43,11 @@ labels:
     env: dev
 
 patches:
-- path: vault-patch.yaml
+- path: naad1.yaml
+- path: naad2.yaml
+- path: database-using-generated-configmap-script.yaml
+#- path: database-with-postStart-hook.yaml
+# - path: database-with-init-container.yaml
+#- path: database.yaml
 #- path: working-basic-patch.yaml
 #- path: working-vault-patch.yaml
