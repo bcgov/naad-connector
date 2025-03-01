@@ -14,11 +14,11 @@ configMapGenerator:
   literals:
   - DESTINATION_URL=https://test.vanity.blog.gov.bc.ca/embc/wp-json/naad/v1/alert
   - DESTINATION_USER=admin
-- name: mariadb-entrypoint
-  files:
-  - entrypoint.sh
-  options:
-    disableNameSuffixHash: true
+# - name: mariadb-entrypoint
+#   files:
+#   - entrypoint.sh
+#   options:
+#     disableNameSuffixHash: true
 
 secretGenerator:
 - behavior: merge
@@ -45,7 +45,8 @@ labels:
 patches:
 - path: naad1.yaml
 - path: naad2.yaml
-- path: database-using-generated-configmap-script.yaml
+- path: database-with-inline-script.yaml
+#- path: database-using-generated-configmap-script.yaml
 - path: remove-database-secrets.yaml  # Add this line to apply the patch
 # - path: database-with-init-container.yaml
 #- path: database.yaml
