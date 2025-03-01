@@ -18,9 +18,9 @@ spec:
         vault.hashicorp.com/agent-inject-template-naad: |
           {{- with secret "bdf349-nonprod/dev" -}}
           export DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
-          export MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
-          export MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
-          export MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          export VAULT_MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export VAULT_MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export VAULT_MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
           {{- end }}
     spec:
       containers:
@@ -28,19 +28,14 @@ spec:
         image: mariadb:11.5.2
         imagePullPolicy: Always
         command:
-                - /bin/sh
-                - -c
-                - |
-                  echo 'Loading database secrets...' >&2
-                  if [ -f /vault/secrets/naad ]; then
-                    . /vault/secrets/naad
-                    cat /vault/secrets/naad
-                  else
-                    echo "Secrets file not found" >&2
-                    exit 1
-                  fi
-
-                  # Call the default entrypoint to handle initialization
-                  exec /usr/local/bin/docker-entrypoint.sh mariadbd "$@"
+        - /entrypoint/entrypoint.sh
+        volumeMounts:
+        - name: entrypoint-script
+          mountPath: /entrypoint
+      volumes:
+      - name: entrypoint-script
+        configMap:
+          name: mariadb-entrypoint  # Corrected to match configMapGenerator
+          defaultMode: 0755  # 493 in decimal, but 0755 is more readable
       serviceAccountName: bdf349-vault
       serviceAccount: bdf349-vault
