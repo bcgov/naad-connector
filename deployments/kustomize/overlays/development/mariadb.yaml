@@ -1,23 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: naad-socket-1
-  annotations:
-    image.openshift.io/triggers: '[{ "from": { "kind": "ImageStreamTag", "name": "naad-app:latest",
-      "namespace": "bdf349-tools" }, "fieldPath": "spec.template.spec.containers[?(@.name==\"naad-app\")].image"
-      }]'
+  name: mariadb
 spec:
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 0
   template:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/agent-inject-token: 'true'
-        vault.hashicorp.com/agent-init-first: 'true'
         vault.hashicorp.com/agent-pre-populate-only: 'true'
         vault.hashicorp.com/auth-path: auth/k8s-silver
         vault.hashicorp.com/namespace: platform-services
@@ -33,15 +23,10 @@ spec:
           {{- end }}
     spec:
       containers:
-      - name: naad-app
-        image: bcgovgdx/naad-app
+      - name: mariadb
+        image: mariadb:11.5.2
         imagePullPolicy: Always
         command:
-        - /app/entrypoint.sh
-      initContainers:
-        - name: wait-for-db
-          image: busybox
-          command:
             - 'sh'
             - '-c'
             - |
@@ -52,11 +37,7 @@ spec:
               done
               echo "Vault secrets are available."
               . /vault/secrets/naad
-              echo "Waiting for MariaDB to be ready..."
-              until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
-                echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
-                sleep 2
-              done
-              echo "$MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT is up and running."
+              # Call the default entrypoint to handle initialization
+              exec /usr/local/bin/docker-entrypoint.sh mariadbd "$@"
       serviceAccountName: bdf349-vault
       serviceAccount: bdf349-vault
