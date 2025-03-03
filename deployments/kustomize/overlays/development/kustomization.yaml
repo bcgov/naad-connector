@@ -43,6 +43,7 @@ labels:
     env: dev
 
 patches:
+- path: migrate-job.yaml
 - path: naad1.yaml
 - path: naad2.yaml
 - path: database-with-inline-script.yaml

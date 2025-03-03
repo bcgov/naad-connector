@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-migration
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/agent-inject-token: 'true'
+        vault.hashicorp.com/agent-init-first: 'true'
+        vault.hashicorp.com/agent-pre-populate-only: 'true'
+        vault.hashicorp.com/auth-path: auth/k8s-silver
+        vault.hashicorp.com/namespace: platform-services
+        vault.hashicorp.com/secret-volume-path: /vault/secrets
+        vault.hashicorp.com/role: bdf349-nonprod
+        vault.hashicorp.com/agent-inject-secret-naad: bfd349-nonprod/dev
+        vault.hashicorp.com/agent-inject-template-naad: |
+          {{- with secret "bdf349-nonprod/dev" -}}
+          export DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
+          export MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          {{- end }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: naad-database-migration
+          image: bcgovgdx/naad-app
+          imagePullPolicy: IfNotPresent
+          envFrom:
+          - configMapRef:
+              name: database-config
+          - secretRef:
+              name: database-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          command:
+            - 'sh'
+            - '-c'
+            - |
+              cat /vault/secrets/naad && echo 'environment:' && printenv && \
+              vendor/bin/doctrine-migrations migrate --no-interaction \
+              --allow-no-migration
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          env:
+            - name: MARIADB_SERVICE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: database-secrets
+                  key: MARIADB_SERVICE_HOST
+            - name: MARIADB_SERVICE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: database-secrets
+                  key: MARIADB_SERVICE_PORT
+          command:
+            - 'sh'
+            - '-c'
+            - |
+              echo "Waiting for Vault secrets to be injected..."
+              while [ ! -f /vault/secrets/naad ]; do
+                echo "Waiting for /vault/secrets/naad to be available..."
+                sleep 2
+              done
+              echo "Vault secrets are available."
+              echo "Waiting for MariaDB to be ready..."
+              until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
+                echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
+                sleep 2
+              done
+              echo "MariaDB is up and running."
+
+      serviceAccountName: bdf349-vault
+      serviceAccount: bdf349-vault
+  backoffLimit: 100
