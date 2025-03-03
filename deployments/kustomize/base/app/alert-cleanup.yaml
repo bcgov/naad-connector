@@ -3,7 +3,8 @@ kind: CronJob
 metadata:
   name: alert-cleanup
 spec:
-  schedule: "0 0 * * 0"  # Runs once a week on Sunday at midnight.
+  #schedule: "0 0 * * 0"  # Runs once a week on Sunday at midnight.
+  schedule: "*/5 * * * *"  # Runs every 1 minutes.
   jobTemplate:
     spec:
       template:
@@ -24,10 +25,10 @@ spec:
                 name: naad-shared-config
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: naad-secrets
-            - secretRef:
-                name: database-secrets
+            # - secretRef:
+            #     name: naad-secrets
+            # - secretRef:
+            #     name: database-secrets
             volumeMounts:
             - name: logs-volume
               mountPath: /var/log/app
