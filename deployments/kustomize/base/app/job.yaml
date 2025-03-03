@@ -16,8 +16,8 @@ spec:
           envFrom:
           - configMapRef:
               name: database-config
-          - secretRef:
-              name: database-secrets
+          # - secretRef:
+          #     name: database-secrets
           resources:
             requests:
               cpu: 100m
@@ -29,16 +29,16 @@ spec:
       initContainers:
         - name: wait-for-db
           image: busybox
-          env:
-            - name: MARIADB_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: database-secrets
-                  key: MARIADB_SERVICE_HOST
-            - name: MARIADB_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: database-secrets
-                  key: MARIADB_SERVICE_PORT
+          # env:
+          #   - name: MARIADB_SERVICE_HOST
+          #     valueFrom:
+          #       secretKeyRef:
+          #         name: database-secrets
+          #         key: MARIADB_SERVICE_HOST
+          #   - name: MARIADB_SERVICE_PORT
+          #     valueFrom:
+          #       secretKeyRef:
+          #         name: database-secrets
+          #         key: MARIADB_SERVICE_PORT
           command: ['sh', '-c', 'until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do echo waiting for database $MARIADB_SERVICE_HOST; sleep 2; done']
   backoffLimit: 100
