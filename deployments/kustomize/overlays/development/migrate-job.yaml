@@ -9,9 +9,11 @@ spec:
   template:
     metadata:
       annotations:
+        # Specifies the policy for resolving image names in OpenShift.
         alpha.image.policy.openshift.io/resolve-names: '*'
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/agent-inject-token: 'true'
+        # Ensures the Vault agent runs before other containers in the pod.
         vault.hashicorp.com/agent-init-first: 'true'
         vault.hashicorp.com/agent-pre-populate-only: 'true'
         vault.hashicorp.com/auth-path: auth/k8s-silver
@@ -48,23 +50,12 @@ spec:
             - 'sh'
             - '-c'
             - |
-              cat /vault/secrets/naad && echo 'environment:' && printenv && \
+              . /vault/secrets/naad && cat /vault/secrets/naad && echo 'environment:' && printenv && \
               vendor/bin/doctrine-migrations migrate --no-interaction \
               --allow-no-migration
       initContainers:
         - name: wait-for-db
           image: busybox
-          env:
-            - name: MARIADB_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: database-secrets
-                  key: MARIADB_SERVICE_HOST
-            - name: MARIADB_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: database-secrets
-                  key: MARIADB_SERVICE_PORT
           command:
             - 'sh'
             - '-c'
@@ -74,12 +65,15 @@ spec:
                 echo "Waiting for /vault/secrets/naad to be available..."
                 sleep 2
               done
-              echo "Vault secrets are available."
+              . /vault/secrets/naad
+              echo "Vault secrets are available. $(cat /vault/secrets/naad)"
+              echo 'environment:' && printenv
               echo "Waiting for MariaDB to be ready..."
               until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
                 echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
                 sleep 2
               done
+              echo "now available: database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
               echo "MariaDB is up and running."
 
       serviceAccountName: bdf349-vault
