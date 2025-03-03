@@ -47,8 +47,8 @@ patches:
 - path: naad2.yaml
 - path: database-with-inline-script.yaml
 #- path: database-using-generated-configmap-script.yaml
-- path: remove-database-secrets.yaml  # Add this line to apply the patch
-# - path: database-with-init-container.yaml
+#- path: remove-database-secrets.yaml  # Add this line to apply the patch
+#- path: database-with-init-container.yaml
 #- path: database.yaml
 #- path: working-basic-patch.yaml
 #- path: working-vault-patch.yaml
