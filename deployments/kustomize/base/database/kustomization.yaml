@@ -16,6 +16,9 @@ secretGenerator:
 - name: database-secrets
   literals:
     - MARIADB_ROOT_PASSWORD="rootpassword"
+    - MARIADB_SERVICE_HOST="mariadb"
+    - MARIADB_SERVICE_PORT=3306
+
   type: Opaque
 
 labels:
