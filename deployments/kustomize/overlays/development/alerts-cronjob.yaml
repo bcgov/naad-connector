@@ -42,10 +42,18 @@ spec:
                 name: naad-shared-config
             - configMapRef:
                 name: database-config
-            # - secretRef:
-            #     name: naad-secrets
-            # - secretRef:
-            #     name: database-secrets
-            command: ["/bin/sh", "-c", ". /vault/secrets/naad && printenv && php src/alert-cleanup.php"]
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for Vault secrets to be injected..."
+              while [ ! -f /vault/secrets/naad ]; do
+                echo "Waiting for /vault/secrets/naad to be available..."
+                sleep 2
+              done
+              echo "Vault secrets are available."
+              . /vault/secrets/naad
+              echo "Cleaning up old alerts..."
+              php src/alert-cleanup.php
           serviceAccountName: bdf349-vault
           serviceAccount: bdf349-vault

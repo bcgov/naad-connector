@@ -37,7 +37,16 @@ spec:
         image: bcgovgdx/naad-app
         imagePullPolicy: Always
         command:
-        - /app/entrypoint.sh
+          - 'sh'
+          - '-c'
+          - |
+            echo "Waiting for Vault secrets to be injected..."
+            while [ ! -f /vault/secrets/naad ]; do
+              echo "Waiting for /vault/secrets/naad to be available..."
+              sleep 2
+            done
+            echo "Vault secrets are available."
+            . /vault/secrets/naad && env && /app/entrypoint.sh
       initContainers:
         - name: wait-for-db
           image: busybox
@@ -52,7 +61,6 @@ spec:
               done
               echo "Vault secrets are available."
               . /vault/secrets/naad
-              echo "Waiting for MariaDB to be ready..."
               until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
                 echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
                 sleep 2
