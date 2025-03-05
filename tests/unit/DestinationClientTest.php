@@ -16,6 +16,8 @@ use Bcgov\NaadConnector\Entity\Alert;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use GuzzleHttp\Psr7\Response;
 
 /**
@@ -162,20 +164,59 @@ final class DestinationClientTest extends TestCase
         $alert->expects($this->once())->method('incrementFailures');
 
         $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
+        $client = $this->createDestinationClient();
 
-        $exception = new ConnectException(
-            'Connection error',
-            new \GuzzleHttp\Psr7\Request('POST', 'test')
-        );
+        // List of fatal response codes to simulate.
+        $fatalStatusCodes = [401, 403, 404, 500];
+
+        foreach ($fatalStatusCodes as $statusCode) {
+            // Create a mock ResponseInterface that returns the desired status code.
+            $response = $this->createMock(ResponseInterface::class);
+            $response->method('getStatusCode')->willReturn($statusCode);
+
+            // Simulate the sendRequest method.
+            $this->mockHttpClient->method('post')
+                ->willReturn($response);
+
+            // Allow the logger to be called more than once if necessary.
+            $this->mockLogger->expects($this->exactly(2))->method('error');
+
+            $this->expectExceptionMessageMatches('/Failure threshold/');
+            $client->sendAlerts();
+        }
+    }
+
+    /**
+     * Tests sendAlerts method when and alert request fails
+     * in a non-fatal way.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testSendAlertsFailureNonFatal()
+    {
+        $alert = $this->createMock(Alert::class);
+        $alert->expects($this->once())->method('setSuccess')->with(false);
+        $alert->expects($this->once())->method('setSendAttempted');
+        $alert->expects($this->once())->method('incrementFailures');
+
+        $this->mockDatabase->method('getUnsentAlerts')->willReturn([$alert]);
+        $client = $this->createDestinationClient();
+
+        // Create a mock ResponseInterface that returns the desired 5xx status code.
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(413);
+
+        // Simulate the sendRequest method to return the mocked ResponseInterface.
         $this->mockHttpClient->method('post')
-            ->willThrowException($exception);
+            ->willReturn($response);
 
-        // Allow the logger to be called more than once if neccesary
+        // Allow the logger to be called more than once if necessary.
         $this->mockLogger->expects($this->exactly(2))->method('error');
 
         $client = $this->createDestinationClient();
 
-        $this->expectExceptionMessageMatches('/Failure threshold/');
+        // Indirectly confirms no exceptions — any would cause the test to fail.  
         $client->sendAlerts();
     }
 
