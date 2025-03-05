@@ -12,14 +12,13 @@ configMapGenerator:
     - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD="0"
     - MARIADB_DATABASE="naad_connector"
 
-secretGenerator:
-- name: database-secrets
-  literals:
-    - MARIADB_ROOT_PASSWORD="rootpassword"
-    - MARIADB_SERVICE_HOST="mariadb"
-    - MARIADB_SERVICE_PORT=3306
-
-  type: Opaque
+# secretGenerator:
+# - name: database-secrets
+#   literals:
+#     - MARIADB_ROOT_PASSWORD="rootpassword"
+#     - MARIADB_SERVICE_HOST="mariadb"
+#     - MARIADB_SERVICE_PORT=3306
+#   type: Opaque
 
 labels:
 - includeSelectors: true
