@@ -19,6 +19,7 @@ use Monolog\Logger;
 class DestinationClient
 {
     const FAILURE_THRESHOLD = 5;
+    private const FATAL_ERRORS = [401, 403, 404];
     protected Client $client;
     protected Logger $logger;
     protected Database $database;
@@ -76,28 +77,20 @@ class DestinationClient
                         'Response: {body}',
                         ['body' => $response['body']]
                     );
+                } elseif (500 <= $response['status_code']
+                    || in_array($response['status_code'], self::FATAL_ERRORS, true)
+                ) {
+                    // 5xx and certain 4xx errors are cause for a retry.
+                    throw new \Exception('Unexpected status code received.');
+
                 } else {
-                    throw new \Exception('Non-200 status code recieved.');
+                    // All other response codes are unrecoverable.
+                    $allSuccessful = false;
+                    $this->handleAlertFailure($alert, $response);
                 }
             } catch (\Exception $e) {
-                $alert->incrementFailures();
-                $alert->setSuccess(false);
                 $allSuccessful = false;
-                $this->logger->error(
-                    'Could not send Alert ({id}): {error}',
-                    [ 'id' => $alert->getId(), 'error' => $e->getMessage() ]
-                );
-
-                if (isset($response)) {
-                    $this->logger->error(
-                        'HTTP response for Alert ({id}): Status {code}: {body}',
-                        [
-                            'code' => $response['status_code'],
-                            'body' => $response['body'],
-                            'id' => $alert->getId()
-                        ]
-                    );
-                }
+                $this->handleAlertFailure($alert, $response, $e);
 
                 // Throw exception when failure threshold is reached.
                 if ($alert->getFailures() >= self::FAILURE_THRESHOLD) {
@@ -114,6 +107,46 @@ class DestinationClient
             }
         }
         return $allSuccessful;
+    }
+
+    /**
+     * Log an HTTP response to a failed attempt to send an alert.
+     *
+     * @param Alert          $alert    The Alert in the failed send attempt.
+     * @param array|null     $response The HTTP response from WordPress, if any.
+     * @param Exception|null $e        The provided exception, if any.
+     *
+     * @return void
+     */
+    private function handleAlertFailure(
+        $alert, array $response = null, \Exception $e = null
+    ): void {
+
+        $alert->incrementFailures();
+        $alert->setSuccess(false);
+
+        if ($e) {
+            $this->logger->error(
+                'Could not send Alert ({id}): {error}',
+                ['id' => $alert->getId(), 'error' => $e->getMessage()]
+            );
+        } else {
+            $this->logger->error(
+                'Could not send Alert ({id})',
+                ['id' => $alert->getId()]
+            );            
+        }
+
+        if (isset($response)) {
+            $this->logger->error(
+                'HTTP response for Alert ({id}): Status {code}: {body}',
+                [
+                    'code' => $response['status_code'],
+                    'body' => $response['body'],
+                    'id' => $alert->getId()
+                ]
+            );
+        }
     }
 
     /**
