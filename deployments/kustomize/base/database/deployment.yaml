@@ -22,8 +22,8 @@ spec:
         envFrom:
         - configMapRef:
             name: database-config
-        # - secretRef:
-        #     name: database-secrets
+        - secretRef:
+            name: database-secrets
         volumeMounts:
         - name: database-volume
           mountPath: /var/lib/mysql
