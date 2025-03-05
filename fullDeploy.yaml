@@ -1,0 +1,650 @@
+apiVersion: v1
+data:
+  LOG_PATH: /var/log/app/cron/alert-cleanup.log
+  NAAD_NAME: NAAD-Alert-Cleanup
+  NAAD_REPO_URL: capcp1.naad-adna.pelmorex.com
+  NAAD_URL: streaming1.naad-adna.pelmorex.com
+kind: ConfigMap
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: cron-alert-cleanup-config-hgd725f2kc
+  namespace: bdf349-dev
+---
+apiVersion: v1
+data:
+  MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "0"
+  MARIADB_DATABASE: naad_connector
+kind: ConfigMap
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: database-config-t4k2bth2d9
+  namespace: bdf349-dev
+---
+apiVersion: v1
+data:
+  ALERTS_TO_KEEP: "100"
+  DESTINATION_URL: https://test.vanity.blog.gov.bc.ca/embc/wp-json/naad/v1/alert
+  DESTINATION_USER: admin
+  LOG_LEVEL: info
+  LOG_RETENTION_DAYS: "365"
+kind: ConfigMap
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: naad-shared-config-6tkhcg766k
+  namespace: bdf349-dev
+---
+apiVersion: v1
+data:
+  LOG_PATH: /var/log/app/naad-1/app.log
+  NAAD_NAME: NAAD-1
+  NAAD_REPO_URL: capcp1.naad-adna.pelmorex.com
+  NAAD_URL: streaming1.naad-adna.pelmorex.com
+kind: ConfigMap
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: naad1-config-mfthmdchh9
+  namespace: bdf349-dev
+---
+apiVersion: v1
+data:
+  LOG_PATH: /var/log/app/naad-2/app.log
+  NAAD_NAME: NAAD-2
+  NAAD_REPO_URL: capcp2.naad-adna.pelmorex.com
+  NAAD_URL: streaming2.naad-adna.pelmorex.com
+kind: ConfigMap
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: naad2-config-64b8bg5ctb
+  namespace: bdf349-dev
+---
+apiVersion: v1
+data:
+  MARIADB_ROOT_PASSWORD: UmdPNC4lNTQxZ2pXcW9FSERSJH0jcGZNP1ZaamN2NHdzbDNnO2lmLXV3S01dT0M7KUA=
+  MARIADB_SERVICE_HOST: bWFyaWFkYg==
+  MARIADB_SERVICE_PORT: MzMwNg==
+kind: Secret
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: database-secrets-8hm9c45ttm
+  namespace: bdf349-dev
+type: Opaque
+---
+apiVersion: v1
+data:
+  DESTINATION_PASSWORD: SXdPMCBYVHFDIGlzdjIgajllaSBHSU5rIDJaMWc=
+kind: Secret
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: naad-secrets-fcg9tt2hbd
+  namespace: bdf349-dev
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: mariadb
+  namespace: bdf349-dev
+spec:
+  ports:
+  - name: 3306-tcp
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: naad-app
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: mariadb
+  namespace: bdf349-dev
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: naad-logs
+  namespace: bdf349-dev
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+  volumeMode: Filesystem
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/name: database
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: mariadb
+  namespace: bdf349-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: naad-app
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: mariadb
+      app.kubernetes.io/part-of: naad-connector
+      env: dev
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-naad: bfd349-nonprod/dev
+        vault.hashicorp.com/agent-inject-template-naad: |
+          {{- with secret "bdf349-nonprod/dev" -}}
+          export DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
+          export MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          {{- end }}
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/auth-path: auth/k8s-silver
+        vault.hashicorp.com/namespace: platform-services
+        vault.hashicorp.com/role: bdf349-nonprod
+        vault.hashicorp.com/secret-volume-path: /vault/secrets
+      labels:
+        app: naad-app
+        app.kubernetes.io/component: database
+        app.kubernetes.io/instance: mariadb
+        app.kubernetes.io/part-of: naad-connector
+        env: dev
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          echo 'Loading database secrets...' >&2
+          if [ -f /vault/secrets/naad ]; then
+            . /vault/secrets/naad
+            cat /vault/secrets/naad
+          else
+            echo "Secrets file not found" >&2
+            exit 1
+          fi
+
+          # Call the default entrypoint to handle initialization
+          exec /usr/local/bin/docker-entrypoint.sh mariadbd "$@"
+        envFrom:
+        - configMapRef:
+            name: database-config-t4k2bth2d9
+        image: mariadb:11.5.2
+        imagePullPolicy: Always
+        name: mariadb
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: database-volume
+      serviceAccount: bdf349-vault
+      serviceAccountName: bdf349-vault
+      volumes:
+      - name: database-volume
+        persistentVolumeClaim:
+          claimName: mariadb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{ "from": { "kind": "ImageStreamTag", "name": "naad-app:latest",
+      "namespace": "bdf349-tools" }, "fieldPath": "spec.template.spec.containers[?(@.name==\"naad-app\")].image"
+      }]'
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/instance: naad-1
+    app.kubernetes.io/name: naad-socket-1
+    app.kubernetes.io/part-of: naad-connector
+    app.openshift.io/runtime: php
+    env: dev
+  name: naad-socket-1
+  namespace: bdf349-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: naad-app
+      app.kubernetes.io/component: socket
+      app.kubernetes.io/part-of: naad-connector
+      env: dev
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-naad: bfd349-nonprod/dev
+        vault.hashicorp.com/agent-inject-template-naad: |
+          {{- with secret "bdf349-nonprod/dev" -}}
+          export DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
+          export MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          {{- end }}
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/auth-path: auth/k8s-silver
+        vault.hashicorp.com/namespace: platform-services
+        vault.hashicorp.com/role: bdf349-nonprod
+        vault.hashicorp.com/secret-volume-path: /vault/secrets
+      labels:
+        app: naad-app
+        app.kubernetes.io/component: socket
+        app.kubernetes.io/part-of: naad-connector
+        env: dev
+    spec:
+      containers:
+      - command:
+        - /app/entrypoint.sh
+        envFrom:
+        - configMapRef:
+            name: naad1-config-mfthmdchh9
+        - configMapRef:
+            name: naad-shared-config-6tkhcg766k
+        - configMapRef:
+            name: database-config-t4k2bth2d9
+        image: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /app/liveness.sh
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 120
+        name: naad-app
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /var/log/app/
+          name: logs-volume
+          subPath: naad-1
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for Vault secrets to be injected..."
+          while [ ! -f /vault/secrets/naad ]; do
+            echo "Waiting for /vault/secrets/naad to be available..."
+            sleep 2
+          done
+          echo "Vault secrets are available."
+          . /vault/secrets/naad
+          echo "Waiting for MariaDB to be ready..."
+          until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
+            echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
+            sleep 2
+          done
+          echo "$MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT is up and running."
+        image: busybox
+        name: wait-for-db
+      serviceAccount: bdf349-vault
+      serviceAccountName: bdf349-vault
+      volumes:
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: naad-logs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{ "from": { "kind": "ImageStreamTag", "name": "naad-app:latest",
+      "namespace": "bdf349-tools" }, "fieldPath": "spec.template.spec.containers[?(@.name==\"naad-app\")].image"
+      }]'
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/instance: naad-2
+    app.kubernetes.io/name: naad-socket-2
+    app.kubernetes.io/part-of: naad-connector
+    app.openshift.io/runtime: php
+    env: dev
+  name: naad-socket-2
+  namespace: bdf349-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: naad-app
+      app.kubernetes.io/component: socket
+      app.kubernetes.io/part-of: naad-connector
+      env: dev
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-naad: bfd349-nonprod/dev
+        vault.hashicorp.com/agent-inject-template-naad: |
+          {{- with secret "bdf349-nonprod/dev" -}}
+          export DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
+          export MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          {{- end }}
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/auth-path: auth/k8s-silver
+        vault.hashicorp.com/namespace: platform-services
+        vault.hashicorp.com/role: bdf349-nonprod
+        vault.hashicorp.com/secret-volume-path: /vault/secrets
+      labels:
+        app: naad-app
+        app.kubernetes.io/component: socket
+        app.kubernetes.io/part-of: naad-connector
+        env: dev
+    spec:
+      containers:
+      - command:
+        - /app/entrypoint.sh
+        envFrom:
+        - configMapRef:
+            name: naad2-config-64b8bg5ctb
+        - configMapRef:
+            name: naad-shared-config-6tkhcg766k
+        - configMapRef:
+            name: database-config-t4k2bth2d9
+        image: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /app/liveness.sh
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 120
+        name: naad-app
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /var/log/app/
+          name: logs-volume
+          subPath: naad-2
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for Vault secrets to be injected..."
+          while [ ! -f /vault/secrets/naad ]; do
+            echo "Waiting for /vault/secrets/naad to be available..."
+            sleep 2
+          done
+          echo "Vault secrets are available."
+          . /vault/secrets/naad
+          echo "Waiting for MariaDB to be ready..."
+          until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
+            echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
+            sleep 2
+          done
+          echo "$MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT is up and running."
+        image: busybox
+        name: wait-for-db
+      serviceAccount: bdf349-vault
+      serviceAccountName: bdf349-vault
+      volumes:
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: naad-logs
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: alert-cleanup
+  namespace: bdf349-dev
+spec:
+  jobTemplate:
+    metadata:
+      labels:
+        app: naad-app
+        app.kubernetes.io/component: socket
+        app.kubernetes.io/part-of: naad-connector
+        env: dev
+    spec:
+      template:
+        metadata:
+          labels:
+            app: naad-app
+            app.kubernetes.io/component: socket
+            app.kubernetes.io/part-of: naad-connector
+            env: dev
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - -c
+            - php src/alert-cleanup.php
+            envFrom:
+            - configMapRef:
+                name: cron-alert-cleanup-config-hgd725f2kc
+            - configMapRef:
+                name: naad-shared-config-6tkhcg766k
+            - configMapRef:
+                name: database-config-t4k2bth2d9
+            image: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app:latest
+            imagePullPolicy: IfNotPresent
+            name: alert-cleanup
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 100m
+                memory: 256Mi
+            volumeMounts:
+            - mountPath: /var/log/app
+              name: logs-volume
+              subPath: cron
+          restartPolicy: OnFailure
+          volumes:
+          - name: logs-volume
+            persistentVolumeClaim:
+              claimName: naad-logs
+  schedule: '*/5 * * * *'
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    app: naad-app
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    env: dev
+  name: database-migration
+  namespace: bdf349-dev
+spec:
+  backoffLimit: 100
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-naad: bfd349-nonprod/dev
+        vault.hashicorp.com/agent-inject-template-naad: |
+          {{- with secret "bdf349-nonprod/dev" -}}
+          export DESTINATION_PASSWORD="{{ .Data.data.DESTINATION_PASSWORD }}"
+          export MARIADB_ROOT_PASSWORD="{{ .Data.data.MARIADB_ROOT_PASSWORD }}"
+          export MARIADB_SERVICE_HOST="{{ .Data.data.MARIADB_SERVICE_HOST }}"
+          export MARIADB_SERVICE_PORT="{{ .Data.data.MARIADB_SERVICE_PORT }}"
+          {{- end }}
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/auth-path: auth/k8s-silver
+        vault.hashicorp.com/namespace: platform-services
+        vault.hashicorp.com/role: bdf349-nonprod
+        vault.hashicorp.com/secret-volume-path: /vault/secrets
+      labels:
+        app: naad-app
+        app.kubernetes.io/component: socket
+        app.kubernetes.io/part-of: naad-connector
+        env: dev
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - |
+          . /vault/secrets/naad && cat /vault/secrets/naad && echo 'environment:' && printenv && \
+          vendor/bin/doctrine-migrations migrate --no-interaction \
+          --allow-no-migration
+        envFrom:
+        - configMapRef:
+            name: database-config-t4k2bth2d9
+        - secretRef:
+            name: database-secrets-8hm9c45ttm
+        image: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app:latest
+        imagePullPolicy: IfNotPresent
+        name: naad-database-migration
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for Vault secrets to be injected..."
+          while [ ! -f /vault/secrets/naad ]; do
+            echo "Waiting for /vault/secrets/naad to be available..."
+            sleep 2
+          done
+          . /vault/secrets/naad
+          echo "Vault secrets are available. $(cat /vault/secrets/naad)"
+          echo 'environment:' && printenv
+          echo "Waiting for MariaDB to be ready..."
+          until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
+            echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
+            sleep 2
+          done
+          echo "now available: database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
+          echo "MariaDB is up and running."
+        image: busybox
+        name: wait-for-db
+      restartPolicy: OnFailure
+      serviceAccount: bdf349-vault
+      serviceAccountName: bdf349-vault
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    env: dev
+  name: allow-db-ingress
+  namespace: bdf349-dev
+spec:
+  ingress:
+  - ports:
+    - port: 3306
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: database
+      env: dev
+  policyTypes:
+  - Ingress
