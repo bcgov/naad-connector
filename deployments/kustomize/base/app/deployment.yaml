@@ -25,10 +25,10 @@ spec:
               name: naad-shared-config
           - configMapRef:
               name: database-config
-          # - secretRef:
-          #     name: naad-secrets
-          # - secretRef:
-          #     name: database-secrets
+          - secretRef:
+              name: naad-secrets
+          - secretRef:
+              name: database-secrets
           volumeMounts:
           - name: logs-volume
             mountPath: /var/log/app/

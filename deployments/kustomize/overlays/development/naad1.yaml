@@ -40,7 +40,6 @@ spec:
           - 'sh'
           - '-c'
           - |
-            echo "Waiting for Vault secrets to be injected..."
             while [ ! -f /vault/secrets/naad ]; do
               echo "Waiting for /vault/secrets/naad to be available..."
               sleep 2
@@ -54,9 +53,8 @@ spec:
             - 'sh'
             - '-c'
             - |
-              echo "Waiting for Vault secrets to be injected..."
               while [ ! -f /vault/secrets/naad ]; do
-                echo "Waiting for /vault/secrets/naad to be available..."
+                echo "Waiting for /vault/secrets/naad to be injected..."
                 sleep 2
               done
               echo "Vault secrets are available."

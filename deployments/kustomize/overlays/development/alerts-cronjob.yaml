@@ -54,6 +54,10 @@ spec:
               echo "Vault secrets are available."
               . /vault/secrets/naad
               echo "Cleaning up old alerts..."
+              while [ ! -f src/alert-cleanup.php ]; do
+                echo "Waiting for src/alert-cleanup.php to be available..."
+                sleep 2
+              done
               php src/alert-cleanup.php
           serviceAccountName: bdf349-vault
           serviceAccount: bdf349-vault

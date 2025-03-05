@@ -50,8 +50,14 @@ spec:
             - 'sh'
             - '-c'
             - |
-              . /vault/secrets/naad && cat /vault/secrets/naad && echo 'environment:' && printenv && \
-              vendor/bin/doctrine-migrations migrate --no-interaction \
+              while [ ! -f /vault/secrets/naad ]; do
+                echo "Waiting for /vault/secrets/naad to be available..."
+                sleep 2
+              done
+              echo "Vault secrets are available."
+              . /vault/secrets/naad
+              vendor/bin/doctrine-migrations migrate \
+              --no-interaction \
               --allow-no-migration
       initContainers:
         - name: wait-for-db
