@@ -66,15 +66,13 @@ spec:
                 sleep 2
               done
               . /vault/secrets/naad
-              echo "Vault secrets are available. $(cat /vault/secrets/naad)"
-              echo 'environment:' && printenv
+              echo "Vault secrets are available."
               echo "Waiting for MariaDB to be ready..."
               until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do
                 echo "Waiting for database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
                 sleep 2
               done
-              echo "now available: database $MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT..."
-              echo "MariaDB is up and running."
+              echo "$MARIADB_SERVICE_HOST:$MARIADB_SERVICE_PORT is up and running."
 
       serviceAccountName: bdf349-vault
       serviceAccount: bdf349-vault
