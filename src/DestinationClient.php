@@ -80,11 +80,11 @@ class DestinationClient
                 } elseif (500 <= $response['status_code']
                     || in_array($response['status_code'], self::FATAL_ERRORS, true)
                 ) {
-                    // 5xx and certain 4xx errors are cause for a retry.
+                    // 5xx and certain 4xx errors require intervention.
                     throw new \Exception('Unexpected status code received.');
 
                 } else {
-                    // All other response codes are unrecoverable.
+                    // All other response codes should just be logged.
                     $allSuccessful = false;
                     $this->handleAlertFailure($alert, $response);
                 }
