@@ -20,19 +20,19 @@ configMapGenerator:
 #   options:
 #     disableNameSuffixHash: true
 
-secretGenerator:
-- behavior: merge
-  name: naad-secrets
-  literals:
-  - DESTINATION_PASSWORD='IwO0 XTqC isv2 j9ei GINk 2Z1g'
-  type: Opaque
-- behavior: merge
-  name: database-secrets
-  literals:
-  - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
-  - MARIADB_SERVICE_HOST="mariadb"
-  - MARIADB_SERVICE_PORT=3306
-  type: Opaque
+# secretGenerator:
+# - behavior: merge
+#   name: naad-secrets
+#   literals:
+#   - DESTINATION_PASSWORD='IwO0 XTqC isv2 j9ei GINk 2Z1g'
+#   type: Opaque
+# - behavior: merge
+#   name: database-secrets
+#   literals:
+#   - MARIADB_ROOT_PASSWORD="RgO4.%541gjWqoEHDR$}#pfM?VZjcv4wsl3g;if-uwKM]OC;)@"
+#   - MARIADB_SERVICE_HOST="mariadb"
+#   - MARIADB_SERVICE_PORT=3306
+#   type: Opaque
 
 resources:
 - ../openshift

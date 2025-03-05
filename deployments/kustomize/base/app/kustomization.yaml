@@ -34,11 +34,11 @@ configMapGenerator:
     - LOG_RETENTION_DAYS=365
     - ALERTS_TO_KEEP=100
 
-secretGenerator:
-- name: naad-secrets
-  literals:
-    - DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
-  type: Opaque
+# secretGenerator:
+# - name: naad-secrets
+#   literals:
+#     - DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
+#   type: Opaque
 
 labels:
 - includeSelectors: true
