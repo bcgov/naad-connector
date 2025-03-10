@@ -7,6 +7,9 @@ A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD
 
 ## Usage
 
+## Secrets
+- production deployments will use vault secrets, there is code that either accepts secrets in the form of env variables or for example `export MY_SECRET=password` or a vault file called `/vault/secrets/MY_SECRET`
+
 ### Local Deployment
 
 #### Devcontainer
@@ -62,6 +65,15 @@ After deployment, PHPMyAdmin will be accessible at the following local addresses
 **Note:** You may need to use Firefox or Safari to access this as Chrome may block this address due to it not using https.
 
 ---
+
+#### Gitignored Folders
+##### secrets
+- this folder is to capture the vault secrets 
+- to test a vault secret, simply add the sescret as a file identical to the secret name, and add your secret into the file.
+- example `secrets/DESTINATION_PASSWORD`
+
+##### logs
+- this folder captures the logs
 
 ### Remote Deployment
 

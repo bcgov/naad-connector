@@ -116,8 +116,13 @@ class NaadVars
         foreach (self::$envMap as $property => $envKey) {
             // Get the environment variable out of the .env file.
             // If not found there, use a default, if not there, just be null.
-            $this->$property = getenv($envKey)
+            $secretFileName = sprintf("/vault/secrets/%s", $envKey);
+            if (file_exists($secretFileName) ) {
+                $this->$property = rtrim(file_get_contents($secretFileName), "\r\n");
+            } else {
+                $this->$property = getenv($envKey)
                 ?: self::$defaultValues[$property] ?? null;
+            }
 
             // If not found in .env or in defaults, Throw error.
             if ($this->$property === null) {
