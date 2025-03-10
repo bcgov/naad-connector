@@ -103,20 +103,20 @@ class NaadVars
 
     /**
      * This initializes the object's properties by loading values from environment variables or from file, 
-     * indicated by the $secretFolder path and filename identical to the environment variable. 
+     * indicated by the $secretPath and filename identical to the environment variable. 
      * It iterates over the predefined environment variable keys and assigns their corresponding values to the object's properties.
      *
-     * @param  $secretFolder The secrets folder for allowing secrets to be stored in files as the same name as the env variable.
+     * @param  $secretPath The secrets path for allowing secrets to be stored in files as the same name as the env variable.
      * @return void
      *
      * @throws Exception If an environment variable is not in .env or defaults.
      */
-    public function __construct($secretFolder="/valut/secrets")
+    public function __construct($secretPath="/valut/secrets")
     {
         foreach (self::$envMap as $property => $envKey) {
             // Get the environment variable out of the .env file.
             // If not found there, use a default, if not there, just be null.
-            $secretFileName = sprintf("%s/%s", $secretFolder, $envKey);
+            $secretFileName = sprintf("%s/%s", $secretPath, $envKey);
             if (file_exists($secretFileName) ) {
                 $this->$property = rtrim(file_get_contents($secretFileName), "\r\n");
             } else {
