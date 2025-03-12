@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: naad-socket
+  labels:
+    app.kubernetes.io/name: naad-socket
+    app.kubernetes.io/component: socket
+    app.kubernetes.io/part-of: naad-connector
+    app.kubernetes.io/instance: naad
+    app.openshift.io/runtime: php
+spec:
+  replicas: 1
+  ordinals:
+    start: 1
+  selector:
+    matchLabels:
+  template:
+    metadata:
+      labels:
+    spec:
+      volumes:
+        - name: logs-volume
+          persistentVolumeClaim:
+            claimName: naad-logs
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: naad-app
+          image: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app
+          imagePullPolicy: Always
+          env:
+          - name: POD_INDEX
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+          envFrom:
+          - configMapRef:
+              name: naad-config
+          - secretRef:
+              name: naad-secrets
+          - configMapRef:
+              name: database-config
+          - secretRef:
+              name: database-secrets
+          volumeMounts:
+          - name: logs-volume
+            mountPath: /var/log/
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+              - /app/liveness.sh
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            failureThreshold: 3
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          envFrom:
+            - configMapRef:
+                name: database-config
+          command: ['sh', '-c', 'until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do echo waiting for database $MARIADB_SERVICE_HOST; sleep 2; done']
