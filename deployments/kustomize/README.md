@@ -8,9 +8,9 @@ This section is to be removed, once all the deployments have been changed, and t
   - application code will have to be updated
 - The log path `LOG_PATH` env will be just a path that points to `/var/log/`,
   - each instance of creation of log will define its own path
-  - examples are  `/var/log/naad-1`, `/var/log/naad-1` and `/var/log/naad-cleanup`
+  - examples are  `/var/log/naad-1`, `/var/log/naad-2` and `/var/log/naad-cleanup`
 - The `NAAD_URL` and `NAAD_URL_REPO` will be part of the application, and will be based on the value of POD_INDEX, primary or secondary url.
-- all logging env variables will have defaults
+- all logging env variables will have defaults within the application
 - Removing of initContainers, and the application will check the db connection
   - remove `MARIADB_SERVICE_HOST` and `MARIADB_SERVICE_PORT` variables
 - Once all application changes have been made
@@ -18,9 +18,9 @@ This section is to be removed, once all the deployments have been changed, and t
   - remove `overlays/openshift` and replace it with `overlays/openshift2`
 
 ## Getting Started
-- Under the `deployments/kustomize` create a folder called `custom`, this folder is ignored by the github repository, and a developer can create sample and test deployments
-- create a `deployments/kustomize/custom/kustomization.yaml` and add the sample `kustomization.yaml` and update the namespace
-- create a `deployments/kustomize/custom/patch.yaml` and add the example patch
+- Under the `deployments/kustomize` create a folder called `custom`, this folder is ignored by the github repository, and a developer can create a sample test deployment
+- create a `deployments/kustomize/custom/kustomization.yaml` and add the sample `kustomization.yaml` and update the namespace to the OpenShift namespace where you are deploying the application
+- create a `deployments/kustomize/custom/patch.yaml` and add the example patch, which adds 2 naad-sockets (defaults to only 1)
 - using the oc command to deploy to openshift
   - login to OpenShift in your terminal
   - run `oc apply -k ./deployments/kustomize/custom/` to deploy to dev

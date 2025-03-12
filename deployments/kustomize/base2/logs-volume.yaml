@@ -4,9 +4,6 @@ metadata:
   name: naad-logs
   labels:
     app.kubernetes.io/name: naad-logs
-    app.kubernetes.io/component: socket
-    app.kubernetes.io/part-of: naad-connector
-    app.kubernetes.io/instance: naad
 spec:
   volumeMode: Filesystem
   accessModes:
