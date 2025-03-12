@@ -111,7 +111,7 @@ oc start-build naad-app --follow
 4. paste the login command into your terminal.
 5. switch to the correct (12345-dev) namespace.
 6. (OPTIONAL - for testing) edit your kustomization file to replace the value of `resources:` to:
-    - `https://github.com/bcgov/naad-connector/deployments/kustomize/overlays/openshift?ref=<your-feature-branch>`
+    - `https://github.com/bcgov/naad-connector//deployments/kustomize/overlays/openshift?ref=<your-feature-branch>`
 7. apply the base configuration:
 
 ```shell
