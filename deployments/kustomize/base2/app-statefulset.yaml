@@ -25,10 +25,10 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: naad-app
-          image: image-registry.openshift-image-registry.svc:5000/bdf349-tools/naad-app
+          image: bcgovgdx/naad-app
           imagePullPolicy: Always
           env:
-          - name: POD_INDEX
+          - name: FEED_ID
             valueFrom:
               fieldRef:
                 fieldPath: metadata.labels['apps.kubernetes.io/pod-index']

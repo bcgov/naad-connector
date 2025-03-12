@@ -18,6 +18,7 @@ spec:
       - name: database-volume
         persistentVolumeClaim:
           claimName: mariadb
+      automountServiceAccountToken: false
       containers:
       - name: mariadb
         image: mariadb:11.5.2

@@ -10,6 +10,7 @@ spec:
   template:
     spec:
       restartPolicy: OnFailure
+      automountServiceAccountToken: false
       containers:
         - name: naad-database-migration
           image: bcgovgdx/naad-app

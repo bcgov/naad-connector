@@ -1,10 +1,10 @@
 # Deployments
-The OpenShift deployment for Early Earthquake System (NAAD) which uses [kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/), and all commands are used from the root of this repository.
+The OpenShift deployment for Early Earthquake Warning System (NaadConnector) which uses [kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/), and all commands are used from the root of this repository.
 
 ## Upcoming Changes
 This section is to be removed, once all the deployments have been changed, and the application has been updated.
 
-- The `POD_INDEX` env variable is being passed to indicate if it is the primary or secondary (1, being primary, and > 1 being secondary) 
+- The `FEED_ID` env variable is being passed to indicate if it is the primary or secondary (1, being primary, and > 1 being secondary) 
   - application code will have to be updated
 - The log path `LOG_PATH` env will be just a path that points to `/var/log/`,
   - each instance of creation of log will define its own path
@@ -38,9 +38,9 @@ NAAD_URL=streaming1.naad-adna.pelmorex.com # will become deprecated
 NAAD_REPO_URL=capcp1.naad-adna.pelmorex.com # will become deprecated 
 # The path where the logs get stored, each log instance will create a subpath and the corresponding log files.
 LOG_PATH=/var/log/app/naad/app.log
-# info
+# debug, info, notice, warning (prod), error, critical, alert, emergency
 LOG_LEVEL=info
-# 0 - no retention, > 0 number of days
+# 0 - unlimited retention, > 0 number of days
 LOG_RETENTION_DAYS=365
 ALERTS_TO_KEEP=100
 
