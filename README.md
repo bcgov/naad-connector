@@ -8,6 +8,7 @@ A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD
 ## Usage
 
 ## Secrets
+> Vault secrets are not going to be used for MVP.
 - production deployments will use vault secrets, there is code that either accepts secrets in the form of env variables or for example `export MY_SECRET=password` or a vault file called `/vault/secrets/MY_SECRET`
 
 ### Local Deployment
@@ -110,7 +111,7 @@ oc start-build naad-app --follow
 4. paste the login command into your terminal.
 5. switch to the correct (12345-dev) namespace.
 6. (OPTIONAL - for testing) edit your kustomization file to replace the value of `resources:` to:
-    - `https://github.com/bcgov/naad-connector//deployments/kustomize/overlays/openshift?ref=<your-feature-branch>`
+    - `https://github.com/bcgov/naad-connector/deployments/kustomize/overlays/openshift?ref=<your-feature-branch>`
 7. apply the base configuration:
 
 ```shell
