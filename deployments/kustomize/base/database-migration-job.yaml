@@ -13,7 +13,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: naad-database-migration
-          image: bcgovgdx/naad-app
+          image: bcgovgdx/naad-app:1.0.0
           imagePullPolicy: IfNotPresent
           envFrom:
           - configMapRef:
