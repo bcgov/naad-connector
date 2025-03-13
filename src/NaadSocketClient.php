@@ -122,19 +122,26 @@ class NaadSocketClient
                     }
                 }
             }
+            $shouldSendAlerts = true;
         } else {
-            $this->processAlert($xml);
+            $shouldSendAlerts = $this->processAlert($xml);
         }
 
         // Try to send alerts to the destination.
-        try {
-            $this->destinationClient->sendAlerts();
-        } catch (Exception $e) {
-            $this->logger->critical(
-                'Could not update alerts: {error}',
-                [ 'error' => $e->getMessage() ]
+        if ($shouldSendAlerts) {
+            try {
+                $this->destinationClient->sendAlerts();
+            } catch (Exception $e) {
+                $this->logger->critical(
+                    'Could not update alerts: {error}',
+                    [ 'error' => $e->getMessage() ]
+                );
+                throw $e;
+            }
+        } else {
+            $this->logger->debug(
+                'Skipping send (another instance received the alert first).'
             );
-            throw $e;
         }
 
         $this->currentOutput = '';
@@ -158,10 +165,8 @@ class NaadSocketClient
      * @throws \Exception If the alert cannot be parsed
      * or inserted into the database.
      */
-    protected function processAlert( SimpleXMLElement $xml )
+    protected function processAlert( SimpleXMLElement $xml ): bool
     {
-        $alert = null;
-
         // Try to parse the XML into an alert.
         try {
             $alert = Alert::fromXml($xml);
@@ -174,11 +179,12 @@ class NaadSocketClient
 
         // Try to insert the alert into the database.
         try {
-            $this->database->insertAlert($alert);
+            $insertedSuccessfully = $this->database->insertAlert($alert);
             $this->logger->info(
                 'Inserted Alert ({id}).',
                 [ 'id' => $alert->getId() ]
             );
+            return $insertedSuccessfully;
         } catch (Exception $e) {
             $this->logger->critical(
                 'Could not connect to database or insert Alert ({id}): {error}',
@@ -334,7 +340,7 @@ class NaadSocketClient
             );
         } catch (Exception $e) {
             $this->logger->critical(
-                'Error retrieving alerts form database: {message}',
+                'Error retrieving alerts from database: {message}',
                 ['message' => $e->getMessage()]
             );
             throw $e;
