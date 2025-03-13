@@ -23,9 +23,10 @@ spec:
           persistentVolumeClaim:
             claimName: naad-logs
       terminationGracePeriodSeconds: 10
+      automountServiceAccountToken: false
       containers:
         - name: naad-app
-          image: bcgovgdx/naad-app
+          image: bcgovgdx/naad-app:1.0.0
           imagePullPolicy: Always
           env:
           - name: FEED_ID
