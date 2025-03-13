@@ -122,6 +122,7 @@ class NaadSocketClient
                     }
                 }
             }
+            $shouldSendAlerts = true;
         } else {
             $shouldSendAlerts = $this->processAlert($xml);
         }
@@ -138,7 +139,9 @@ class NaadSocketClient
                 throw $e;
             }
         } else {
-            $this->logger->debug('Skipping send (another pod received the alert first)');
+            $this->logger->debug(
+                'Skipping send (another instance received the alert first).'
+            );
         }
 
         $this->currentOutput = '';
@@ -164,8 +167,6 @@ class NaadSocketClient
      */
     protected function processAlert( SimpleXMLElement $xml ): bool
     {
-        $alert = null;
-
         // Try to parse the XML into an alert.
         try {
             $alert = Alert::fromXml($xml);
@@ -339,7 +340,7 @@ class NaadSocketClient
             );
         } catch (Exception $e) {
             $this->logger->critical(
-                'Error retrieving alerts form database: {message}',
+                'Error retrieving alerts from database: {message}',
                 ['message' => $e->getMessage()]
             );
             throw $e;
