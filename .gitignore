@@ -24,5 +24,9 @@ heartbeat.log
 /docs/
 .phpdoc
 
+# secrets - used for testing vault secrets
+secrets
+
 # Ignore development files
 /deployments/kustomize/overlays/development/
+/deployments/kustomize/custom/

@@ -7,6 +7,9 @@ A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD
 
 ## Usage
 
+## Secrets
+- production deployments will use vault secrets, there is code that either accepts secrets in the form of env variables or for example `export MY_SECRET=password` or a vault file called `/vault/secrets/MY_SECRET`
+
 ### Local Deployment
 
 #### Devcontainer
@@ -63,6 +66,15 @@ After deployment, PHPMyAdmin will be accessible at the following local addresses
 
 ---
 
+#### Gitignored Folders
+##### secrets
+- this folder is to capture the vault secrets 
+- to test a vault secret, simply add the sescret as a file identical to the secret name, and add your secret into the file.
+- example `secrets/DESTINATION_PASSWORD`
+
+##### logs
+- this folder captures the logs
+
 ### Remote Deployment
 
 #### OpenShift Image Build
@@ -83,7 +95,7 @@ oc apply -k deployments/kustomize/image-builds
 oc start-build naad-app --follow
 ```
 
-##### OPenshift build testing
+##### Openshift build testing
 
 1. follow steps 1 - 3 above
 2. edit `deployments/kustomize/image-builds/app.yaml`:
@@ -108,6 +120,47 @@ oc project 12345-dev # Replace with your namespace
 # from your tenant root, apply the Kustomization file
 oc apply -k deployments/kustomize/dev
 ```
+
+### OpenShift Tekton Pipeline
+
+#### Overview
+This pipeline automates the build process in OpenShift Pipelines. It detects changes in the `src/` directory and rebuilds the `naad-app` image only if needed.
+
+#### Workflow
+1. **Triggers**:
+   - Automatically runs when files in `src/` change (`.github/workflows/build.yml`).
+   - Can be manually triggered using GitHub Actions' "Run workflow" button.
+
+2. **Pipeline Execution**:
+   - The pipeline (`build-pipeline.yaml`) starts the `start-build` task.
+   - The task checks if changes require a rebuild.
+   - If changes are detected, `oc start-build naad-app --wait` runs.
+   - On success, the image is tagged as `dev`.
+
+3. **How to Manually Run the Pipeline**
+   - Run the following command in OpenShift:
+     ```
+     oc create -f openshift/tekton/pipelineruns/build-pipelinerun.yaml
+     ```
+
+### E2E Testing
+
+End to end testing is done by using e2e testing socket server to replace the real NAADS socket allowing us to send any alert XML we want to test the entire NaadConnector system to ensure it's working as expected when receiving a given alert.
+
+#### Local
+
+##### Devcontainer
+
+1. Add an entry to `.devcontainer/override.env` to set `NAAD_URL=0.0.0.0` to cause the application to connect to the e2e testing socket server.
+1. Rebuild the devcontainer (`View > Command Pallette > Dev Containers: Rebuild Container`) so it's using the new env from step 1.
+1. In a devcontainer terminal, run `php tests/e2e/start.php` to start the e2e testing socket server.
+1. In another devcontainer, run `php src/start.php` to start the application which should connect to the testing socket server.
+
+##### Kubernetes
+
+1. Build the image (`composer build`).
+1. Apply the e2e overlay (`kubectl apply -k deployments/kustomize/overlays/e2e`).
+  - Note: Not currently working due to connection issues between socket server and client.
 
 ### Generate & View Documentation with phpDocumentor
 
