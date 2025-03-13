@@ -3,15 +3,17 @@ kind: Job
 metadata:
   name: database-migration
   annotations:
+    app.kubernetes.io/name: database-migration
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
       restartPolicy: OnFailure
+      automountServiceAccountToken: false
       containers:
         - name: naad-database-migration
-          image: bcgovgdx/naad-app
+          image: bcgovgdx/naad-app:1.0.0
           imagePullPolicy: IfNotPresent
           envFrom:
           - configMapRef:
@@ -22,23 +24,17 @@ spec:
             requests:
               cpu: 100m
               memory: 500Mi
+              ephemeral-storage: "500Mi"
             limits:
+              ephemeral-storage: "1Gi"
               cpu: 500m
               memory: 1Gi
           command: ['vendor/bin/doctrine-migrations', 'migrate', '--no-interaction', '--allow-no-migration']
       initContainers:
         - name: wait-for-db
           image: busybox
-          env:
-            - name: MARIADB_SERVICE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: database-secrets
-                  key: MARIADB_SERVICE_HOST
-            - name: MARIADB_SERVICE_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: database-secrets
-                  key: MARIADB_SERVICE_PORT
+          envFrom:
+          - configMapRef:
+              name: database-config
           command: ['sh', '-c', 'until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do echo waiting for database $MARIADB_SERVICE_HOST; sleep 2; done']
   backoffLimit: 100

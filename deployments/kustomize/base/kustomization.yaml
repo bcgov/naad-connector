@@ -2,15 +2,49 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- app
-- database
+- database-deployment.yaml
+- database-service.yaml
+- database-volume.yaml
+- database-migration-job.yaml
+- alert-cleanup-cronjob.yaml
+- logs-volume.yaml
+- app-statefulset.yaml
 
 
-# Overrides the namespace
-namespace: default
+
+secretGenerator:
+- name: naad-secrets
+  literals:
+    - DESTINATION_PASSWORD='AAAA AAAA AAAA AAAA'
+    - DESTINATION_URL="http://local:38080/embc/wp-json/naad/v1/alert"
+    - DESTINATION_USER=naadbot
+  type: Opaque
+- name: database-secrets
+  literals:
+    - MARIADB_ROOT_PASSWORD="rootpassword"
+  type: Opaque
+
+configMapGenerator:
+- name: database-config
+  literals:
+    - MARIADB_DATABASE="naad_connector"
+    # Temporary, they will get removed once init containers get removed.
+    - MARIADB_SERVICE_HOST="mariadb"
+    - MARIADB_SERVICE_PORT="3306"
+- name: naad-config
+  literals:
+    - NAAD_URL=streaming1.naad-adna.pelmorex.com
+    - NAAD_REPO_URL=capcp1.naad-adna.pelmorex.com
+    - LOG_PATH=/var/log/app/naad/app.log
+    - LOG_LEVEL=info
+    - LOG_RETENTION_DAYS=365
+    - ALERTS_TO_KEEP=100
+
 
 labels:
 - includeSelectors: true
   pairs:
+    app.kubernetes.io/part-of: naad-connector
+    app.kubernetes.io/instance: naad
     app: naad-app
     env: default

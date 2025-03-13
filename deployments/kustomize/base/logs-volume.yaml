@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mariadb
+  name: naad-logs
+  labels:
+    app.kubernetes.io/name: naad-logs
 spec:
   volumeMode: Filesystem
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 500Mi
-  
