@@ -11,6 +11,7 @@ resources:
 - app-statefulset.yaml
 
 
+
 secretGenerator:
 - name: naad-secrets
   literals:

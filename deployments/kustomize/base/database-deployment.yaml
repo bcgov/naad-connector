@@ -36,3 +36,11 @@ spec:
         volumeMounts:
         - name: database-volume
           mountPath: /var/lib/mysql
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            ephemeral-storage: "1Gi"
+            cpu: 500m
+            memory: 1Gi
