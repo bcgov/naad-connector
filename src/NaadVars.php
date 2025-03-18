@@ -57,7 +57,7 @@ class NaadVars
     private array $data = [];
 
     /**
-     * Can use files the same name as the ENV, 
+     * Can use files the same name as the ENV,
      * the path is where to find the files
      *
      * @example /vault/secrets/MY_PASSWORD, same as env as MY_PASSWORD.
@@ -99,8 +99,8 @@ class NaadVars
             if (file_exists($secretFileName) ) {
                 $this->$property = rtrim(file_get_contents($secretFileName), "\r\n");
             } else {
-                $this->$property = array_key_exists($envKey, $env) ? 
-                    $env[$envKey]: 
+                $this->$property = array_key_exists($envKey, $env) ?
+                    $env[$envKey]:
                     null;
             }
         }
@@ -138,7 +138,7 @@ class NaadVars
             'NAAD_REPO_URL' => 'capcp1.naad-adna.pelmorex.com',
             'LOG_PATH' => '/logs',
         ];
-        return array_merge($defaults, getenv());     
+        return array_merge($defaults, getenv());
     }
 
     /**
@@ -211,7 +211,7 @@ class NaadVars
      *
      * @param string     $name  The name of the property you want to set.
      * @param string|int $value The value of the property to be set.
-     * 
+     *
      * @return void
      */
     public function __set(string $name, $value): void
