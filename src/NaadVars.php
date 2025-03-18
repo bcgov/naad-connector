@@ -61,7 +61,7 @@ class NaadVars
      * the path is where to find the files
      *
      * @example /vault/secrets/MY_PASSWORD, same as env as MY_PASSWORD.
-     * 
+     *
      * @var string
      */
     private string $secretPath;
@@ -128,7 +128,7 @@ class NaadVars
      * @return array
      */
     private function getEnvs(): array
-    { 
+    {
         $defaults = [
             'FEED_ID' => 'default',
             'LOG_LEVEL'      => 'info',
@@ -145,9 +145,9 @@ class NaadVars
      * This gets the final log path based on feedId and the LOG_PATH env.
      *
      * @param string $path   The path which comes from the env LOG_PATH.
-     * @param string $feedId The feed identifier, which is used to determine 
+     * @param string $feedId The feed identifier, which is used to determine
      *                       naad-1, naad-2, migration, or cleanup.
-     * 
+     *
      * @return string
      */
     private function getLogPath(string $path, string $feedId ): string
