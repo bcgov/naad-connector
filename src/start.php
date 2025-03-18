@@ -9,19 +9,23 @@ use Bcgov\NaadConnector\Database;
 use Bcgov\NaadConnector\DestinationClient;
 use Bcgov\NaadConnector\NaadSocketClient;
 use Bcgov\NaadConnector\NaadSocketConnection;
-use Bcgov\NaadConnector\NaadVars;
 use Bcgov\NaadConnector\NaadRepositoryClient;
+use Bcgov\NaadConnector\NaadVars;
+use Bcgov\NaadConnector\Config\ApplicationConfig;
 
 use GuzzleHttp\Client;
+use PhpParser\Node\Name;
 
 // Get environment variables for configuring a socket connection.
-$naadVars = new NaadVars();
+// $config = new ApplicationConfig();
+// $config->init();
+$config = new NaadVars();
 
 // Create loggers for each component.
 $logger = LoggerFactory::createLogger(
-    $naadVars->logPath,
-    $naadVars->logRetentionDays,
-    $naadVars->logLevel
+    $config->logPath,
+    $config->logRetentionDays,
+    $config->logLevel
 );
 $naadSocketConnectionLogger = $logger->withName('NaadSocketConnection');
 $destinationClientLogger    = $logger->withName('DestinationClient');
@@ -38,8 +42,8 @@ $guzzleClient = new Client();
 // configure the guzzle client for the DestinationClient
 $destinationGuzzleclient = new Client(
     [
-    'base_uri' => $naadVars->destinationURL,
-    'auth'     => [$naadVars->destinationUser, $naadVars->destinationPassword],
+    'base_uri' => $config->destinationURL,
+    'auth'     => [$config->destinationUser, $config->destinationPassword],
     'headers'  => $headers // secure headers for api requests
     ]
 );
@@ -55,7 +59,7 @@ $destinationClient = new DestinationClient(
 // Create a new RepositoryClient instance with the provided configuration.
 $repositoryClient = new NaadRepositoryClient(
     $guzzleClient,
-    $naadVars->naadRepoUrl,
+    $config->naadRepoUrl,
     $repositoryClientLogger
 );
 
@@ -68,7 +72,7 @@ $socketClient = new NaadSocketClient(
 
 $reactConnector = new React\Socket\Connector();
 $connector = new NaadSocketConnection(
-    $naadVars->naadUrl,
+    $config->naadUrl,
     $reactConnector,
     $socketClient,
     $naadSocketConnectionLogger,
