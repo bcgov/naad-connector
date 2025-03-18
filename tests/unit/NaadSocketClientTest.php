@@ -57,7 +57,6 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -216,7 +215,6 @@ final class NaadSocketClientTest extends TestCase
             );
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -267,7 +265,6 @@ final class NaadSocketClientTest extends TestCase
             ->willReturn($alertXml);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -304,7 +301,6 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -342,7 +338,6 @@ final class NaadSocketClientTest extends TestCase
         $err = 'Invalid XML: "identifier" field is required and must not be empty.';
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
