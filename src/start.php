@@ -60,7 +60,6 @@ $repositoryClient = new NaadRepositoryClient(
 );
 
 $socketClient = new NaadSocketClient(
-    $naadVars->naadName,
     $destinationClient,
     $naadSocketClientLogger,
     $database,

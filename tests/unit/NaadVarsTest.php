@@ -69,7 +69,6 @@ final class NaadVarsTest extends TestCase
           'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
           'destinationUser' => 'test_destination_user',
           'destinationPassword' => 'test_destination_password',
-          'naadName' => 'TEST-NAAD-1',
           'naadUrl' => 'test.naad_url.com',
           'naadRepoUrl' => 'test.naad_repo_url.com',
         ];
@@ -96,9 +95,10 @@ final class NaadVarsTest extends TestCase
           'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
           'destinationUser' => 'test_destination_user',
           'destinationPassword' => 'test_destination_password_from_file',
-          'naadName' => 'TEST-NAAD-1',
           'naadUrl' => 'test.naad_url.com',
           'naadRepoUrl' => 'test.naad_repo_url.com',
+          'logPath' => '/logs/naad-default/app.log',
+          'feedId' => 'default',
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
@@ -111,7 +111,7 @@ final class NaadVarsTest extends TestCase
      *
      * @return void
      */
-    public function testConstructorThrowsExceptionWhenEnvVariableMissing()
+    public function testGetVariableThrowsExceptionWhenEnvVariableMissing()
     {
         // Clear a required environment variable to simulate the issue
         putenv('MARIADB_ROOT_PASSWORD'); // Remove this key from the environment
@@ -120,11 +120,11 @@ final class NaadVarsTest extends TestCase
         // Assert that the exception is thrown
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "Environment variable 'MARIADB_ROOT_PASSWORD' is required."
+            "Property 'databaseRootPassword' does not exist."
         );
 
-        // Instantiate NaadVars to trigger the constructor
-        new NaadVars();
+        $nad = new NaadVars();
+        $nad->databaseRootPassword;
     }
 
 
@@ -155,7 +155,6 @@ final class NaadVarsTest extends TestCase
     {
         $naadVars = new NaadVars();
         $this->assertInstanceOf(NaadVars::class, $naadVars);
-        $this->assertSame('TEST-NAAD-1', $naadVars->naadName);
         $this->assertSame('test.naad_url.com', $naadVars->naadUrl);
         $this->assertSame('test.naad_repo_url.com', $naadVars->naadRepoUrl);
     }
