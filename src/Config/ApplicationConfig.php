@@ -12,7 +12,7 @@ use Bcgov\NaadConnector\Config\DatabaseConfig;
  * @author   Digital Engagement Solutions <govwordpress@gov.bc.ca>
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
- * 
+ *
  * @property string $destinationURL The URL of the destination API, eg.
  * local: "https://0.0.0.0/wp-json/naad/v1/alert".
  * @property string $destinationUser The username to authenticate the

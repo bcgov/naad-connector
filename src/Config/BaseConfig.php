@@ -137,7 +137,7 @@ abstract class BaseConfig
      * @param string $name The name of the property to retrieve.
      *
      * @return void
-     * 
+     *
      * @throws \InvalidArgumentException If the property does not exist.
      */
     public function __get(string $name)
@@ -185,7 +185,7 @@ abstract class BaseConfig
     }
 
     /**
-     * Helper function to have consistent exception for set/get 
+     * Helper function to have consistent exception for set/get
      * invalid property value.
      *
      * @param string $name The property that is throwing exception.
