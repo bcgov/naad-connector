@@ -44,15 +44,18 @@ final class NaadSocketClientTest extends TestCase
      * @param array $xmlResponses An array of XML response data, where each
      *                            entry contains a 'location' for the XML file
      *                            and an 'expected' value for assertion.
+     * @param int   $sendAttempts The number of times DestinationClient->sendAlerts()
+     *                            should have been called.
      *
      * @return void
      */
     #[Test]
     #[DataProvider('handleResponseProvider')]
-    public function testHandleResponse(array $xmlResponses)
+    public function testHandleResponse(array $xmlResponses, int $sendAttempts)
     {
         $database = $this->createStub(Database::class);
-        $destinationClient = $this->createStub(DestinationClient::class);
+        $database->method('insertAlert')->willReturn(true);
+        $destinationClient = $this->createMock(DestinationClient::class);
         $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
@@ -63,6 +66,11 @@ final class NaadSocketClientTest extends TestCase
             $database,
             $repositoryClient
         );
+
+        $destinationClient
+            ->expects($this->exactly($sendAttempts))
+            ->method('sendAlerts');
+
         libxml_use_internal_errors(true);
         foreach ($xmlResponses as $response) {
             $result = $client->handleResponse(
@@ -94,6 +102,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => true,
                     ],
                 ],
+                1
             ],
             'Success - multi-part'                 => [
                 [
@@ -106,6 +115,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => true,
                     ],
                 ],
+                1
             ],
             'Invalid - multi-part'                 => [
                 [
@@ -118,6 +128,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => false,
                     ],
                 ],
+                0
             ],
             'Success - Recover from invalid alert' => [
                 [
@@ -134,6 +145,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => true,
                     ],
                 ],
+                1
             ],
             'Success - Recover from multipart alert heartbeat interruption' => [
                 [
@@ -154,6 +166,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => true,
                     ],
                 ],
+                1
             ],
             'Success - Heartbeat'                  => [
                 [
@@ -162,6 +175,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => true,
                     ],
                 ],
+                1
             ],
             // Should skip schema validation and return true.
             'Invalid - Incorrect namespace'        => [
@@ -171,6 +185,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => true,
                     ],
                 ],
+                1
             ],
             'Invalid - Fails schema validation'    => [
                 [
@@ -179,6 +194,7 @@ final class NaadSocketClientTest extends TestCase
                         'expected' => false,
                     ],
                 ],
+                0
             ],
         ];
     }
@@ -230,6 +246,35 @@ final class NaadSocketClientTest extends TestCase
         $this->assertEquals(true, $result);
     }
 
+    #[Test]
+    /**
+     * Tests handleResponse when an exception occurs when selecting
+     * alerts from the database rethrows the exception.
+     *
+     * @return void
+     */
+    public function testHandleResponseMissedAlertsDatabseException()
+    {
+        $database = $this->createMock(Database::class);
+        $database->method('getAlertsById')->willThrowException(new Exception());
+        $destinationClient = $this->createStub(DestinationClient::class);
+        $logger = $this->createStub(Logger::class);
+        $repositoryClient = $this->createStub(NaadRepositoryClient::class);
+
+        $client = new NaadSocketClient(
+            'test-naad',
+            $destinationClient,
+            $logger,
+            $database,
+            $repositoryClient
+        );
+
+        $this->expectException(Exception::class);
+
+        $client->handleResponse(
+            file_get_contents(self::XML_TEST_FILE_LOCATION . 'heartbeat.xml')
+        );
+    }
 
     /**
      * Tests the handleResponse method of the NaadSocketClient class when there are
@@ -315,7 +360,6 @@ final class NaadSocketClientTest extends TestCase
 
         $this->expectException(Exception::class);
 
-
         $client->handleResponse(
             file_get_contents(self::XML_TEST_FILE_LOCATION . 'complete-alert.xml')
         );
@@ -355,6 +399,78 @@ final class NaadSocketClientTest extends TestCase
 
         $client->handleResponse(
             file_get_contents(self::XML_TEST_FILE_LOCATION . 'empty-identifier.xml')
+        );
+    }
+
+    /**
+     * Tests the handleResponse method when inserting an alert into the database
+     * results in a duplicate key exception. Receiving this exception should
+     * cause the alert not to be sent via DestinationClient.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testHandleResponseDuplicateAlert()
+    {
+        $database = $this->createStub(Database::class);
+        $database->method('insertAlert')->willReturn(false);
+        $destinationClient = $this->createMock(DestinationClient::class);
+        $logger = $this->createStub(Logger::class);
+        $repositoryClient = $this->createStub(NaadRepositoryClient::class);
+
+        $client = new NaadSocketClient(
+            'test-naad',
+            $destinationClient,
+            $logger,
+            $database,
+            $repositoryClient
+        );
+
+        $destinationClient
+            ->expects($this->exactly(0))
+            ->method('sendAlerts');
+
+        $client->handleResponse(
+            file_get_contents(self::XML_TEST_FILE_LOCATION . 'complete-alert.xml')
+        );
+    }
+
+    /**
+     * Tests the handleResponse method of the NaadSocketClient class when
+     * a database  exception occurs.
+     *
+     * This method tests the handleResponse method with a valid XML response, but
+     * simulates a database exception when trying to insert the
+     * alert into the database.
+     * It checks if the method correctly handles the database exception and throws
+     * an exception.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testHandleResponseDestinationClientException()
+    {
+        $database = $this->createStub(Database::class);
+        $database->method('insertAlert')->willReturn(true);
+        $destinationClient = $this->createStub(DestinationClient::class);
+        $destinationClient
+            ->method('sendAlerts')
+            ->willThrowException(new Exception());
+        $logger = $this->createStub(Logger::class);
+        $repositoryClient = $this->createStub(NaadRepositoryClient::class);
+
+        $client = new NaadSocketClient(
+            'test-naad',
+            $destinationClient,
+            $logger,
+            $database,
+            $repositoryClient
+        );
+
+        $this->expectException(Exception::class);
+
+        $client->handleResponse(
+            file_get_contents(self::XML_TEST_FILE_LOCATION . 'complete-alert.xml')
         );
     }
 }
