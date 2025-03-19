@@ -55,6 +55,7 @@ final class ApplicationConfigTest extends TestCase
     #[Test]
     public function testMagicGetter(): void
     {
+        putenv('FEED_ID=1');
         $config = new ApplicationConfig();
         $expectedProperties = [
           'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
@@ -77,18 +78,20 @@ final class ApplicationConfigTest extends TestCase
     #[Test]
     public function testMagicGetterFromFile(): void
     {
+        putenv('FEED_ID=2');
         $config = new ApplicationConfig('./tests/data/secret');
         $expectedProperties = [
             'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
             'destinationUser' => 'test_destination_user',
             'destinationPassword' => 'test_destination_password_from_file',
-            'naadUrl' => 'test.naad_url.com',
-            'naadRepoUrl' => 'test.naad_repo_url.com',
+            'naadUrl' => 'streaming2.naad-adna.pelmorex.com',
+            'naadRepoUrl' => 'capcp2.naad-adna.pelmorex.com',
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
             $this->assertEquals($expectedValue, $config->$property);
         }
+        unset($_ENV['FEED_ID']);
     }
  
     /**
@@ -116,10 +119,12 @@ final class ApplicationConfigTest extends TestCase
     #[Test]
     public function testApplicationConfigConstructor()
     {
+        putenv('FEED_ID=1');
         $config = new ApplicationConfig();
         $this->assertInstanceOf(ApplicationConfig::class, $config);
         $this->assertSame(1, $config->feedId);
         $this->assertSame('test_destination_password', $config->destinationPassword);
+        unset($_ENV['FEED_ID']);
     }
 
 }
