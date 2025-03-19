@@ -80,7 +80,7 @@ class ApplicationConfig extends DatabaseConfig
         return [
                 'FEED_ID' => 1,
                 'NAAD_URL' => 'streaming1.naad-adna.pelmorex.com',
-                'NAAD_REPO_URL' => 'capcp1.naad-adna.pelmorex.com',      
+                'NAAD_REPO_URL' => 'capcp1.naad-adna.pelmorex.com',
         ];
     }
 

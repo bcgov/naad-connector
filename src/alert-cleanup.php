@@ -2,9 +2,9 @@
 require_once 'vendor/autoload.php';
 
 use Bcgov\NaadConnector\{
-    LoggerFactory, 
-    Database, 
-    Config\DatabaseConfig, 
+    LoggerFactory,
+    Database,
+    Config\DatabaseConfig,
     Config\LoggerConfig
 };
 

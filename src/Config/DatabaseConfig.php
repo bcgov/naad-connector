@@ -110,7 +110,7 @@ class DatabaseConfig extends BaseConfig
       * @param string $name the property name to get.
       *
       * @return void
-      */  
+      */
     public function __get(string $name)
     {
         if (property_exists($this, $name) ) {
