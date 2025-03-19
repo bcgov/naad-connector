@@ -52,7 +52,7 @@ class LoggerConfig extends BaseConfig
      * @param string $secretPath need ability to change secret path.
      */
     public function __construct(
-        string $logSubPath="socket", 
+        string $logSubPath="socket",
         string $secretPath="/vault/secrets"
     ) {
         $this->logSubPath = $logSubPath;
@@ -108,12 +108,12 @@ class LoggerConfig extends BaseConfig
     {
         if (empty($value)) {
             parent::throwError($name);
-        } else if ($name === 'logPath') {
+        } elseif ($name === 'logPath') {
             // Remove any existing config that might use a log file.
             $path = rtrim($value, '.log');
             $this->logPath =  sprintf(
-                "%s/%s/app.log", 
-                rtrim($path, '/'), 
+                "%s/%s/app.log",
+                rtrim($path, '/'),
                 $this->logSubPath
             );
         } else {

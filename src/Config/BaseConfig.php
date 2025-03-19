@@ -63,7 +63,7 @@ abstract class BaseConfig
      *                           path if using files for env.
      */
     public function __construct(string $secretPath='/vault/secrets')
-    {   
+    {
         $this->secretPath = rtrim($secretPath, '/');
         $this->setVariables();
         $this->afterSetupHook();
