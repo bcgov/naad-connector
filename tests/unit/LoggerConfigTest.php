@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\{
 };
 
 use PHPUnit\Framework\TestCase;
-use Bcgov\NaadConnector\Config\ApplicationConfig;
+use Bcgov\NaadConnector\Config\LoggerConfig;
 use Dotenv\Dotenv;
 
 /**
@@ -23,9 +23,9 @@ use Dotenv\Dotenv;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-#[CoversClass('Bcgov\NaadConnector\Config\ApplicationConfig')]
-#[UsesClass('Bcgov\NaadConnector\Config\ApplicationConfig')]
-final class ApplicationConfigTest extends TestCase
+#[CoversClass('Bcgov\NaadConnector\Config\LoggerConfig')]
+#[UsesClass('Bcgov\NaadConnector\Config\LoggerConfig')]
+final class LoggerConfigTest extends TestCase
 {
 
     /**
@@ -42,9 +42,11 @@ final class ApplicationConfigTest extends TestCase
         parent::setUp();
         $dotenv = Dotenv::createMutable(__DIR__, '.env.test');
         $dotenv->load();
+        // Override environment variables manually
         foreach ($_ENV as $key => $value) {
             putenv("$key=$value");
         }
+
     }
 
     /**
@@ -55,13 +57,11 @@ final class ApplicationConfigTest extends TestCase
     #[Test]
     public function testMagicGetter(): void
     {
-        $config = new ApplicationConfig();
+        $config = new LoggerConfig('test-subpath');
         $expectedProperties = [
-          'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
-          'destinationUser' => 'test_destination_user',
-          'destinationPassword' => 'test_destination_password',
-          'naadUrl' => 'test.naad_url.com',
-          'naadRepoUrl' => 'test.naad_repo_url.com',
+          'logPath' => '/logs/naad/test-subpath/app.log',
+          'logLevel' => 'debug',
+          'logRetentionDays' => 7,
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
@@ -69,28 +69,8 @@ final class ApplicationConfigTest extends TestCase
         }
     }
 
-     /**
-     * Test the magic getter for retrieving properties including one from pas
-     *
-     * @return void
-     */
-    #[Test]
-    public function testMagicGetterFromFile(): void
-    {
-        $config = new ApplicationConfig('./tests/data/secret');
-        $expectedProperties = [
-            'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
-            'destinationUser' => 'test_destination_user',
-            'destinationPassword' => 'test_destination_password_from_file',
-            'naadUrl' => 'test.naad_url.com',
-            'naadRepoUrl' => 'test.naad_repo_url.com',
-        ];
 
-        foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $config->$property);
-        }
-    }
- 
+
     /**
      * Test the magic getter for an Invalid property.
      * Expect exception.
@@ -100,7 +80,7 @@ final class ApplicationConfigTest extends TestCase
     #[Test]
     public function testMagicGetterForInvalidProperty()
     {
-        $config = new ApplicationConfig();
+        $config = new LoggerConfig();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             "Property 'NonExistentProperty' does not exist."
@@ -114,12 +94,12 @@ final class ApplicationConfigTest extends TestCase
      * @return void
      */
     #[Test]
-    public function testApplicationConfigConstructor()
+    public function testLoggerConfigConstructor()
     {
-        $config = new ApplicationConfig();
-        $this->assertInstanceOf(ApplicationConfig::class, $config);
-        $this->assertSame(1, $config->feedId);
-        $this->assertSame('test_destination_password', $config->destinationPassword);
+        $config = new LoggerConfig();
+        $this->assertInstanceOf(LoggerConfig::class, $config);
+        $this->assertSame('debug', $config->logLevel);
+        $this->assertSame(7, $config->logRetentionDays);
     }
 
 }

@@ -31,15 +31,8 @@ abstract class BaseConfig
      *
      * @var string
      */
-    public string $secretPath = '/vault/secrets';
+    private string $secretPath;
 
-
-    /**
-     * Where all the properties are stored.
-     *
-     * @var array
-     */
-    protected array $data = [];
 
     /**
      * Where the default values are stored as the ENV variable.
@@ -56,25 +49,25 @@ abstract class BaseConfig
     abstract protected function getEnvMap(): array;
 
     /**
-     * Allows for updating or overriding object parameters.
+     * Hook for after setup of the variable config.
      *
      * @return void
      */
-    abstract protected function configOverrides(): void;
-   
+    abstract protected function afterSetupHook(): void;
+
 
     /**
      * Used to initiate the configuration object paramaters.
      *
-     * @return void
+     * @param string $secretPath A way of changing the secrets
+     *                           path if using files for env.
      */
-    public function init(): void
-    {
+    public function __construct(string $secretPath='/vault/secrets')
+    {   
+        $this->secretPath = rtrim($secretPath, '/');
         $this->setVariables();
-        $this->configOverrides();
+        $this->afterSetupHook();
     }
-
-
 
     /**
      * This sets the object parameter variables from the ENV global variables.
@@ -95,7 +88,6 @@ abstract class BaseConfig
                     null;
             }
         }
-        
     }
 
     /**
@@ -107,24 +99,6 @@ abstract class BaseConfig
     {
         return array_merge($this->getDefaults(), getenv());
     }
-
-
-    /**
-     * This gets the final log path based on feedId and the LOG_PATH env.
-     *
-     * @param string $path   The path which comes from the env LOG_PATH.
-     * @param string $feedId The feed identifier, which is used to determine
-     *                       naad-1, naad-2, migration, or cleanup.
-     *
-     * @return string
-     */
-    protected function getLogPath(string $path, string $feedId ): string
-    {
-        // Remove any existing config that might use a log file.
-        $path = rtrim($path, '.log');
-        return sprintf("%s/naad-%s/app.log", rtrim($path, '/'), $feedId);
-    }
-
 
 
     /**
@@ -142,46 +116,10 @@ abstract class BaseConfig
      */
     public function __get(string $name)
     {
-        if (array_key_exists($name, $this->data) && !empty($this->data[$name])) {
-            return $this->data[$name];
+        if (property_exists($this, $name) ) {
+            return $this->$name;
         }
-        
         $this->throwError($name);
-    }
-
-
-
-    /**
-     * Magic Setter class for properties, which does simple sanitization.
-     *
-     * @param string     $name  The name of the property you want to set.
-     * @param string|int $value The value of the property to be set.
-     *
-     * @return void
-     */
-    public function __set(string $name, $value): void
-    {
-        if (empty($value)) {
-            $this->throwError($name);
-        }
-        if (is_string($value)) {
-            $this->data[$name] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-        } else {
-            $this->data[$name] = $value;
-        }
-        
-    }
-
-    /**
-     * This allows to set the secrets path location when used with vault secrets.
-     *
-     * @param string $path The secret's path folder for use with vault secrets.
-     *
-     * @return void
-     */
-    public function setSecretPath( string $path ): void
-    {
-        $this->secretPath = $path;
     }
 
     /**
@@ -192,10 +130,25 @@ abstract class BaseConfig
      *
      * @return void
      */
-    private function throwError(string $name )
+    protected function throwError(string $name )
     {
         throw new \InvalidArgumentException(
             "Property '$name' does not exist."
         );
+    }
+
+    /**
+     * Helper function to get all the config values.
+     *
+     * @return array
+     */
+    public function getConfigValues(): array
+    {
+        $values = [];
+        foreach ( array_keys($this->getEnvMap()) as $keys) {
+            $values[$keys] = $this->$keys;
+        }
+        $values['secretPath'] = $this->secretPath;
+        return $values;
     }
 }

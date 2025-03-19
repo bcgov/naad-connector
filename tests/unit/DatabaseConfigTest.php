@@ -8,8 +8,6 @@ use PHPUnit\Framework\Attributes\{
 };
 
 use PHPUnit\Framework\TestCase;
-
-use Bcgov\NaadConnector\Config\ApplicationConfig;
 use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Dotenv\Dotenv;
 
@@ -42,16 +40,12 @@ final class DatabaseConfigTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Load .env.test file
         $dotenv = Dotenv::createMutable(__DIR__, '.env.test');
         $dotenv->load();
-
         // Override environment variables manually
         foreach ($_ENV as $key => $value) {
             putenv("$key=$value");
         }
-
     }
 
     /**
@@ -63,12 +57,12 @@ final class DatabaseConfigTest extends TestCase
     public function testMagicGetter(): void
     {
         $config = new DatabaseConfig();
-        $config->init();
         $expectedProperties = [
           'databaseRootPassword' => 'test_database_root_password',
           'databaseHost' => 'test_database_host',
-          'databasePort' => '3306',
+          'databasePort' => 3306,
           'databaseName' => 'test_database_name',
+          'alertsToKeep' => 100
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
@@ -76,7 +70,7 @@ final class DatabaseConfigTest extends TestCase
         }
     }
 
-    /**
+     /**
      * Test the magic getter for retrieving properties including one from pas
      *
      * @return void
@@ -84,18 +78,13 @@ final class DatabaseConfigTest extends TestCase
     #[Test]
     public function testMagicGetterFromFile(): void
     {
-        // $config = new NaadVars('./tests/data/secret');
-        $config = new DatabaseConfig();
-        $config->setSecretPath('./tests/data/secret');
-        $config->init();
-        
+        $config = new DatabaseConfig('./tests/data/secret');
         $expectedProperties = [
-          'databaseRootPassword' => 'test_mariadb_root_password_from_file',
-          'databaseHost' => 'test_database_host',
-          'databasePort' => '3306',
-          'databaseName' => 'test_database_name',
-          'logPath' => '/logs/naad-database/app.log',
-          'feedId' => 'database',
+            'databaseRootPassword' => 'test_mariadb_root_password_from_file',
+            'databaseHost' => 'test_database_host',
+            'databasePort' => 3306,
+            'databaseName' => 'test_database_name',
+            'alertsToKeep' => 100
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
@@ -121,7 +110,6 @@ final class DatabaseConfigTest extends TestCase
         );
 
         $config = new DatabaseConfig();
-        $config->init();
         $config->databaseRootPassword;
     }
 
@@ -136,7 +124,6 @@ final class DatabaseConfigTest extends TestCase
     public function testMagicGetterForInvalidProperty()
     {
         $config = new DatabaseConfig();
-        $config->init();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             "Property 'NonExistentProperty' does not exist."
@@ -153,10 +140,8 @@ final class DatabaseConfigTest extends TestCase
     public function testDatabaseConfigConstructor()
     {
         $config = new DatabaseConfig();
-        $config->init();
         $this->assertInstanceOf(DatabaseConfig::class, $config);
         $this->assertSame('test_database_host', $config->databaseHost);
-        $this->assertSame('3306', $config->databasePort);
+        $this->assertSame(3306, $config->databasePort);
     }
-
 }

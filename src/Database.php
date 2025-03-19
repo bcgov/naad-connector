@@ -3,7 +3,7 @@
 namespace Bcgov\NaadConnector;
 
 use Bcgov\NaadConnector\Entity\Alert;
-use Bcgov\NaadConnector\NaadVars;
+use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\Exception\EntityIdentityCollisionException;
@@ -27,15 +27,19 @@ class Database
 
     protected Logger $logger;
 
+    protected DatabaseConfig $dbConfig;
+
     /**
      * Constructor for Database class.
      *
-     * @param Logger $logger An instance of Monolog/Logger.
+     * @param Logger         $logger   An instance of Monolog/Logger.
+     * @param DatabaseConfig $dbConfig The database config instance.
      */
-    public function __construct(Logger $logger)
+    public function __construct(Logger $logger, DatabaseConfig $dbConfig)
     {
-        $this->entityManager = $this->getEntityManager();
         $this->logger = $logger;
+        $this->dbConfig = $dbConfig;
+        $this->entityManager = $this->getEntityManager();
     }
 
     /**
@@ -46,7 +50,7 @@ class Database
     protected function getEntityManager(): EntityManager
     {
         // Extract environment variables from .env file.
-        $naadVars = new NaadVars();
+       
 
         // Create a simple "default" Doctrine ORM configuration.
         $config = ORMSetup::createAttributeMetadataConfiguration(
@@ -59,10 +63,10 @@ class Database
             [
             // TODO: Create non-root user.
             'user'     => 'root',
-            'password' => $naadVars-> databaseRootPassword,
-            'host'     => $naadVars-> databaseHost,
-            'port'     => $naadVars-> databasePort,
-            'dbname'   => $naadVars-> databaseName,
+            'password' => $this->dbConfig->databaseRootPassword,
+            'host'     => $this->dbConfig->databaseHost,
+            'port'     => $this->dbConfig->databasePort,
+            'dbname'   => $this->dbConfig->databaseName,
             'driver'   => 'pdo_mysql',
             ]
         );
@@ -107,8 +111,7 @@ class Database
         $alertRepository = $this->entityManager->getRepository(Alert::class);
 
         // Retrieve the number of fresh alerts to keep from environment variables.
-        $naadVars = new NaadVars();
-        $freshAlertsToKeep = $naadVars->alertsToKeep;
+        $freshAlertsToKeep = $this->dbConfig->alertsToKeep;
 
         // Retrieve all alerts ordered by 'received' date in descending order.
         $alerts = $alertRepository->findBy([], ['received' => 'DESC']);
