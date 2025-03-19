@@ -66,20 +66,20 @@ class ApplicationConfig extends DatabaseConfig
         $this->feedId = $this->getPropertyValueFromEnv('FEED_ID', 1);
         $this->destinationUrl = $this->getPropertyValueFromEnv('DESTINATION_URL');
         $this->destinationUser = $this->getPropertyValueFromEnv('DESTINATION_USER');
-        $this->destinationPassword 
+        $this->destinationPassword
             = $this->getPropertyValueFromEnv('DESTINATION_PASSWORD');
         if (intval($this->feedId) > 1) {
             $this->naadUrl = 'streaming2.naad-adna.pelmorex.com';
             $this->naadRepoUrl = 'capcp2.naad-adna.pelmorex.com';
         } else {
             $this->naadUrl = $this->getPropertyValueFromEnv(
-                'NAAD_URL', 
+                'NAAD_URL',
                 'streaming1.naad-adna.pelmorex.com'
             );
             $this->naadRepoUrl = $this->getPropertyValueFromEnv(
-                'NAAD_REPO_URL', 
+                'NAAD_REPO_URL',
                 'capcp1.naad-adna.pelmorex.com' 
-            );           
+            );
         }
     }
     

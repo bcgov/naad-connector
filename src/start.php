@@ -47,7 +47,7 @@ $destinationGuzzleclient = new Client(
     [
     'base_uri' => $appConfig->getDestinationUrl(),
     'auth'     => [
-        $appConfig->getDestinationUser(), 
+        $appConfig->getDestinationUser(),
         $appConfig->getDestinationPassword()
     ],
     'headers'  => $headers // secure headers for api requests
