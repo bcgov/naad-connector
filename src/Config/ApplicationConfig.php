@@ -4,7 +4,7 @@ namespace Bcgov\NaadConnector\Config ;
 use Bcgov\NaadConnector\Config\BaseConfig;
 
 /**
- * Class BaseConfig
+ * Class ApplicationConfig
  *
  * @category Utility
  * @package  Bcgov\NaadConnector\Config\BaseConfig

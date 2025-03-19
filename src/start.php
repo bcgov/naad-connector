@@ -15,7 +15,6 @@ use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Bcgov\NaadConnector\Config\LoggerConfig;
 
 use GuzzleHttp\Client;
-use PhpParser\Node\Name;
 
 // Get environment variables for configuring a socket connection.
 $dbConfig = new DatabaseConfig();
