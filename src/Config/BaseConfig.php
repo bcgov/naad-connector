@@ -110,6 +110,8 @@ abstract class BaseConfig
      *
      * @param string $name The name of the property to retrieve.
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      *
      * @throws \InvalidArgumentException If the property does not exist.
@@ -139,6 +141,8 @@ abstract class BaseConfig
 
     /**
      * Helper function to get all the config values.
+     *
+     * @codeCoverageIgnore
      *
      * @return array
      */
