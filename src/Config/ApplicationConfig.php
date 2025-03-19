@@ -107,6 +107,8 @@ class ApplicationConfig extends DatabaseConfig
      * @param string $name  The name of the property.
      * @param mixed  $value The value to set to the property.
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function __set(string $name, $value )
@@ -122,6 +124,8 @@ class ApplicationConfig extends DatabaseConfig
      * The getter class override to get properties.
      *
      * @param string $name the property name to get.
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
