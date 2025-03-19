@@ -68,7 +68,7 @@ class LoggerConfig extends BaseConfig
     {
         $this->logLevel = $this->getPropertyValueFromEnv('LOG_LEVEL', 'info');
         $this->logRetentionDays = $this->getPropertyValueFromEnv(
-            'LOG_RETENTION_DAYS', 
+            'LOG_RETENTION_DAYS',
             0
         );
         $this->logPath = $this->setLogPath();

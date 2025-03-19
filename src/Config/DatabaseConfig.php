@@ -60,7 +60,7 @@ class DatabaseConfig extends BaseConfig
         $this->databaseRootPassword
             = $this->getPropertyValueFromEnv('MARIADB_ROOT_PASSWORD');
         $this->databaseHost = $this->getPropertyValueFromEnv('MARIADB_SERVICE_HOST');
-        $this->databasePort 
+        $this->databasePort
             = $this->getPropertyValueFromEnv('MARIADB_SERVICE_PORT', 3306);
         $this->databaseName = $this->getPropertyValueFromEnv('MARIADB_DATABASE');
     }
