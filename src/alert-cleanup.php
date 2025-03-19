@@ -11,9 +11,9 @@ use Bcgov\NaadConnector\{
 $dbConfig = new DatabaseConfig();
 $logConfig = new LoggerConfig('database');
 $logger = LoggerFactory::createLogger(
-    $logConfig->logPath,
-    $logConfig->logRetentionDays,
-    $logConfig->logLevel
+    $logConfig->getLogPath(),
+    $logConfig->getLogRetentionDays(),
+    $logConfig->getLogLevel()
 )->withName('AlertCleanup');
 
 (new Database($logger, $dbConfig))->deleteOldAlerts();

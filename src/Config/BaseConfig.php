@@ -84,9 +84,11 @@ abstract class BaseConfig
                     $default;
         }
         if (empty($value)) {
+            // @codeCoverageIgnoreStart
             throw new \InvalidArgumentException(
                 "Property '$envKey' does not exist."
             );
+            // @codeCoverageIgnoreEnd
         }
         return $value;
     }

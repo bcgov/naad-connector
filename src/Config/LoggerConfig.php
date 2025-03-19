@@ -113,7 +113,7 @@ class LoggerConfig extends BaseConfig
     }
 
     /**
-     * Get the FeedId.
+     * Get the logPath.
      *
      * @return string
      */
