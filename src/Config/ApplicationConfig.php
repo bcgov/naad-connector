@@ -42,7 +42,7 @@ class ApplicationConfig extends DatabaseConfig
      *
      * @var string
      */
-    private string $destinationURL;
+    private string $destinationUrl;
     /**
      * The username to authenticate the endpoint requests with.
      *
@@ -57,83 +57,90 @@ class ApplicationConfig extends DatabaseConfig
     private string $destinationPassword;
 
     /**
-     * Allows for updating or overriding object parameters.
+     * An abstract function that assigns all the properties from ENV variables.
      *
      * @return void
      */
-    protected function afterSetupHook(): void
+    protected function assignProperties(): void
     {
+        $this->feedId = $this->getPropertyValueFromEnv('FEED_ID', 1);
+        $this->destinationUrl = $this->getPropertyValueFromEnv('DESTINATION_URL');
+        $this->destinationUser = $this->getPropertyValueFromEnv('DESTINATION_USER');
+        $this->destinationPassword 
+            = $this->getPropertyValueFromEnv('DESTINATION_PASSWORD');
         if (intval($this->feedId) > 1) {
             $this->naadUrl = 'streaming2.naad-adna.pelmorex.com';
             $this->naadRepoUrl = 'capcp2.naad-adna.pelmorex.com';
-        }
-
-    }
-
-    /**
-     * Where the default values are stored as the ENV variable.
-     *
-     * @return array
-     */
-    protected function getDefaults(): array
-    {
-        return [
-                'FEED_ID' => 1,
-                'NAAD_URL' => 'streaming1.naad-adna.pelmorex.com',
-                'NAAD_REPO_URL' => 'capcp1.naad-adna.pelmorex.com',
-        ];
-    }
-
-    /**
-     * The mapping from ENV variable to object property.
-     *
-     * @return array
-     */
-    protected  function getEnvMap(): array
-    {
-        return [
-                'destinationURL' => 'DESTINATION_URL',
-                'destinationUser' => 'DESTINATION_USER',
-                'destinationPassword' => 'DESTINATION_PASSWORD',
-                'naadUrl' => 'NAAD_URL',
-                'naadRepoUrl' => 'NAAD_REPO_URL',
-                'feedId' => 'FEED_ID',
-        ];
-    }
-
-    /**
-     * The Setter override to set parameters.
-     *
-     * @param string $name  The name of the property.
-     * @param mixed  $value The value to set to the property.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return void
-     */
-    public function __set(string $name, $value )
-    {
-        if (empty($value)) {
-            parent::throwError($name);
         } else {
-            $this->$name = $value;
+            $this->naadUrl = $this->getPropertyValueFromEnv(
+                'NAAD_URL', 
+                'streaming1.naad-adna.pelmorex.com'
+            );
+            $this->naadRepoUrl = $this->getPropertyValueFromEnv(
+                'NAAD_REPO_URL', 
+                'capcp1.naad-adna.pelmorex.com' 
+            );           
         }
     }
-   
+    
+
     /**
-     * The getter class override to get properties.
+     * Get the FeedId.
      *
-     * @param string $name the property name to get.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return void
+     * @return int
      */
-    public function __get(string $name)
+    public function getFeedId(): int
     {
-        if (property_exists($this, $name) ) {
-            return $this->$name;
-        }
-        parent::throwError($name);
+        return $this->feedId;
+    }
+
+    /**
+     * Get the destinationURL.
+     *
+     * @return string
+     */
+    public function getDestinationUrl(): string
+    {
+        return $this->destinationUrl;
+    }
+
+    /**
+     * Get the destinationUser.
+     *
+     * @return string
+     */
+    public function getDestinationUser(): string
+    {
+        return $this->destinationUser;
+    }
+
+    /**
+     * Get the destinationPassword.
+     *
+     * @return string
+     */
+    public function getDestinationPassword(): string
+    {
+        return $this->destinationPassword;
+    }
+
+    /**
+     * Get the naadUrl.
+     *
+     * @return string
+     */
+    public function getNaadUrl(): string
+    {
+        return $this->naadUrl;
+    }
+
+    /**
+     * Get the naadRepoUrl.
+     *
+     * @return string
+     */
+    public function getNaadRepoUrl(): string
+    {
+        return $this->naadRepoUrl;
     }
 }

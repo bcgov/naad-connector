@@ -66,7 +66,8 @@ final class DatabaseConfigTest extends TestCase
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $config->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
     }
 
@@ -88,7 +89,8 @@ final class DatabaseConfigTest extends TestCase
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $config->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
     }
 
@@ -106,30 +108,14 @@ final class DatabaseConfigTest extends TestCase
         // Assert that the exception is thrown
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "Property 'databaseRootPassword' does not exist."
+            "Property 'MARIADB_ROOT_PASSWORD' does not exist."
         );
 
         $config = new DatabaseConfig();
-        $config->databaseRootPassword;
+        $config->getDatabaseRootPassword();
     }
 
 
-    /**
-     * Test the magic getter for an Invalid property.
-     * Expect exception.
-     *
-     * @return void
-     */
-    #[Test]
-    public function testMagicGetterForInvalidProperty()
-    {
-        $config = new DatabaseConfig();
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            "Property 'NonExistentProperty' does not exist."
-        );
-        $config->NonExistentProperty;
-    }
 
     /**
      * Test the NaadVars Constructor.
@@ -141,7 +127,7 @@ final class DatabaseConfigTest extends TestCase
     {
         $config = new DatabaseConfig();
         $this->assertInstanceOf(DatabaseConfig::class, $config);
-        $this->assertSame('test_database_host', $config->databaseHost);
-        $this->assertSame(3306, $config->databasePort);
+        $this->assertSame('test_database_host', $config->getDatabaseHost());
+        $this->assertSame(3306, $config->getDatabasePort());
     }
 }

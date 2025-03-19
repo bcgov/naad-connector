@@ -66,7 +66,8 @@ final class ApplicationConfigTest extends TestCase
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $config->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
     }
 
@@ -89,27 +90,12 @@ final class ApplicationConfigTest extends TestCase
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $config->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
         unset($_ENV['FEED_ID']);
     }
  
-    /**
-     * Test the magic getter for an Invalid property.
-     * Expect exception.
-     *
-     * @return void
-     */
-    #[Test]
-    public function testMagicGetterForInvalidProperty()
-    {
-        $config = new ApplicationConfig();
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            "Property 'NonExistentProperty' does not exist."
-        );
-        $config->NonExistentProperty;
-    }
 
     /**
      * Test the NaadVars Constructor.
@@ -122,8 +108,11 @@ final class ApplicationConfigTest extends TestCase
         putenv('FEED_ID=1');
         $config = new ApplicationConfig();
         $this->assertInstanceOf(ApplicationConfig::class, $config);
-        $this->assertSame(1, $config->feedId);
-        $this->assertSame('test_destination_password', $config->destinationPassword);
+        $this->assertSame(1, $config->getFeedId());
+        $this->assertSame(
+            'test_destination_password', 
+            $config->getDestinationPassword()
+        );
         unset($_ENV['FEED_ID']);
     }
 

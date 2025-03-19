@@ -63,10 +63,10 @@ class Database
             [
             // TODO: Create non-root user.
             'user'     => 'root',
-            'password' => $this->dbConfig->databaseRootPassword,
-            'host'     => $this->dbConfig->databaseHost,
-            'port'     => $this->dbConfig->databasePort,
-            'dbname'   => $this->dbConfig->databaseName,
+            'password' => $this->dbConfig->getDatabaseRootPassword(),
+            'host'     => $this->dbConfig->getDatabaseHost(),
+            'port'     => $this->dbConfig->getDatabasePort(),
+            'dbname'   => $this->dbConfig->getDatabaseName(),
             'driver'   => 'pdo_mysql',
             ]
         );
@@ -108,7 +108,7 @@ class Database
         $alertRepository = $this->entityManager->getRepository(Alert::class);
 
         // Retrieve the number of fresh alerts to keep from environment variables.
-        $freshAlertsToKeep = $this->dbConfig->alertsToKeep;
+        $freshAlertsToKeep = $this->dbConfig->getAlertsToKeep();
 
         // Retrieve all alerts ordered by 'received' date in descending order.
         $alerts = $alertRepository->findBy([], ['received' => 'DESC']);

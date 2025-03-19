@@ -65,28 +65,11 @@ final class LoggerConfigTest extends TestCase
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $config->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
     }
 
-
-
-    /**
-     * Test the magic getter for an Invalid property.
-     * Expect exception.
-     *
-     * @return void
-     */
-    #[Test]
-    public function testMagicGetterForInvalidProperty()
-    {
-        $config = new LoggerConfig();
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            "Property 'NonExistentProperty' does not exist."
-        );
-        $config->NonExistentProperty;
-    }
 
     /**
      * Test the NaadVars Constructor.
@@ -98,8 +81,8 @@ final class LoggerConfigTest extends TestCase
     {
         $config = new LoggerConfig();
         $this->assertInstanceOf(LoggerConfig::class, $config);
-        $this->assertSame('debug', $config->logLevel);
-        $this->assertSame(7, $config->logRetentionDays);
+        $this->assertSame('debug', $config->getLogLevel());
+        $this->assertSame(7, $config->getLogRetentionDays());
     }
 
 }

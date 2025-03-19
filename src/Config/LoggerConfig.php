@@ -60,83 +60,66 @@ class LoggerConfig extends BaseConfig
     }
 
     /**
-     * Allows for updating or overriding object parameters.
+     * An abstract function that assigns all the properties from ENV variables.
      *
      * @return void
      */
-    protected function afterSetupHook(): void
+    protected function assignProperties(): void
     {
+        $this->logLevel = $this->getPropertyValueFromEnv('LOG_LEVEL', 'info');
+        $this->logRetentionDays = $this->getPropertyValueFromEnv(
+            'LOG_RETENTION_DAYS', 
+            0
+        );
+        $this->logPath = $this->setLogPath();
+       
     }
 
     /**
-     * Where the default values are stored as the ENV variable.
+     * Sets log path based on subpath, and does some validation.
      *
-     * @return array
+     * @return string
      */
-    protected function getDefaults(): array
+    private function setLogPath(): string
     {
-        return [
-            'LOG_LEVEL'      => 'info',
-            'LOG_RETENTION_DAYS' => 0, // No rotation.
-            'LOG_PATH' => '/logs',
-        ];
+        $path = $this->getPropertyValueFromEnv('LOG_PATH', '/logs');
+        $path = rtrim($path, '.log');
+        $path = sprintf(
+            "%s/%s/app.log",
+            rtrim($path, '/'),
+            $this->logSubPath
+        );
+        return $path;
     }
 
     /**
-     * The mapping from ENV variable to object property.
+     * Get the logLevel.
      *
-     * @return array
+     * @return string
      */
-    protected  function getEnvMap(): array
+    public function getLogLevel(): string
     {
-        return [
-            'logLevel' => 'LOG_LEVEL',
-            'logPath' => 'LOG_PATH',
-            'logRetentionDays' => 'LOG_RETENTION_DAYS',
-        ];
+        return $this->logLevel;
     }
 
     /**
-     * The Setter override to set parameters.
+     * Get the logRetentionDays.
      *
-     * @param string $name  The name of the property.
-     * @param mixed  $value The value to set to the property.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return void
+     * @return int
      */
-    public function __set(string $name, $value )
+    public function getLogRetentionDays(): int
     {
-        if (empty($value)) {
-            parent::throwError($name);
-        } elseif ($name === 'logPath') {
-            // Remove any existing config that might use a log file.
-            $path = rtrim($value, '.log');
-            $this->logPath =  sprintf(
-                "%s/%s/app.log",
-                rtrim($path, '/'),
-                $this->logSubPath
-            );
-        } else {
-            $this->$name = $value;
-        }
+        return $this->logRetentionDays;
+    }
+
+    /**
+     * Get the FeedId.
+     *
+     * @return string
+     */
+    public function getLogPath(): string
+    {
+        return $this->logPath;
     }
    
-    /**
-     * The getter class override to get properties.
-     *
-     * @param string $name the property name to get.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return void
-     */
-    public function __get(string $name)
-    {
-        if (property_exists($this, $name) ) {
-            return $this->$name;
-        }
-        parent::throwError($name);
-    }
 }

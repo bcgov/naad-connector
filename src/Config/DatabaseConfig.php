@@ -50,77 +50,69 @@ class DatabaseConfig extends BaseConfig
     private int $alertsToKeep;
 
     /**
-     * Allows for updating or overriding object parameters.
+     * An abstract function that assigns all the properties from ENV variables.
      *
      * @return void
      */
-    protected function afterSetupHook(): void
+    protected function assignProperties(): void
     {
-    
+        $this->alertsToKeep = $this->getPropertyValueFromEnv('ALERTS_TO_KEEP', 100);
+        $this->databaseRootPassword
+            = $this->getPropertyValueFromEnv('MARIADB_ROOT_PASSWORD');
+        $this->databaseHost = $this->getPropertyValueFromEnv('MARIADB_SERVICE_HOST');
+        $this->databasePort 
+            = $this->getPropertyValueFromEnv('MARIADB_SERVICE_PORT', 3306);
+        $this->databaseName = $this->getPropertyValueFromEnv('MARIADB_DATABASE');
     }
 
     /**
-     * Where the default values are stored as the ENV variable.
+     * Get the alertsToKeep.
      *
-     * @return array
+     * @return string
      */
-    protected function getDefaults(): array
+    public function getAlertsToKeep(): string
     {
-        return [
-            'ALERTS_TO_KEEP' => 100,
-        ];
+        return $this->alertsToKeep;
     }
 
     /**
-     * The mapping from ENV variable to object property.
+     * Get the databaseRootPassword.
      *
-     * @return array
+     * @return string
      */
-    protected  function getEnvMap(): array
+    public function getDatabaseRootPassword(): string
     {
-        return [
-            'databaseRootPassword' => 'MARIADB_ROOT_PASSWORD',
-            'databaseHost' => 'MARIADB_SERVICE_HOST',
-            'databasePort' => 'MARIADB_SERVICE_PORT',
-            'databaseName' => 'MARIADB_DATABASE',
-            'alertsToKeep' => 'ALERTS_TO_KEEP',
-        ];
+        return $this->databaseRootPassword;
     }
 
     /**
-     * The Setter override to set parameters.
+     * Get the databaseHost.
      *
-     * @param string $name  The name of the property.
-     * @param mixed  $value The value to set to the property.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return void
+     * @return string
      */
-    public function __set(string $name, $value )
+    public function getDatabaseHost(): string
     {
-        if (empty($value)) {
-            parent::throwError($name);
-        } else {
-            $this->$name = $value;
-        }
+        return $this->databaseHost;
     }
 
-     /**
-      * The getter class override to get properties.
-      *
-      * @param string $name the property name to get.
-      *
-      * @codeCoverageIgnore
-      *
-      * @return void
-      */
-    public function __get(string $name)
+    /**
+     * Get the databasePort.
+     *
+     * @return int
+     */
+    public function getDatabasePort(): int
     {
-        if (property_exists($this, $name) ) {
-            return $this->$name;
-        }
-        parent::throwError($name);
+        return $this->databasePort;
+    }
+
+    /**
+     * Get the databaseName.
+     *
+     * @return string
+     */
+    public function getDatabaseName(): string
+    {
+        return $this->databaseName;
     }
 
 }

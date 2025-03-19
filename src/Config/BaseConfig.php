@@ -33,28 +33,20 @@ abstract class BaseConfig
      */
     private string $secretPath;
 
-
     /**
-     * Where the default values are stored as the ENV variable.
+     * The ENV data.
      *
-     * @return array
+     * @var array
      */
-    abstract protected function getDefaults(): array;
+    private array $envData = [];
+
 
     /**
-     * The mapping from ENV variable to object property.
-     *
-     * @return array
-     */
-    abstract protected function getEnvMap(): array;
-
-    /**
-     * Hook for after setup of the variable config.
+     * Assigns all the ENV values to the class properties.
      *
      * @return void
      */
-    abstract protected function afterSetupHook(): void;
-
+    abstract protected function assignProperties(): void;
 
     /**
      * Used to initiate the configuration object paramaters.
@@ -65,94 +57,37 @@ abstract class BaseConfig
     public function __construct(string $secretPath='/vault/secrets')
     {
         $this->secretPath = rtrim($secretPath, '/');
-        $this->setVariables();
-        $this->afterSetupHook();
+        $this->envData = getenv();
+        // Sets all the values
+        $this->assignProperties();
+
     }
 
     /**
-     * This sets the object parameter variables from the ENV global variables.
+     * Returns the ENV variable value, and validates.
      *
-     * @return void
+     * @param string          $envKey  The ENV key.
+     * @param string|int|null $default the string or integer or null default.
+     *
+     * @return mixed
      */
-    private function setVariables(): void
+    protected function getPropertyValueFromEnv( string $envKey, $default=null )
     {
-        $env = $this->getEnv();
-        foreach ($this->getEnvMap() as $property => $envKey) {
-            $secretFileName = sprintf("%s/%s", $this->secretPath, $envKey);
-            // This means a secret file exists, to get the contents.
-            if (file_exists($secretFileName) ) {
-                $this->$property = rtrim(file_get_contents($secretFileName), "\r\n");
-            } else {
-                $this->$property = array_key_exists($envKey, $env) ?
-                    $env[$envKey]:
-                    null;
-            }
+        $value = null;
+        $secretFileName = sprintf("%s/%s", $this->secretPath, $envKey);
+        // This means a secret file exists, to get the contents.
+        if (file_exists($secretFileName) ) {
+            $value = rtrim(file_get_contents($secretFileName), "\r\n");
+        } else {
+            $value = array_key_exists($envKey, $this->envData) ?
+                    $this->envData[$envKey]:
+                    $default;
         }
-    }
-
-    /**
-     * Loads the default values with global ENV variables.
-     *
-     * @return array
-     */
-    public function getEnv(): array
-    {
-        return array_merge($this->getDefaults(), getenv());
-    }
-
-
-    /**
-     * Magic getter method to retrieve the value of a property.
-     *
-     * It checks if the requested property exists in the object.
-     * If it does, it returns the value of that property;
-     * otherwise, it throws an InvalidArgumentException.
-     *
-     * @param string $name The name of the property to retrieve.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return void
-     *
-     * @throws \InvalidArgumentException If the property does not exist.
-     */
-    public function __get(string $name)
-    {
-        if (property_exists($this, $name) ) {
-            return $this->$name;
+        if (empty($value)) {
+            throw new \InvalidArgumentException(
+                "Property '$envKey' does not exist."
+            );
         }
-        $this->throwError($name);
-    }
-
-    /**
-     * Helper function to have consistent exception for set/get
-     * invalid property value.
-     *
-     * @param string $name The property that is throwing exception.
-     *
-     * @return void
-     */
-    protected function throwError(string $name )
-    {
-        throw new \InvalidArgumentException(
-            "Property '$name' does not exist."
-        );
-    }
-
-    /**
-     * Helper function to get all the config values.
-     *
-     * @codeCoverageIgnore
-     *
-     * @return array
-     */
-    public function getConfigValues(): array
-    {
-        $values = [];
-        foreach ( array_keys($this->getEnvMap()) as $keys) {
-            $values[$keys] = $this->$keys;
-        }
-        $values['secretPath'] = $this->secretPath;
-        return $values;
+        return $value;
     }
 }
