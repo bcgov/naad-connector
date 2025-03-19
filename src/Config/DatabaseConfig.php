@@ -12,24 +12,51 @@ use Bcgov\NaadConnector\Config\BaseConfig;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  *
- * @property-read string $logLevel The minimum level of logs the Logger will send.
- * @property-read int $alertsToKeep The number of alerts to keep in the database.
- * @property-read string $logPath The path to the log file to write to.
- * @property-read int    $logRetentionDays The number of days to keep a log file
- * before rotating.
- *
  * @inheritDoc
  */
 class DatabaseConfig extends BaseConfig
 {
     /**
+     * The password used to authenticate
+     * to the database which stores Alerts pulled from the NAAD API.
+     *
+     * @var string
+     */
+    private string $databaseRootPassword;
+    /**
+     * The hostname of the database
+     *
+     * @var string
+     */
+    private string $databaseHost;
+    /**
+     * The Host port of the database
+     *
+     * @var integer
+     */
+    private int $databasePort;
+    /**
+     * The Name of the database.
+     *
+     * @var string
+     */
+    private string $databaseName;
+
+    /**
+     * The number of alerts to keep in the database.
+     *
+     * @var integer
+     */
+    private int $alertsToKeep;
+
+    /**
      * Allows for updating or overriding object parameters.
      *
      * @return void
      */
-    protected function configOverrides(): void
+    protected function afterSetupHook(): void
     {
-        $this->logPath = $this->getLogPath($this->logPath, $this->feedId);
+    
     }
 
     /**
@@ -40,14 +67,9 @@ class DatabaseConfig extends BaseConfig
     protected function getDefaults(): array
     {
         return [
-            'FEED_ID' => 'database',
-            'LOG_LEVEL'      => 'info',
             'ALERTS_TO_KEEP' => 100,
-            'LOG_RETENTION_DAYS' => 0, // No rotation.
-            'LOG_PATH' => '/logs',
         ];
     }
-
 
     /**
      * The mapping from ENV variable to object property.
@@ -61,12 +83,40 @@ class DatabaseConfig extends BaseConfig
             'databaseHost' => 'MARIADB_SERVICE_HOST',
             'databasePort' => 'MARIADB_SERVICE_PORT',
             'databaseName' => 'MARIADB_DATABASE',
-            'logLevel' => 'LOG_LEVEL',
-            'logPath' => 'LOG_PATH',
-            'logRetentionDays' => 'LOG_RETENTION_DAYS',
             'alertsToKeep' => 'ALERTS_TO_KEEP',
-            'feedId' => 'FEED_ID'
         ];
     }
-   
+
+    /**
+     * The Setter override to set parameters.
+     *
+     * @param string $name  The name of the property.
+     * @param mixed  $value The value to set to the property.
+     *
+     * @return void
+     */
+    public function __set(string $name, $value )
+    {
+        if (empty($value)) {
+            parent::throwError($name);
+        } else {
+            $this->$name = $value;
+        }
+    }
+
+     /**
+      * The getter class override to get properties.
+      *
+      * @param string $name the property name to get.
+      *
+      * @return void
+      */  
+    public function __get(string $name)
+    {
+        if (property_exists($this, $name) ) {
+            return $this->$name;
+        }
+        parent::throwError($name);
+    }
+
 }

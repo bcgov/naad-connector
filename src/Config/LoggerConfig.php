@@ -1,10 +1,10 @@
 <?php
 
-namespace Bcgov\NaadConnector\Config ;
-use Bcgov\NaadConnector\Config\DatabaseConfig;
+namespace Bcgov\NaadConnector\Config;
+use Bcgov\NaadConnector\Config\BaseConfig;
 
 /**
- * Class BaseConfig
+ * Class LoggerConfig
  *
  * @category Utility
  * @package  Bcgov\NaadConnector\Config\BaseConfig
@@ -14,47 +14,50 @@ use Bcgov\NaadConnector\Config\DatabaseConfig;
  *
  * @inheritDoc
  */
-class ApplicationConfig extends DatabaseConfig
+class LoggerConfig extends BaseConfig
 {
     /**
-     * The Feed id to determine if it is socket-1 or socket-2.
-     *
-     * @var integer
-     */
-    private int $feedId;
-    /**
-     * The URL of the NAAD endpoint the application
-     * is pulling data from, eg. "streaming1.naad-adna.pelmorex.com".
+     * The minimum level of logs the Logger will send.
      *
      * @var string
      */
-    private string $naadUrl;
+    private string $logLevel;
+
     /**
-     * The URL of the NAAD Repository, which we
-     * fetch missing alerts from, eg. "capcp1.naad-adna.pelmorex.com".
+     * The path to the log file to write to.
      *
      * @var string
      */
-    private string $naadRepoUrl;
+    private string $logPath;
+
     /**
-     * The URL of the destination API, eg.
-     * local: "https://0.0.0.0/wp-json/naad/v1/alert".
+     * The number of days to keep a log file before rotating.
+     *
+     * @var int
+     */
+    private int $logRetentionDays;
+
+    /**
+     * Log subpath where logs will be stored.
      *
      * @var string
      */
-    private string $destinationURL;
+    private string $logSubPath;
+
+
     /**
-     * The username to authenticate the endpoint requests with.
+     * Constructor.
      *
-     * @var string
+     * @param string $logSubPath Allows to configure log path.
+     * @param string $secretPath need ability to change secret path.
      */
-    private string $destinationUser;
-    /**
-     * The password to authenticate the endpoint requests with.
-     *
-     * @var string
-     */
-    private string $destinationPassword;
+    public function __construct(
+        string $logSubPath="socket", 
+        string $secretPath="/vault/secrets"
+    ) {
+        $this->logSubPath = $logSubPath;
+        parent::__construct($secretPath);
+    }
 
     /**
      * Allows for updating or overriding object parameters.
@@ -63,11 +66,6 @@ class ApplicationConfig extends DatabaseConfig
      */
     protected function afterSetupHook(): void
     {
-        if (intval($this->feedId) > 1) {
-            $this->naadUrl = 'streaming2.naad-adna.pelmorex.com';
-            $this->naadRepoUrl = 'capcp2.naad-adna.pelmorex.com';
-        }
-
     }
 
     /**
@@ -78,9 +76,9 @@ class ApplicationConfig extends DatabaseConfig
     protected function getDefaults(): array
     {
         return [
-                'FEED_ID' => 1,
-                'NAAD_URL' => 'streaming1.naad-adna.pelmorex.com',
-                'NAAD_REPO_URL' => 'capcp1.naad-adna.pelmorex.com',      
+            'LOG_LEVEL'      => 'info',
+            'LOG_RETENTION_DAYS' => 0, // No rotation.
+            'LOG_PATH' => '/logs',
         ];
     }
 
@@ -92,12 +90,9 @@ class ApplicationConfig extends DatabaseConfig
     protected  function getEnvMap(): array
     {
         return [
-                'destinationURL' => 'DESTINATION_URL',
-                'destinationUser' => 'DESTINATION_USER',
-                'destinationPassword' => 'DESTINATION_PASSWORD',
-                'naadUrl' => 'NAAD_URL',
-                'naadRepoUrl' => 'NAAD_REPO_URL',
-                'feedId' => 'FEED_ID',
+            'logLevel' => 'LOG_LEVEL',
+            'logPath' => 'LOG_PATH',
+            'logRetentionDays' => 'LOG_RETENTION_DAYS',
         ];
     }
 
@@ -113,6 +108,14 @@ class ApplicationConfig extends DatabaseConfig
     {
         if (empty($value)) {
             parent::throwError($name);
+        } else if ($name === 'logPath') {
+            // Remove any existing config that might use a log file.
+            $path = rtrim($value, '.log');
+            $this->logPath =  sprintf(
+                "%s/%s/app.log", 
+                rtrim($path, '/'), 
+                $this->logSubPath
+            );
         } else {
             $this->$name = $value;
         }
