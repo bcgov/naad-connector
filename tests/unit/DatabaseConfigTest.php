@@ -23,8 +23,8 @@ use Dotenv\Dotenv;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-#[CoversClass('Bcgov\NaadConnector\Config\ApplicationConfig')]
-#[UsesClass('Bcgov\NaadConnector\Config\ApplicationConfig')]
+#[CoversClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
+#[UsesClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
 final class DatabaseConfigTest extends TestCase
 {
 
