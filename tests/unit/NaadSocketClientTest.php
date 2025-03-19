@@ -15,6 +15,7 @@ use Bcgov\NaadConnector\{
     NaadRepositoryClient,
     NaadSocketClient,
 };
+use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Bcgov\NaadConnector\Entity\Alert;
 
 /**
@@ -29,7 +30,7 @@ use Bcgov\NaadConnector\Entity\Alert;
  */
 #[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
 #[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
-#[UsesClass('Bcgov\NaadConnector\NaadVars')]
+#[UsesClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
 final class NaadSocketClientTest extends TestCase
 {
 
@@ -51,7 +52,7 @@ final class NaadSocketClientTest extends TestCase
     #[DataProvider('handleResponseProvider')]
     public function testHandleResponse(array $xmlResponses)
     {
-        $database = $this->createStub(Database::class);
+        $database = $this->createStub(Database::class, DatabaseConfig::class);
         $destinationClient = $this->createStub(DestinationClient::class);
         $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
