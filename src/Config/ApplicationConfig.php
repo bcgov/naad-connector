@@ -78,7 +78,7 @@ class ApplicationConfig extends DatabaseConfig
             );
             $this->naadRepoUrl = $this->getPropertyValueFromEnv(
                 'NAAD_REPO_URL',
-                'capcp1.naad-adna.pelmorex.com' 
+                'capcp1.naad-adna.pelmorex.com'
             );
         }
     }
