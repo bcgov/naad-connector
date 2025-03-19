@@ -1,7 +1,7 @@
 <?php
 
 namespace Bcgov\NaadConnector\Config ;
-use Bcgov\NaadConnector\Config\DatabaseConfig;
+use Bcgov\NaadConnector\Config\BaseConfig;
 
 /**
  * Class BaseConfig
@@ -14,7 +14,7 @@ use Bcgov\NaadConnector\Config\DatabaseConfig;
  *
  * @inheritDoc
  */
-class ApplicationConfig extends DatabaseConfig
+class ApplicationConfig extends BaseConfig
 {
     /**
      * The Feed id to determine if it is socket-1 or socket-2.
