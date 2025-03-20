@@ -1,13 +1,19 @@
 <?php
 require_once 'vendor/autoload.php';
 
-use Bcgov\NaadConnector\{LoggerFactory, Database, NaadVars};
+use Bcgov\NaadConnector\{
+    LoggerFactory,
+    Database,
+    Config\DatabaseConfig,
+    Config\LoggerConfig
+};
 
-$naadVars = new NaadVars();
+$dbConfig = new DatabaseConfig();
+$logConfig = new LoggerConfig('database');
 $logger = LoggerFactory::createLogger(
-    $naadVars->logPath,
-    $naadVars->logRetentionDays,
-    $naadVars->logLevel
+    $logConfig->getLogPath(),
+    $logConfig->getLogRetentionDays(),
+    $logConfig->getLogLevel()
 )->withName('AlertCleanup');
 
-(new Database($logger))->deleteOldAlerts();
+(new Database($logger, $dbConfig))->deleteOldAlerts();

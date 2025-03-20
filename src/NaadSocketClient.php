@@ -39,12 +39,6 @@ class NaadSocketClient
 
     protected const HEARTBEAT_FILE_PATH = 'heartbeat.log';
 
-    /**
-     * The name of the NAAD connection instance.
-     *
-     * @var string
-     */
-    protected string $name;
 
     protected DestinationClient $destinationClient;
 
@@ -59,8 +53,6 @@ class NaadSocketClient
     /**
      * Constructor for NaadClient.
      *
-     * @param string               $name              The name of the NAAD connection
-     *                                                instance.
      * @param DestinationClient    $destinationClient An instance of
      *                                                DestinationClient.
      * @param Logger               $logger            An instance of Monolog/Logger.
@@ -69,13 +61,11 @@ class NaadSocketClient
      *                                                NaadRepositoryClient.
      */
     public function __construct(
-        string $name,
         DestinationClient $destinationClient,
         Logger $logger,
         Database $database,
         NaadRepositoryClient $repositoryClient,
     ) {
-        $this->name              = $name;
         $this->destinationClient = $destinationClient;
         $this->logger            = $logger;
         $this->database          = $database;

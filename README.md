@@ -8,6 +8,7 @@ A PHP client for connecting the National Alert Aggregation & Dissemination (NAAD
 ## Usage
 
 ## Secrets
+> Vault secrets are not going to be used for MVP.
 - production deployments will use vault secrets, there is code that either accepts secrets in the form of env variables or for example `export MY_SECRET=password` or a vault file called `/vault/secrets/MY_SECRET`
 
 ### Local Deployment

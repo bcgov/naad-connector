@@ -15,6 +15,7 @@ use Bcgov\NaadConnector\{
     NaadRepositoryClient,
     NaadSocketClient,
 };
+use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Bcgov\NaadConnector\Entity\Alert;
 
 /**
@@ -29,7 +30,7 @@ use Bcgov\NaadConnector\Entity\Alert;
  */
 #[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
 #[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
-#[UsesClass('Bcgov\NaadConnector\NaadVars')]
+#[UsesClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
 final class NaadSocketClientTest extends TestCase
 {
 
@@ -53,14 +54,13 @@ final class NaadSocketClientTest extends TestCase
     #[DataProvider('handleResponseProvider')]
     public function testHandleResponse(array $xmlResponses, int $sendAttempts)
     {
-        $database = $this->createStub(Database::class);
+        $database = $this->createStub(Database::class, DatabaseConfig::class);
         $database->method('insertAlert')->willReturn(true);
         $destinationClient = $this->createMock(DestinationClient::class);
         $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -232,7 +232,6 @@ final class NaadSocketClientTest extends TestCase
             );
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -262,7 +261,6 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -312,7 +310,6 @@ final class NaadSocketClientTest extends TestCase
             ->willReturn($alertXml);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -349,7 +346,6 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -386,7 +382,6 @@ final class NaadSocketClientTest extends TestCase
         $err = 'Invalid XML: "identifier" field is required and must not be empty.';
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -419,7 +414,6 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,
@@ -460,7 +454,6 @@ final class NaadSocketClientTest extends TestCase
         $repositoryClient = $this->createStub(NaadRepositoryClient::class);
 
         $client = new NaadSocketClient(
-            'test-naad',
             $destinationClient,
             $logger,
             $database,

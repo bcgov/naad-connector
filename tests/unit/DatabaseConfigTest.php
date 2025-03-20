@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\{
 };
 
 use PHPUnit\Framework\TestCase;
-use Bcgov\NaadConnector\NaadVars;
+use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Dotenv\Dotenv;
 
 /**
@@ -23,9 +23,9 @@ use Dotenv\Dotenv;
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
  */
-#[CoversClass('Bcgov\NaadConnector\NaadVars')]
-#[UsesClass('Bcgov\NaadConnector\NaadVars')]
-final class NaadVarsTest extends TestCase
+#[CoversClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
+#[UsesClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
+final class DatabaseConfigTest extends TestCase
 {
 
     /**
@@ -40,16 +40,12 @@ final class NaadVarsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Load .env.test file
         $dotenv = Dotenv::createMutable(__DIR__, '.env.test');
         $dotenv->load();
-
         // Override environment variables manually
         foreach ($_ENV as $key => $value) {
             putenv("$key=$value");
         }
-
     }
 
     /**
@@ -60,26 +56,22 @@ final class NaadVarsTest extends TestCase
     #[Test]
     public function testMagicGetter(): void
     {
-        $naadVars = new NaadVars('/not/real/path');
+        $config = new DatabaseConfig();
         $expectedProperties = [
           'databaseRootPassword' => 'test_database_root_password',
           'databaseHost' => 'test_database_host',
-          'databasePort' => '3306',
+          'databasePort' => 3306,
           'databaseName' => 'test_database_name',
-          'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
-          'destinationUser' => 'test_destination_user',
-          'destinationPassword' => 'test_destination_password',
-          'naadName' => 'TEST-NAAD-1',
-          'naadUrl' => 'test.naad_url.com',
-          'naadRepoUrl' => 'test.naad_repo_url.com',
+          'alertsToKeep' => 100
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $naadVars->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
     }
 
-    /**
+     /**
      * Test the magic getter for retrieving properties including one from pas
      *
      * @return void
@@ -87,22 +79,18 @@ final class NaadVarsTest extends TestCase
     #[Test]
     public function testMagicGetterFromFile(): void
     {
-        $naadVars = new NaadVars('./tests/data/secret');
+        $config = new DatabaseConfig('./tests/data/secret');
         $expectedProperties = [
-          'databaseRootPassword' => 'test_mariadb_root_password_from_file',
-          'databaseHost' => 'test_database_host',
-          'databasePort' => '3306',
-          'databaseName' => 'test_database_name',
-          'destinationURL' => 'http://0.0.0.0:38080/test/wp-json/naad/v1/alert',
-          'destinationUser' => 'test_destination_user',
-          'destinationPassword' => 'test_destination_password_from_file',
-          'naadName' => 'TEST-NAAD-1',
-          'naadUrl' => 'test.naad_url.com',
-          'naadRepoUrl' => 'test.naad_repo_url.com',
+            'databaseRootPassword' => 'test_mariadb_root_password_from_file',
+            'databaseHost' => 'test_database_host',
+            'databasePort' => 3306,
+            'databaseName' => 'test_database_name',
+            'alertsToKeep' => 100
         ];
 
         foreach ($expectedProperties as $property => $expectedValue) {
-            $this->assertEquals($expectedValue, $naadVars->$property);
+            $getter = sprintf("get%s", ucfirst($property));
+            $this->assertEquals($expectedValue, $config->$getter());
         }
     }
 
@@ -111,7 +99,7 @@ final class NaadVarsTest extends TestCase
      *
      * @return void
      */
-    public function testConstructorThrowsExceptionWhenEnvVariableMissing()
+    public function testGetVariableThrowsExceptionWhenEnvVariableMissing()
     {
         // Clear a required environment variable to simulate the issue
         putenv('MARIADB_ROOT_PASSWORD'); // Remove this key from the environment
@@ -120,30 +108,14 @@ final class NaadVarsTest extends TestCase
         // Assert that the exception is thrown
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "Environment variable 'MARIADB_ROOT_PASSWORD' is required."
+            "Property 'MARIADB_ROOT_PASSWORD' does not exist."
         );
 
-        // Instantiate NaadVars to trigger the constructor
-        new NaadVars();
+        $config = new DatabaseConfig();
+        $config->getDatabaseRootPassword();
     }
 
 
-    /**
-     * Test the magic getter for an Invalid property.
-     * Expect exception.
-     *
-     * @return void
-     */
-    #[Test]
-    public function testMagicGetterForInvalidProperty()
-    {
-        $naadVars = new NaadVars();
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            "Property 'NonExistentProperty' does not exist."
-        );
-        $naadVars->NonExistentProperty;
-    }
 
     /**
      * Test the NaadVars Constructor.
@@ -151,13 +123,11 @@ final class NaadVarsTest extends TestCase
      * @return void
      */
     #[Test]
-    public function testNaadVarsConstructor()
+    public function testDatabaseConfigConstructor()
     {
-        $naadVars = new NaadVars();
-        $this->assertInstanceOf(NaadVars::class, $naadVars);
-        $this->assertSame('TEST-NAAD-1', $naadVars->naadName);
-        $this->assertSame('test.naad_url.com', $naadVars->naadUrl);
-        $this->assertSame('test.naad_repo_url.com', $naadVars->naadRepoUrl);
+        $config = new DatabaseConfig();
+        $this->assertInstanceOf(DatabaseConfig::class, $config);
+        $this->assertSame('test_database_host', $config->getDatabaseHost());
+        $this->assertSame(3306, $config->getDatabasePort());
     }
-
 }

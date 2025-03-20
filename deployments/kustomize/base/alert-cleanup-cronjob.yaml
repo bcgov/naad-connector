@@ -2,6 +2,11 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: alert-cleanup
+  labels:
+    app.kubernetes.io/name: alert-cleanup
+    app.kubernetes.io/part-of: naad-connector
+    app.kubernetes.io/instance: naad
+    app.openshift.io/runtime: php
 spec:
   schedule: "0 0 * * 0"  # Runs once a week on Sunday at midnight.
   jobTemplate:
@@ -15,28 +20,25 @@ spec:
                 claimName: naad-logs
           containers:
           - name: alert-cleanup
-            image: bcgovgdx/naad-app
+            image: bcgovgdx/naad-app:1.0.0
             imagePullPolicy: IfNotPresent
             envFrom:
             - configMapRef:
-                name: cron-alert-cleanup-config
-            - configMapRef:
-                name: naad-shared-config
+                name: naad-config
             - configMapRef:
                 name: database-config
-            - secretRef:
-                name: naad-secrets
             - secretRef:
                 name: database-secrets
             volumeMounts:
             - name: logs-volume
-              mountPath: /var/log/app
-              subPath: cron
+              mountPath: /var/log/
             resources:
               requests:
                 cpu: 100m
                 memory: 256Mi
+                ephemeral-storage: "500Mi"
               limits:
+                ephemeral-storage: "1Gi"
                 cpu: 500m
                 memory: 512Mi
             command: ["/bin/sh", "-c", "php src/alert-cleanup.php"]

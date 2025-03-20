@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+  labels:
+    app.kubernetes.io/component: database
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: database
+        app.kubernetes.io/name: database
+        app.kubernetes.io/instance: naad
+        app.kubernetes.io/part-of: naad-connector
+    spec:
+      volumes:
+      - name: database-volume
+        persistentVolumeClaim:
+          claimName: mariadb
+      automountServiceAccountToken: false
+      containers:
+      - name: mariadb
+        image: mariadb:11.5.2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+            value: "0"
+        envFrom:
+        - configMapRef:
+            name: database-config
+        - secretRef:
+            name: database-secrets
+        volumeMounts:
+        - name: database-volume
+          mountPath: /var/lib/mysql
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+            ephemeral-storage: "500Mi"
+          limits:
+            ephemeral-storage: "1Gi"
+            cpu: 500m
+            memory: 1Gi
