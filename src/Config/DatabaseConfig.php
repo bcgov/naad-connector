@@ -114,5 +114,4 @@ class DatabaseConfig extends BaseConfig
     {
         return $this->databaseName;
     }
-
 }

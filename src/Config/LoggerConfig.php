@@ -121,5 +121,4 @@ class LoggerConfig extends BaseConfig
     {
         return $this->logPath;
     }
-   
 }
