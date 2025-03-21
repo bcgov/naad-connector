@@ -2,7 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- app.yaml
+- build-pipeline.yaml
+- build-pipelinerun.yaml
+- start-build.yaml
 
 labels:
 - includeSelectors: true
@@ -10,5 +12,5 @@ labels:
     app: naad
     env: tools
     app.kubernetes.io/name: naad
-    app.kubernetes.io/component: image-builds
+    app.kubernetes.io/component: pipeline
     app.kubernetes.io/part-of: naad-connector
