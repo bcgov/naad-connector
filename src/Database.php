@@ -163,15 +163,15 @@ class Database
 
     /**
      * Delete the oldest rows from the alerts table leaving
-     * only ALERTS_TO_KEEP rows.
+     * only $alertsToKeep rows.
      *
+     * @param int $alertsToKeep The number of alerts to leave in
+     *                          the table.
+     * 
      * @return void
      */
-    public function deleteOldAlerts(): void
+    public function deleteOldAlerts(int $alertsToKeep): void
     {
-        // Retrieve the number of fresh alerts to keep from environment variables.
-        $alertsToKeep = $this->dbConfig->getAlertsToKeep();
-
         // Get the current total number of rows in the table.
         $qb = $this->entityManager->createQueryBuilder();
         $count = $qb->select('count(a.id)')

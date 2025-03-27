@@ -17,4 +17,4 @@ $logger = LoggerFactory::createLogger(
 )->withName('AlertCleanup');
 
 $db = new Database($logger, $dbConfig);
-$db->deleteOldAlerts();
+$db->deleteOldAlerts($dbConfig->getAlertsToKeep());
