@@ -171,7 +171,6 @@ class Database
     {
         // Retrieve the number of fresh alerts to keep from environment variables.
         $alertsToKeep = $this->dbConfig->getAlertsToKeep();
-        $alertsToKeep = 11;
 
         // Get the current total number of rows in the table.
         $qb = $this->entityManager->createQueryBuilder();
