@@ -61,10 +61,3 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 120
             failureThreshold: 3
-      initContainers:
-        - name: wait-for-db
-          image: busybox
-          envFrom:
-            - configMapRef:
-                name: database-config
-          command: ['sh', '-c', 'until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do echo waiting for database $MARIADB_SERVICE_HOST; sleep 2; done']
