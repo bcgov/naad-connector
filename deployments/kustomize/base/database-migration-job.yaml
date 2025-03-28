@@ -13,7 +13,7 @@ spec:
       containers:
         - name: naad-database-migration
           image: bcgovgdx/naad-app:1.0.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
           - configMapRef:
               name: database-config
@@ -28,12 +28,5 @@ spec:
               ephemeral-storage: "1Gi"
               cpu: 500m
               memory: 1Gi
-          command: ['vendor/bin/doctrine-migrations', 'migrate', '--no-interaction', '--allow-no-migration']
-      initContainers:
-        - name: wait-for-db
-          image: busybox
-          envFrom:
-          - configMapRef:
-              name: database-config
-          command: ['sh', '-c', 'until nc -z $MARIADB_SERVICE_HOST $MARIADB_SERVICE_PORT; do echo waiting for database $MARIADB_SERVICE_HOST; sleep 2; done']
+          command: ["/bin/bash", "/app/run-migrations.sh"]
   backoffLimit: 100

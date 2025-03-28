@@ -28,9 +28,6 @@ configMapGenerator:
 - name: database-config
   literals:
     - MARIADB_DATABASE="naad_connector"
-    # Temporary, they will get removed once init containers get removed.
-    - MARIADB_SERVICE_HOST="mariadb"
-    - MARIADB_SERVICE_PORT="3306"
 - name: naad-config
   literals:
     - NAAD_URL=streaming1.naad-adna.pelmorex.com
