@@ -19,7 +19,7 @@ To run in the devcontainer (see .devcontainer/ directory):
 
 1. Install the Dev Containers VSCode extension.
 1. Run `cp .devcontainer/sample.override.env .devcontainer/override.env` and add/remove any env variable overrides you need based on your environment.
-    - Note: this step can be skipped if you do'ot need to override any env variables.
+    - Note: this step can be skipped if you do not need to override any env variables.
 1. View > Command Palette... > Dev Containers: Reopen in Container
 1. VSCode should relaunch and the terminal should look like this: `vscode ➜ /workspaces/naad-connector`
 1. This terminal should allow most commands to be run without any further dev environment setup:
@@ -69,7 +69,7 @@ After deployment, PHPMyAdmin will be accessible at the following local addresses
 
 #### Gitignored Folders
 ##### secrets
-- this folder is to capture the vault secrets 
+- this folder is to capture the vault secrets
 - to test a vault secret, simply add the sescret as a file identical to the secret name, and add your secret into the file.
 - example `secrets/DESTINATION_PASSWORD`
 
