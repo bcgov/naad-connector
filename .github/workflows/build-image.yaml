@@ -36,4 +36,4 @@ jobs:
 
             - name: Create PipelineRun
               run: |
-                oc create -f openshift/tekton/pipelineruns/build-pipelinerun.yaml
+                oc create -f deployments/kustomize/pipelines/build-pipelinerun.yaml
