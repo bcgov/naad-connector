@@ -80,7 +80,7 @@ class NaadSocketConnection
                 $this->logger->info(
                     'Socket connected. Listening for socket messages...'
                 );
-    
+
                 $this->setEventHandlers($connection);
             },
             // Unsuccessful connection, get an Exception.
@@ -100,16 +100,16 @@ class NaadSocketConnection
      *
      * @param ConnectionInterface $connection React/Socket Connection to set
      *                                        event handlers for.
-     * 
+     *
      * @return void
      * @link   https://github.com/reactphp/stream?tab=readme-ov-file#readablestreaminterface
      */
     protected function setEventHandlers(ConnectionInterface $connection)
     {
-        $this->reconnectAttempts = 0;
 
         $connection->on(
             'data', function (string $chunk) {
+                $this->reconnectAttempts = 0;
                 // Enables error XML error reporting (used by libxml_get_errors()).
                 $previousUseInternalErrorsValue = libxml_use_internal_errors(true);
 
@@ -132,7 +132,9 @@ class NaadSocketConnection
                     exit(1);
                 }
 
-                $this->logger->info('Socket closed.');
+                // Attempt to reconnect after a short delay (allows time to reset).
+                $this->logger->info('Socket closed. Attempting to reconnect...');
+                sleep(5);
                 $this->connect();
             }
         );
