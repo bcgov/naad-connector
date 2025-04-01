@@ -68,7 +68,7 @@
     }
   },
   "require": {
-    "php": ">8.2",
+    "php": "^8.1",
     "monolog/monolog": "^3.5",
     "doctrine/dbal": "^4.1",
     "doctrine/migrations": "^3.8",

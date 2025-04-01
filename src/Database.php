@@ -6,6 +6,7 @@ use Bcgov\NaadConnector\Entity\Alert;
 use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Exception\EntityIdentityCollisionException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
@@ -101,37 +102,6 @@ class Database
     }
 
     /**
-     * Delete all the alerts (minus ALERTS_TO_KEEP) from the database.
-     * ALERTS_TO_KEEP is defined .env or naad-shared-config configMap.
-     *
-     * @return void
-     */
-    public function deleteOldAlerts(): void
-    {
-        $alertRepository = $this->entityManager->getRepository(Alert::class);
-
-        // Retrieve the number of fresh alerts to keep from environment variables.
-        $freshAlertsToKeep = $this->dbConfig->getAlertsToKeep();
-
-        // Retrieve all alerts ordered by 'received' date in descending order.
-        $alerts = $alertRepository->findBy([], ['received' => 'DESC']);
-        $alertsToDelete = array_slice($alerts, $freshAlertsToKeep);
-        $alertsDeleted = count($alertsToDelete);
-
-        // Announce the number of stale alerts being deleted.
-        $this->logger->info("Deleting {$alertsDeleted} stale alerts:");
-
-        // Delete all alerts to be deleted.
-        foreach ($alertsToDelete as $alert) {
-            $this->logger->info('Deleting alert: ' . $alert->getId());
-            $this->entityManager->remove($alert);
-        }
-
-        $this->flush();
-    }
-
-
-    /**
      * Flushes EntityManager causing database queries to be executed.
      *
      * @return void
@@ -191,4 +161,45 @@ class Database
         return $alerts;
     }
 
+    /**
+     * Delete the oldest rows from the alerts table leaving
+     * only $alertsToKeep rows.
+     *
+     * @param int $alertsToKeep The number of alerts to leave in
+     *                          the table.
+     * 
+     * @return void
+     */
+    public function deleteOldAlerts(int $alertsToKeep): void
+    {
+        // Get the current total number of rows in the table.
+        $qb = $this->entityManager->createQueryBuilder();
+        $count = $qb->select('count(a.id)')
+            ->from(Alert::class, 'a')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Calculate the number of rows to delete.
+        $alertsToDelete = intval($count) - $alertsToKeep;
+
+        $alertsDeleted = 0;
+        // Delete alertsToDelete rows from alerts table if any need to be deleted.
+        if ($alertsToDelete > 0) {
+            $stmt = $this->entityManager->getConnection()->prepare(
+                '
+                DELETE FROM alerts
+                ORDER BY received ASC
+                LIMIT :limit;
+                '
+            );
+            $stmt->bindValue('limit', $alertsToDelete, ParameterType::INTEGER);
+            $result = $stmt->executeQuery();
+            $alertsDeleted = $result->rowCount();
+        }
+
+        $this->logger->info(
+            '{alertsDeleted} alerts deleted.',
+            ['alertsDeleted' => $alertsDeleted]
+        );
+    }
 }
