@@ -177,3 +177,34 @@ To view the documentation, you can use one of the following methods:
 
 - Run `composer phpdoc-view`
 - Navigate to `./docs` in your console and type `open index.html`
+
+# Log Inspector (On-Demand Sidecar)
+
+This utility pod allows us to inspect log files from the `naad-logs` PersistentVolumeClaim (PVC) without modifying the main app deployment. It is intended for on-demand use by administrators and developers.
+
+---
+
+## How to Deploy
+
+1. Apply the `sidecar.yaml` file manually:
+    ```
+    oc apply -f deployments/kustomize/base/sidecar.yaml
+    ```
+2. Access the sidecar terminal via the OpenShift Gui.
+3. Navigate to the logs directory:
+    ```
+    cd /var/log/app/naad/app/
+    ls -la
+    ```
+    You should see subfolders like:
+    * `database`
+    * `socket-1`
+4. Search logs for the timestamp or event you are interested in:
+   ```
+   grep "CRITICAL" socket-1/app-2025-04-01.log
+   less database/app-2025-04-06.log
+   ```
+5. Clean up when done:
+   ```
+   oc delete pod sidecar
+   ```

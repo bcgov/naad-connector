@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: log-inspector
+  name: sidecar
 spec:
   automountServiceAccountToken: false
   containers:
-    - name: log-inspector
+    - name: sidecar
       image: alpine:3
       command: ["sh", "-c", "sleep infinity"]
       volumeMounts:
