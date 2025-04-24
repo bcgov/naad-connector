@@ -64,7 +64,7 @@ class NaadSocketClient
         DestinationClient $destinationClient,
         Logger $logger,
         Database $database,
-        NaadRepositoryClient $repositoryClient,
+        NaadRepositoryClient $repositoryClient
     ) {
         $this->destinationClient = $destinationClient;
         $this->logger            = $logger;
@@ -90,28 +90,7 @@ class NaadSocketClient
         $xml->registerXPathNamespace('x', self::XML_NAMESPACE);
 
         if ($this->isHeartbeat($xml) ) {
-            $this->logger->debug('Heartbeat received.');
-            $this->touchHeartbeatFile();
-            $missedAlerts = $this->findMissedAlerts($xml);
-            if (count($missedAlerts) > 0) {
-                $this->logger->info(
-                    'Found {count} missing alerts in heartbeat. '
-                        . 'Fetching from NAAD repository.',
-                    ['count' => count($missedAlerts)]
-                );
-
-                // Fetch, validate, then process missed alerts.
-                foreach ( $missedAlerts as $alert ) {
-                    $this->currentOutput = '';
-                    $rawXml = $this->repositoryClient->fetchAlert(
-                        $alert['id'], $alert['sent']
-                    );
-                    $xml = $this->validateResponse($rawXml);
-                    if ($xml) {
-                        $this->processAlert($xml);
-                    }
-                }
-            }
+            $this->handleHeartbeat($xml);
             $shouldSendAlerts = true;
         } else {
             $shouldSendAlerts = $this->processAlert($xml);
@@ -136,6 +115,55 @@ class NaadSocketClient
 
         $this->currentOutput = '';
         return true;
+    }
+
+    /**
+     * Determines whether a given SimpleXMLElement is a NAAD heartbeat message.
+     *
+     * @param SimpleXMLElement $xml XML from NAAD socket.
+     *
+     * @return boolean True if the XML is a heartbeat message, false otherwise.
+     */
+    protected function isHeartbeat( SimpleXMLElement $xml ): bool
+    {
+        $sender = $xml->xpath(
+            '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
+        );
+        return ! empty($sender);
+    }
+
+    /**
+     * Handles heartbeat messages, retrieving any missed alerts from the NAADS
+     * alert repository and processing them.
+     *
+     * @param SimpleXMLElement $xml XML from NAAD socket.
+     *
+     * @return void
+     */
+    protected function handleHeartbeat(SimpleXMLElement $xml)
+    {
+        $this->logger->debug('Heartbeat received.');
+        $this->touchHeartbeatFile();
+        $missedAlerts = $this->findMissedAlerts($xml);
+        if (count($missedAlerts) > 0) {
+            $this->logger->info(
+                'Found {count} missing alerts in heartbeat. '
+                    . 'Fetching from NAAD repository.',
+                ['count' => count($missedAlerts)]
+            );
+
+            // Fetch, validate, then process missed alerts.
+            foreach ( $missedAlerts as $alert ) {
+                $this->currentOutput = '';
+                $rawXml = $this->repositoryClient->fetchAlert(
+                    $alert['id'], $alert['sent']
+                );
+                $missedAlertXml = $this->validateResponse($rawXml);
+                if ($missedAlertXml) {
+                    $this->processAlert($missedAlertXml);
+                }
+            }
+        }
     }
 
     /**
@@ -272,21 +300,6 @@ class NaadSocketClient
             );
         }
         return true;
-    }
-
-    /**
-     * Determines whether a given SimpleXMLElement is a NAAD heartbeat message.
-     *
-     * @param SimpleXMLElement $xml XML from NAAD socket.
-     *
-     * @return boolean True if the XML is a heartbeat message, false otherwise.
-     */
-    protected function isHeartbeat( SimpleXMLElement $xml ): bool
-    {
-        $sender = $xml->xpath(
-            '/x:alert/x:sender[contains(text(),"NAADS-Heartbeat")]'
-        );
-        return ! empty($sender);
     }
 
     /**
