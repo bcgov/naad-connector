@@ -10,8 +10,6 @@ resources:
 - logs-volume.yaml
 - app-statefulset.yaml
 
-
-
 secretGenerator:
 - name: naad-secrets
   literals:
@@ -36,7 +34,6 @@ configMapGenerator:
     - LOG_LEVEL=info
     - LOG_RETENTION_DAYS=365
     - ALERTS_TO_KEEP=100
-
 
 labels:
 - includeSelectors: true

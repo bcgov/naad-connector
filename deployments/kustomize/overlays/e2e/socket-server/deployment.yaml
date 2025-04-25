@@ -10,9 +10,10 @@ spec:
   replicas: 1
   template:
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: naad-app
-          image: bcgovgdx/naad-app
+          image: bcgovgdx/naad-app:1.0.0
           imagePullPolicy: IfNotPresent
           command: ["php"]
           args: ["tests/e2e/start.php"]
@@ -22,6 +23,7 @@ spec:
             requests:
               cpu: 100m
               memory: 500Mi
+              ephemeral-storage: 500Mi
             limits:
               cpu: 500m
               memory: 1Gi

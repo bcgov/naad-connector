@@ -5,7 +5,6 @@ resources:
 - ../../base/
 - phpmyadmin
 
-
 # Overrides the namespace
 namespace: default
 
@@ -13,4 +12,22 @@ labels:
 - includeSelectors: true
   pairs:
     app: naad-app
-    env: default
+    env: local
+
+images:
+- name: bcgovgdx/naad-app
+  newTag: latest
+
+patches:
+- path: pvc-patch.yaml
+  target:
+    name: naad-logs
+- path: image-pull-policy-patch.yaml
+  target:
+    name: naad-socket
+- path: image-pull-policy-patch.yaml
+  target:
+    name: database-migration
+- path: cron-image-pull-policy-patch.yaml
+  target:
+    name: alert-cleanup

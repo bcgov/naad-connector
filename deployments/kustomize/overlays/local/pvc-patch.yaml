@@ -1,0 +1,3 @@
+- op: replace
+  path: /spec/accessModes/0
+  value: ReadWriteOnce # ReadWriteMany is not usable on local Kubernetes.
