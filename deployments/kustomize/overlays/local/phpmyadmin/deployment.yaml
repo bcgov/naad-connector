@@ -15,9 +15,17 @@ spec:
       labels:
         app: phpmyadmin
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: phpmyadmin
           image: phpmyadmin/phpmyadmin:5.2
+          resources:
+            requests:
+              cpu: 2
+              memory: 512Mi
+              ephemeral-storage: 500Mi
+            limits:
+              memory: 1024Mi
           ports:
             - containerPort: 80
           envFrom:

@@ -34,7 +34,7 @@
       "php src/start.php"
     ],
     "k8s-start": [
-      "kubectl config use-context docker-desktop",
+      "kubectl config use-context rancher-desktop",
       "composer build",
       "kubectl apply -k deployments/kustomize/overlays/local"
     ],

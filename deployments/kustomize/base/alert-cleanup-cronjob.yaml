@@ -21,7 +21,7 @@ spec:
           containers:
           - name: alert-cleanup
             image: bcgovgdx/naad-app:1.0.0
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: Always
             envFrom:
             - configMapRef:
                 name: naad-config
