@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="tests/unit/bootstrap.php"
          cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
          shortenArraysForExportThreshold="10"
@@ -14,16 +14,6 @@
          failOnWarning="true"
          colors="true"
          testdox="true">
-    <php>
-        <env name="MARIADB_ROOT_PASSWORD" value="none" />
-        <env name="MARIADB_SERVICE_HOST" value="test-mariadb" />
-        <env name="MARIADB_SERVICE_PORT" value="3306" />
-        <env name="MARIADB_DATABASE" value="test_database" />
-        <env name="DESTINATION_URL" value="https://0.0.0.0/wp-json/naad/v1/alert" />
-        <env name="DESTINATION_USER" value="test-naadbot" />
-        <env name="DESTINATION_PASSWORD" value="testPassword" />
-        <env name="LOG_PATH" value="logs/test" />
-    </php>
 
     <testsuites>
         <testsuite name="default">
