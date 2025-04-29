@@ -34,7 +34,7 @@ class Alert
     private ?DateTime $received = null;
 
     #[ORM\Column]
-    private ?DateTime $sendAttempted = null;
+    private ?DateTime $send_attempted = null;
 
     #[ORM\Column]
     private int $failures = 0;
@@ -117,7 +117,7 @@ class Alert
      */
     public function getSendAttempted(): DateTime
     {
-        return $this->sendAttempted;
+        return $this->send_attempted;
     }
 
     /**
@@ -130,7 +130,7 @@ class Alert
      */
     public function setSendAttempted( ?\DateTime $sendAttempted ): void
     {
-        $this->sendAttempted = $sendAttempted;
+        $this->send_attempted = $sendAttempted;
     }
 
     /**
