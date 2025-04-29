@@ -1,6 +1,7 @@
 <?php
 namespace Bcgov\NaadConnector;
 
+use Bcgov\NaadConnector\Exception\AlertFailureThresholdException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
@@ -98,11 +99,10 @@ class DestinationClient
 
                 // Throw exception when failure threshold is reached.
                 if ($alert->getFailures() >= self::FAILURE_THRESHOLD) {
-                    throw new \Exception(
-                        sprintf(
-                            'Failure threshold of %d reached.',
-                            self::FAILURE_THRESHOLD
-                        )
+                    throw new AlertFailureThresholdException(
+                        self::FAILURE_THRESHOLD,
+                        $alert->getId(),
+                        $e
                     );
                 }
             } finally {
@@ -138,7 +138,7 @@ class DestinationClient
             $this->logger->error(
                 'Could not send Alert ({id})',
                 ['id' => $alert->getId()]
-            );            
+            );
         }
 
         if (isset($response)) {

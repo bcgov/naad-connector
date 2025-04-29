@@ -13,6 +13,7 @@ use Bcgov\NaadConnector\{
     DestinationClient
 };
 use Bcgov\NaadConnector\Entity\Alert;
+use Bcgov\NaadConnector\Exception\AlertFailureThresholdException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -31,6 +32,7 @@ use GuzzleHttp\Psr7\Response;
  */
 #[CoversClass('Bcgov\NaadConnector\DestinationClient')]
 #[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
+#[UsesClass('Bcgov\NaadConnector\Exception\AlertFailureThresholdException')]
 final class DestinationClientTest extends TestCase
 {
     private $mockDatabase;
@@ -182,6 +184,7 @@ final class DestinationClientTest extends TestCase
             $this->mockLogger->expects($this->exactly(2))->method('error');
 
             $this->expectExceptionMessageMatches('/Failure threshold/');
+            $this->expectException(AlertFailureThresholdException::class);
             $client->sendAlerts();
         }
     }
