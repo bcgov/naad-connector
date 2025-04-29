@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bcgov\NaadConnector\Exception\AlertFetchFailureException;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -11,6 +12,7 @@ use Monolog\Logger;
 
 use PHPUnit\Framework\Attributes\{
     CoversClass,
+    UsesClass,
     DataProvider
 };
 
@@ -27,6 +29,7 @@ use Bcgov\NaadConnector\NaadRepositoryClient;
  * @link     https://alerts.pelmorex.com/
  */
 #[CoversClass(NaadRepositoryClient::class)]
+#[UsesClass('Bcgov\NaadConnector\Exception\AlertFetchFailureException')]
 final class NaadRepositoryClientTest extends TestCase
 {
     /**
@@ -96,7 +99,7 @@ final class NaadRepositoryClientTest extends TestCase
         $sent = $alert['sent'];
 
         if ($expectsException) {
-            $this->expectException(\RuntimeException::class);
+            $this->expectException(AlertFetchFailureException::class);
             $this->expectExceptionMessage($expectedBody);
             $client->fetchAlert($id, $sent);
         } else {
