@@ -1,17 +1,9 @@
 <?php
-/**
- * Bootstrap file for unit tests.
- *
- * This script performs the following tasks:
- * - Loads the Composer autoloader to include dependencies.
- * - Clears stale environment variables from the $_ENV superglobal to ensure
- *   a clean testing environment.
- */
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 // List of environment variables to unset
-$env_keys = [
+$envKeys = [
     'MARIADB_ROOT_PASSWORD',
     'MARIADB_SERVICE_HOST',
     'MARIADB_SERVICE_PORT',
@@ -33,11 +25,11 @@ $env_keys = [
 ];
 
 // Unset the environment variables and log their status
-array_walk($env_keys, function ($key) {
+foreach ($envKeys as $key) {
     if (isset($_ENV[$key])) {
         error_log("Unsetting stale environment variable: $key");
         unset($_ENV[$key]);
     } else {
         error_log("Environment variable not found: $key");
     }
-});
+}
