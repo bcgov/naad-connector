@@ -61,15 +61,7 @@ class Database
 
         // Configuring the database connection.
         $connection = DriverManager::getConnection(
-            [
-            // TODO: Create non-root user.
-            'user'     => 'root',
-            'password' => $this->dbConfig->getDatabaseRootPassword(),
-            'host'     => $this->dbConfig->getDatabaseHost(),
-            'port'     => $this->dbConfig->getDatabasePort(),
-            'dbname'   => $this->dbConfig->getDatabaseName(),
-            'driver'   => 'pdo_mysql',
-            ]
+            $this->dbConfig->getConnectionArray()
         );
         return new EntityManager($connection, $config);
     }
@@ -156,9 +148,7 @@ class Database
             ->getQuery();
 
         // Execute the query and return results.
-        $alerts = $query->getResult();
-
-        return $alerts;
+        return $query->getResult();
     }
 
     /**
@@ -167,7 +157,7 @@ class Database
      *
      * @param int $alertsToKeep The number of alerts to leave in
      *                          the table.
-     * 
+     *
      * @return void
      */
     public function deleteOldAlerts(int $alertsToKeep): void

@@ -252,7 +252,7 @@ final class NaadSocketClientTest extends TestCase
      *
      * @return void
      */
-    public function testHandleResponseMissedAlertsDatabseException()
+    public function testHandleResponseMissedAlertsDatabaseException()
     {
         $database = $this->createMock(Database::class);
         $database->method('getAlertsById')->willThrowException(new Exception());

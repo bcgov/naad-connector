@@ -4,10 +4,10 @@ namespace Bcgov\NaadConnector\Config;
 use Bcgov\NaadConnector\Config\BaseConfig;
 
 /**
- * Class BaseConfig
+ * Class DatabaseConfig
  *
  * @category Utility
- * @package  Bcgov\NaadConnector\Config\BaseConfig
+ * @package  Bcgov\NaadConnector\Config\DatabaseConfig
  * @author   Digital Engagement Solutions <govwordpress@gov.bc.ca>
  * @license  https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link     https://alerts.pelmorex.com/
@@ -113,5 +113,24 @@ class DatabaseConfig extends BaseConfig
     public function getDatabaseName(): string
     {
         return $this->databaseName;
+    }
+
+    /**
+     * Get the connection array used by
+     * Doctrine\DBAL\DriverManager\DriverManager::getConnection.
+     *
+     * @return array
+     */
+    public function getConnectionArray(): array
+    {
+        return [
+            // TODO: Create non-root user.
+            'user'     => 'root',
+            'password' => $this->getDatabaseRootPassword(),
+            'host'     => $this->getDatabaseHost(),
+            'port'     => $this->getDatabasePort(),
+            'dbname'   => $this->getDatabaseName(),
+            'driver'   => 'pdo_mysql',
+        ];
     }
 }
