@@ -25,7 +25,7 @@ final class AlertFetchFailureExceptionTest extends TestCase
     /**
      * Test that the constructor includes the previous exception's message
      * when one is provided.
-     * 
+     *
      * @return void
      */
     #[Test]
@@ -45,7 +45,7 @@ final class AlertFetchFailureExceptionTest extends TestCase
     /**
      * Test that the constructor works without a previous exception,
      * and includes a generic failure message.
-     * 
+     *
      * @return void
      */
     #[Test]

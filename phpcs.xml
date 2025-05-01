@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="NaadConnectorStandard">
+    <!-- Description of the coding standard -->
     <description>Naad Connector coding standard.</description>
 
-    <!-- apply only to the ./src and ./tests directories -->
+    <!-- Directories to scan -->
     <file>src</file>
     <file>tests</file>
 
-	<!-- How to scan -->
-	<!-- Usage instructions: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
-	<!-- Annotated ruleset: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
-	<arg value="sp"/> <!-- Show sniff and progress -->
-	<arg name="basepath" value="./"/><!-- Strip the file paths down to the relevant bit -->
-	<arg name="colors"/>
-	<arg name="extensions" value="php"/>
-	<arg name="parallel" value="8"/><!-- Enables parallel processing when available for faster results. -->
+    <!-- General configuration arguments -->
+    <arg value="sp"/> <!-- Short progress output -->
+    <arg name="basepath" value="./"/> <!-- Base path for the project -->
+    <arg name="colors"/> <!-- Enable colored output -->
+    <arg name="extensions" value="php"/> <!-- File extensions to check -->
+    <arg name="parallel" value="8"/> <!-- Number of parallel processes -->
 
-    <!-- ruleset -->
+    <!-- Ruleset configurations -->
+    <!-- PEAR coding standard with specific exclusions -->
     <rule ref="PEAR">
-
-        <!-- Exclude specific rules that are not applicable -->
+        <!-- Exclude missing file comments -->
         <exclude name="PEAR.Commenting.FileComment.Missing"/>
+        <!-- Exclude private variable naming convention -->
         <exclude name="PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
+        <!-- Exclude private function naming convention -->
         <exclude name="PEAR.NamingConventions.ValidFunctionName.PrivateNoUnderscore"/>
-
     </rule>
 
+    <!-- Additional rules -->
+    <!-- Enforce no superfluous whitespace at the end of lines -->
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace.EndLine"/>
+    <!-- Enforce a newline at the end of files -->
+    <rule ref="PSR2.Files.EndFileNewline"/>
 </ruleset>
