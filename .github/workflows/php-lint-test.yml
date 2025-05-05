@@ -12,9 +12,10 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
+          coverage: xdebug
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -26,4 +27,9 @@ jobs:
         run: composer run phpcs
       
       - name: Test coverage (PHPUnit)
-        run: composer run test-coverage
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
