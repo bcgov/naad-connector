@@ -72,7 +72,7 @@ class LoggerConfig extends BaseConfig
             0
         );
         $this->logPath = $this->setLogPath();
-       
+
     }
 
     /**

@@ -95,7 +95,7 @@ final class ApplicationConfigTest extends TestCase
         }
         unset($_ENV['FEED_ID']);
     }
- 
+
 
     /**
      * Test the NaadVars Constructor.
@@ -110,7 +110,7 @@ final class ApplicationConfigTest extends TestCase
         $this->assertInstanceOf(ApplicationConfig::class, $config);
         $this->assertSame(1, $config->getFeedId());
         $this->assertSame(
-            'test_destination_password', 
+            'test_destination_password',
             $config->getDestinationPassword()
         );
         unset($_ENV['FEED_ID']);

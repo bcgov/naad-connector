@@ -219,7 +219,7 @@ final class DestinationClientTest extends TestCase
 
         $client = $this->createDestinationClient();
 
-        // Indirectly confirms no exceptions — any would cause the test to fail.  
+        // Indirectly confirms no exceptions — any would cause the test to fail.
         $client->sendAlerts();
     }
 

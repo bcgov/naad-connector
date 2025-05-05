@@ -51,7 +51,7 @@ class Database
     protected function getEntityManager(): EntityManager
     {
         // Extract environment variables from .env file.
-       
+
 
         // Create a simple "default" Doctrine ORM configuration.
         $config = ORMSetup::createAttributeMetadataConfiguration(

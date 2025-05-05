@@ -82,7 +82,7 @@ class ApplicationConfig extends BaseConfig
             );
         }
     }
-    
+
 
     /**
      * Get the FeedId.
