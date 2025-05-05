@@ -66,7 +66,7 @@ class NaadSocketClient
         Database $database,
         NaadRepositoryClient $repositoryClient
     ) {
-        # Change PHP file to trigger workflow.
+        // Change PHP file to trigger workflow.
         $this->destinationClient = $destinationClient;
         $this->logger            = $logger;
         $this->database          = $database;
