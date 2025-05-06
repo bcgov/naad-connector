@@ -29,4 +29,5 @@ jobs:
         with:
           commands: |
             vendor/bin/phpunit --coverage-clover=coverage.xml
+          node_version: "20"
 
