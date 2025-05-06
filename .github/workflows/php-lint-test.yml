@@ -26,6 +26,7 @@ jobs:
       
       - name: Test coverage and analysis (PHPUnit)
         uses: bcgov/action-test-and-analyse@1.3.0
-        commands: |
-          vendor/bin/phpunit --coverage-clover=coverage.xml
+        with:
+          commands: |
+            vendor/bin/phpunit --coverage-clover=coverage.xml
 
