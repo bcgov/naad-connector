@@ -24,10 +24,11 @@ jobs:
       - name: Linting (PHPCS)
         run: composer run phpcs
       
-      - name: Test coverage and analysis (PHPUnit)
-        uses: bcgov/action-test-and-analyse@v1.3.0
-        with:
-          commands: |
-            vendor/bin/phpunit --coverage-clover=coverage.xml
-          node_version: "20"
+      - name: Test coverage (PHPUnit)
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
