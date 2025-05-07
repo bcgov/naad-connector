@@ -17,12 +17,19 @@ use Bcgov\NaadConnector\Config\BaseConfig;
 class DatabaseConfig extends BaseConfig
 {
     /**
+     * The username used to authenticate
+     * to the database which stores Alerts pulled from the NAAD API.
+     *
+     * @var string
+     */
+    private string $databaseServiceUser;
+    /**
      * The password used to authenticate
      * to the database which stores Alerts pulled from the NAAD API.
      *
      * @var string
      */
-    private string $databaseRootPassword;
+    private string $databaseServicePassword;
     /**
      * The hostname of the database
      *
@@ -57,8 +64,10 @@ class DatabaseConfig extends BaseConfig
     protected function assignProperties(): void
     {
         $this->alertsToKeep = $this->getPropertyValueFromEnv('ALERTS_TO_KEEP', 100);
-        $this->databaseRootPassword
-            = $this->getPropertyValueFromEnv('MARIADB_ROOT_PASSWORD');
+        $this->databaseServiceUser
+            = $this->getPropertyValueFromEnv('MARIADB_SERVICE_USER');
+        $this->databaseServicePassword
+            = $this->getPropertyValueFromEnv('MARIADB_SERVICE_PASSWORD');
         $this->databaseHost = $this->getPropertyValueFromEnv('MARIADB_SERVICE_HOST');
         $this->databasePort
             = $this->getPropertyValueFromEnv('MARIADB_SERVICE_PORT', 3306);
@@ -76,13 +85,23 @@ class DatabaseConfig extends BaseConfig
     }
 
     /**
-     * Get the databaseRootPassword.
+     * Get the databaseServiceUser.
      *
      * @return string
      */
-    public function getDatabaseRootPassword(): string
+    public function getDatabaseServiceUser(): string
     {
-        return $this->databaseRootPassword;
+        return $this->databaseServiceUser;
+    }
+
+    /**
+     * Get the databaseServicePassword.
+     *
+     * @return string
+     */
+    public function getDatabaseServicePassword(): string
+    {
+        return $this->databaseServicePassword;
     }
 
     /**
@@ -125,8 +144,8 @@ class DatabaseConfig extends BaseConfig
     {
         return [
             // TODO: Create non-root user.
-            'user'     => 'root',
-            'password' => $this->getDatabaseRootPassword(),
+            'user'     => $this->getDatabaseServiceUser(),
+            'password' => $this->getDatabaseServicePassword(),
             'host'     => $this->getDatabaseHost(),
             'port'     => $this->getDatabasePort(),
             'dbname'   => $this->getDatabaseName(),

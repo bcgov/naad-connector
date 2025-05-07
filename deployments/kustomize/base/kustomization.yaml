@@ -6,6 +6,7 @@ resources:
 - database-service.yaml
 - database-volume.yaml
 - database-migration-job.yaml
+- database-create-user-job.yaml
 - alert-cleanup-cronjob.yaml
 - logs-volume.yaml
 - app-statefulset.yaml

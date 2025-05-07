@@ -5,6 +5,7 @@ metadata:
   annotations:
     app.kubernetes.io/name: database-migration
     argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   template:
     spec:

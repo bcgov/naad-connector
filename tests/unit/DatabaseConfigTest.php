@@ -58,7 +58,8 @@ final class DatabaseConfigTest extends TestCase
     {
         $config = new DatabaseConfig();
         $expectedProperties = [
-          'databaseRootPassword' => 'test_database_root_password',
+          'databaseServiceUser' => 'test_user',
+          'databaseServicePassword' => 'test_database_user_password',
           'databaseHost' => 'test_database_host',
           'databasePort' => 3306,
           'databaseName' => 'test_database_name',
@@ -81,7 +82,8 @@ final class DatabaseConfigTest extends TestCase
     {
         $config = new DatabaseConfig('./tests/data/secret');
         $expectedProperties = [
-            'databaseRootPassword' => 'test_mariadb_root_password_from_file',
+            'databaseServiceUser' => 'test_user',
+            'databaseServicePassword' => 'test_mariadb_user_password_from_file',
             'databaseHost' => 'test_database_host',
             'databasePort' => 3306,
             'databaseName' => 'test_database_name',
@@ -102,17 +104,17 @@ final class DatabaseConfigTest extends TestCase
     public function testGetVariableThrowsExceptionWhenEnvVariableMissing()
     {
         // Clear a required environment variable to simulate the issue
-        putenv('MARIADB_ROOT_PASSWORD'); // Remove this key from the environment
-        unset($_ENV['MARIADB_ROOT_PASSWORD']); // Clear $_ENV if needed
+        putenv('MARIADB_SERVICE_USER'); // Remove this key from the environment
+        unset($_ENV['MARIADB_SERVICE_USER']); // Clear $_ENV if needed
 
         // Assert that the exception is thrown
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            "Property 'MARIADB_ROOT_PASSWORD' does not exist."
+            "Property 'MARIADB_SERVICE_USER' does not exist."
         );
 
         $config = new DatabaseConfig();
-        $config->getDatabaseRootPassword();
+        $config->getDatabaseServicePassword();
     }
 
 
