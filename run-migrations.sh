@@ -1,11 +1,10 @@
 #!/bin/bash
 
 max_retries=5
-retry_delay=10
-attempt=1
+retry_delay=20
 
 # Try to migrate up to max_retries times.
-while [ $attempt -le $max_retries ]
+for ((attempt = 1; attempt <= max_retries; attempt++));
 do
     echo "Migrating database (Attempt: $attempt/$max_retries)..."
     /usr/local/bin/php /app/vendor/bin/doctrine-migrations migrate --no-interaction --allow-no-migration
@@ -17,7 +16,6 @@ do
     # Otherwise, try again.
     echo "Migration failed. Retrying in $retry_delay seconds..."
     sleep $retry_delay
-    attempt=$((attempt + 1))
 done
 
 echo "Max retries reached. Migration failed."

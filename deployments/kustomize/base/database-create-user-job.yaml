@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-create-user
+  labels:
+      app.kubernetes.io/name: database-create-user
+      app.kubernetes.io/instance: naad
+      app.kubernetes.io/component: database
+      app.kubernetes.io/part-of: naad-connector
+      app.kubernetes.io/managed-by: argocd
+  annotations:
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      containers:
+      - name: create-user
+        image: mariadb:11.5.2
+        command: ['sh', '-c']
+        args:
+          - |
+            # Validate environment variables.
+            : "${MARIADB_SERVICE_HOST:?Missing MARIADB_SERVICE_HOST}"
+            : "${MARIADB_SERVICE_PORT:?Missing MARIADB_SERVICE_PORT}"
+            : "${MARIADB_ROOT_PASSWORD:?Missing MARIADB_ROOT_PASSWORD}"
+            : "${MARIADB_SERVICE_USER:?Missing MARIADB_SERVICE_USER}"
+            : "${MARIADB_SERVICE_PASSWORD:?Missing MARIADB_SERVICE_PASSWORD}"
+            : "${MARIADB_DATABASE:?Missing MARIADB_DATABASE}"
+
+            # Create the user and grant it privileges.
+            mariadb -h "$MARIADB_SERVICE_HOST" -P "$MARIADB_SERVICE_PORT" -u root -p"$MARIADB_ROOT_PASSWORD" -e "\
+            CREATE USER IF NOT EXISTS "$MARIADB_SERVICE_USER" IDENTIFIED BY '$MARIADB_SERVICE_PASSWORD';
+            GRANT SELECT, INSERT, UPDATE, DELETE ON "$MARIADB_DATABASE".* TO "$MARIADB_SERVICE_USER"@'%';"
+        envFrom:
+          - configMapRef:
+              name: database-config
+          - secretRef:
+              name: database-secrets
+          - secretRef:
+              name: root-database-secrets
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+            ephemeral-storage: 10Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+

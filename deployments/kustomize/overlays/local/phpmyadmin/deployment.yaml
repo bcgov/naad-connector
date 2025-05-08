@@ -35,5 +35,5 @@ spec:
           - name: PMA_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: database-secrets
+                name: root-database-secrets
                 key: MARIADB_ROOT_PASSWORD
