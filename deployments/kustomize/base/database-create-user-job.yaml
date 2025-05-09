@@ -39,10 +39,22 @@ spec:
         envFrom:
           - configMapRef:
               name: database-config
-          - secretRef:
-              name: database-secrets
-          - secretRef:
-              name: root-database-secrets
+        env:
+          - name: MARIADB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: root-database-secrets
+                key: MARIADB_ROOT_PASSWORD
+          - name: MARIADB_SERVICE_USER
+            valueFrom:
+              secretKeyRef:
+                name: database-secrets
+                key: MARIADB_SERVICE_USER
+          - name: MARIADB_SERVICE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secrets
+                key: MARIADB_SERVICE_PASSWORD
         resources:
           requests:
             cpu: 50m
