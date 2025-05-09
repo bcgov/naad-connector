@@ -32,7 +32,7 @@ spec:
         - configMapRef:
             name: database-config
         - secretRef:
-            name: database-secrets
+            name: root-database-secrets
         volumeMounts:
         - name: database-volume
           mountPath: /var/lib/mysql
