@@ -53,7 +53,7 @@ class NaadRepositoryClient
      *
      * @return string The alert response body.
      *
-     * @throws Exception if an error occurs during the GET request.
+     * @throws Exception if a non-500 error occurs during the GET request.
      */
     public function fetchAlert(string $id, string $sent): string
     {
@@ -70,7 +70,19 @@ class NaadRepositoryClient
                 'Failed to fetch alert: {message}',
                 ['message' => $e->getMessage()]
             );
-            throw new AlertFetchFailureException($e);
+            // If the response is a 500 error, continue to the next iteration
+            if ($e->getCode() === 500) {
+                $this->logger->warning(
+                    'Received 500 error from palmorex server, ' .
+                    'continuing to wait for new alert',
+                );
+                // wait for 5 seconds before retrying
+                sleep(5);
+                return '';
+            } else {
+                // If the error is not a 500, throw an exception
+                throw new AlertFetchFailureException($e);
+            }
         }
     }
 
