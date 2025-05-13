@@ -126,21 +126,6 @@ final class NaadRepositoryClientTest extends TestCase
                 'Alert Body',
                 false,
             ],
-            // Simulate a 500 error from the Palmorex server
-            // and check if the method continues to wait for a new alert
-            '500 error from Palmorex server, continue waiting for new alert' => [
-                new Response(
-                    500,
-                    [],
-                    'Received 500 error from Palmorex server, ' .
-                    'continuing to wait for new alert'
-                ),
-                ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],
-                'Received 500 error from Palmorex server, ' .
-                'continuing to wait for new alert',
-                false,
-            ],
-            // Simulate a non-500 error
             'request error' => [
                 'Request error scenario',
                 ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],

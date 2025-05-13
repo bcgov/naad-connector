@@ -155,9 +155,26 @@ class NaadSocketClient
             // Fetch, validate, then process missed alerts.
             foreach ( $missedAlerts as $alert ) {
                 $this->currentOutput = '';
-                $rawXml = $this->repositoryClient->fetchAlert(
-                    $alert['id'], $alert['sent']
-                );
+                try {
+                    $rawXml = $this->repositoryClient->fetchAlert(
+                        $alert['id'], $alert['sent']
+                    );
+                } catch (Exception $e) {
+                    // if the exception is a 500 error, log it and continue
+                    if ($e->getCode() === 500) {
+                        $this->logger->error(
+                            'Error fetching alert {id} from repository: {error}',
+                            [
+                                'id'    => $alert['id'],
+                                'error' => $e->getMessage(),
+                            ]
+                        );
+                        continue;
+                    } else {
+                        throw $e;
+                    }
+                }
+
                 $missedAlertXml = $this->validateResponse($rawXml);
                 if ($missedAlertXml) {
                     $this->processAlert($missedAlertXml);
