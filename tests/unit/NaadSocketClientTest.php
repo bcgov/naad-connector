@@ -468,8 +468,8 @@ final class NaadSocketClientTest extends TestCase
     }
 
     /**
-     * Tests the handleHeartbeat method of the NaadSocketClient class
-     * when the fetchAlert method throws an exception.
+     * Tests that the handleHeartbeat method of the NaadSocketClient class logs the error and continues
+     * when the fetchAlert method of the NaadRepositoryClient throws a 500 exception.
      */
     #[Test]
     public function testHandleHeartbeatWhenFetchAlertThrows500Exception()
@@ -533,4 +533,5 @@ final class NaadSocketClientTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($stub, $xml);
     }
+
 }
