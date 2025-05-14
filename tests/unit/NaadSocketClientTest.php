@@ -494,9 +494,6 @@ final class NaadSocketClientTest extends TestCase
         $method = $reflection->getMethod('handleHeartbeat');
         $method->setAccessible(true);
 
-        // Simulate findMissedAlerts to return one alert
-        $findMissedAlerts = $reflection->getMethod('findMissedAlerts');
-        $findMissedAlerts->setAccessible(true);
 
         // Mock fetchAlert to throw an Exception with code 500
         $repositoryClient
