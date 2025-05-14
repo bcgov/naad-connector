@@ -161,7 +161,7 @@ class NaadSocketClient
                     );
                 } catch (Exception $e) {
                     // if the exception is a 500 error, log it and continue
-                    if ($e->getCode() === 500) {
+                    if ($e->getCode() >= 500) {
                         $this->logger->error(
                             'Error fetching alert {id} from repository: {error}',
                             [
