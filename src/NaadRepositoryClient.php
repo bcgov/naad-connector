@@ -56,15 +56,6 @@ class NaadRepositoryClient
      */
     public function fetchAlert(string $id, string $sent): string
     {
-        // simulate throwing a request exception for testing
-        // we want to throw a 502 error
-        // $this->logger->info('Simulating a request exception');
-        // throw new RequestException(
-        //     'Bad Gateway',
-        //     new \GuzzleHttp\Psr7\Request('GET', 'https://example.com'),
-        //     new \GuzzleHttp\Psr7\Response(502)
-        // );
-
         try {
             $url = $this->constructURL($id, $sent);
             $this->logger->info(
