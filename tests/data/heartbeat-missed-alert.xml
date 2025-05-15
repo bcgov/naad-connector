@@ -1,9 +1,0 @@
-<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
-  <identifier>ID123</identifier>
-  <sender>NAADS-Heartbeat</sender>
-  <sent>2024-01-01T00:00:00+00:00</sent>
-  <status>Actual</status>
-  <msgType>Alert</msgType>
-  <scope>Public</scope>
-  <references>sender,ID123,2024-01-01T00:00:00+00:00</references>
-</alert>
