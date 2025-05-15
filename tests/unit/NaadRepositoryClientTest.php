@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Bcgov\NaadConnector\Exception\AlertFetchFailureException;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -29,7 +28,6 @@ use Bcgov\NaadConnector\NaadRepositoryClient;
  * @link     https://alerts.pelmorex.com/
  */
 #[CoversClass(NaadRepositoryClient::class)]
-#[UsesClass('Bcgov\NaadConnector\Exception\AlertFetchFailureException')]
 final class NaadRepositoryClientTest extends TestCase
 {
     /**
@@ -85,7 +83,7 @@ final class NaadRepositoryClientTest extends TestCase
         if ($expectsException) {
             $mockClient->method('get')->willThrowException(
                 new RequestException(
-                    "Error",
+                    "Exception: Internal Server Error",
                     $this->createMock(RequestInterface::class)
                 )
             );
@@ -99,7 +97,7 @@ final class NaadRepositoryClientTest extends TestCase
         $sent = $alert['sent'];
 
         if ($expectsException) {
-            $this->expectException(AlertFetchFailureException::class);
+            $this->expectException(RequestException::class);
             $this->expectExceptionMessage($expectedBody);
             $client->fetchAlert($id, $sent);
         } else {
@@ -129,7 +127,7 @@ final class NaadRepositoryClientTest extends TestCase
             'request error' => [
                 'Request error scenario',
                 ['sent' => '2024-06-17T12:00:00Z', 'id' => '123'],
-                'Failed to fetch alert: Error',
+                'Exception: Internal Server Error',
                 true,
             ],
         ];

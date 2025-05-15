@@ -15,7 +15,6 @@ use Bcgov\NaadConnector\{
     NaadRepositoryClient,
     NaadSocketClient,
 };
-use Bcgov\NaadConnector\Config\DatabaseConfig;
 use Bcgov\NaadConnector\Entity\Alert;
 
 /**
@@ -30,7 +29,6 @@ use Bcgov\NaadConnector\Entity\Alert;
  */
 #[CoversClass('Bcgov\NaadConnector\NaadSocketClient')]
 #[UsesClass('Bcgov\NaadConnector\Entity\Alert')]
-#[UsesClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
 final class NaadSocketClientTest extends TestCase
 {
 
@@ -54,7 +52,7 @@ final class NaadSocketClientTest extends TestCase
     #[DataProvider('handleResponseProvider')]
     public function testHandleResponse(array $xmlResponses, int $sendAttempts)
     {
-        $database = $this->createStub(Database::class, DatabaseConfig::class);
+        $database = $this->createStub(Database::class);
         $database->method('insertAlert')->willReturn(true);
         $destinationClient = $this->createMock(DestinationClient::class);
         $logger = $this->createStub(Logger::class);
@@ -464,6 +462,87 @@ final class NaadSocketClientTest extends TestCase
 
         $client->handleResponse(
             file_get_contents(self::XML_TEST_FILE_LOCATION . 'complete-alert.xml')
+        );
+    }
+
+    /**
+     * Tests that handleResponse method throws an exception when the handleHeartbeat
+     * process encounters an Exception with code < 500 while fetching an alert.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testHandleResponseThrowsOnHeartbeatException()
+    {
+        $database = $this->createStub(Database::class);
+        $destinationClient = $this->createStub(DestinationClient::class);
+        $logger = $this->createStub(Logger::class);
+        $repositoryClient = $this->createMock(NaadRepositoryClient::class);
+
+        // Mock fetchAlert to throw an Exception with code < 500
+        $repositoryClient
+            ->method('fetchAlert')
+            ->willThrowException(new Exception('Bad Request', 400));
+
+        // Patch findMissedAlerts to always return one missed alert
+        $client = new NaadSocketClient(
+            $destinationClient,
+            $logger,
+            $database,
+            $repositoryClient
+        );
+
+        // references node to simulate missed alerts in a heartbeat
+        $heartbeatXml = file_get_contents(
+            self::XML_TEST_FILE_LOCATION . 'heartbeat.xml'
+        );
+
+        // Call handleResponse and ensure an exception is thrown
+        $this->expectException(Exception::class);
+        $client->handleResponse($heartbeatXml);
+    }
+
+    /**
+     * Tests that handleResponse logs an error when handleHeartbeat
+     * encounters an Exception with code 502 while fetching an alert.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testHandleResponseLogsErrorOn502Exception()
+    {
+        $database = $this->createStub(Database::class);
+        $destinationClient = $this->createStub(DestinationClient::class);
+        $logger = $this->createMock(Logger::class);
+        $repositoryClient = $this->createMock(NaadRepositoryClient::class);
+
+        $repositoryClient
+            ->method('fetchAlert')
+            ->willThrowException(new Exception('Bad Gateway', 502));
+
+        // Logger should receive an error call for each missed alert.
+        $logger->expects($this->exactly(10))
+            ->method('error')
+            ->with(
+                $this->stringContains('Error fetching alert'),
+                $this->arrayHasKey('id')
+            );
+
+        $client = new NaadSocketClient(
+            $destinationClient,
+            $logger,
+            $database,
+            $repositoryClient
+        );
+
+        $heartbeatXml = file_get_contents(
+            self::XML_TEST_FILE_LOCATION . 'heartbeat.xml'
+        );
+
+        // Call handleResponse and ensure no exception is thrown,
+        // error is logged
+        $client->handleResponse(
+            $heartbeatXml
         );
     }
 }

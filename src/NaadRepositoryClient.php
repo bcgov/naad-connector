@@ -1,7 +1,6 @@
 <?php
 namespace Bcgov\NaadConnector;
 
-use Bcgov\NaadConnector\Exception\AlertFetchFailureException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Monolog\Logger;
@@ -53,7 +52,7 @@ class NaadRepositoryClient
      *
      * @return string The alert response body.
      *
-     * @throws Exception if an error occurs during the GET request.
+     * @throws RequestException if an error occurs during the GET request.
      */
     public function fetchAlert(string $id, string $sent): string
     {
@@ -70,7 +69,7 @@ class NaadRepositoryClient
                 'Failed to fetch alert: {message}',
                 ['message' => $e->getMessage()]
             );
-            throw new AlertFetchFailureException($e);
+            throw $e;
         }
     }
 
