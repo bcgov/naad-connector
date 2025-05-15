@@ -468,52 +468,23 @@ final class NaadSocketClientTest extends TestCase
     }
 
     /**
-     * Tests that the handleHeartbeat method of the NaadSocketClient class
-     * logs the error and continues when the fetchAlert method of the
-     * NaadRepositoryClient throws a 500 exception.
+     * Tests that handleResponse method throws an exception when the handleHeartbeat
+     * process encounters an Exception with code < 500 while fetching an alert.
      *
      * @return void
      */
     #[Test]
-    public function testHandleHeartbeatWhenFetchAlertThrows500Exception()
+    public function testHandleResponseThrowsOnHeartbeatException()
     {
         $database = $this->createStub(Database::class);
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
         $repositoryClient = $this->createMock(NaadRepositoryClient::class);
 
-        $client = new NaadSocketClient(
-            $destinationClient,
-            $logger,
-            $database,
-            $repositoryClient
-        );
-
-        // Prepare a missed alert to trigger fetchAlert
-        $reflection = new \ReflectionClass($client);
-        $method = $reflection->getMethod('handleHeartbeat');
-        $method->setAccessible(true);
-
-
-        // Mock fetchAlert to throw an Exception with code 500
+        // Mock fetchAlert to throw an Exception with code < 500
         $repositoryClient
             ->method('fetchAlert')
-            ->willThrowException(new Exception('Internal Server Error', 500));
-
-        // Logger should receive an error call
-        $logger->expects($this->once())
-            ->method('error')
-            ->with(
-                $this->stringContains('Error fetching alert'),
-                $this->arrayHasKey('id')
-            );
-
-        // references node to simulate missed alerts
-        $xml = new SimpleXMLElement(
-            '<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">' .
-            '<references>sender,ID123,2024-01-01T00:00:00+00:00</references>' .
-            '</alert>'
-        );
+            ->willThrowException(new Exception('Bad Request', 400));
 
         // Patch findMissedAlerts to always return one missed alert
         $stub = $this->getMockBuilder(NaadSocketClient::class)
@@ -530,61 +501,85 @@ final class NaadSocketClientTest extends TestCase
 
         $stub->method('findMissedAlerts')->willReturn(
             [
-            ['id' => 'ID123', 'sent' => '2024-01-01T00:00:00+00:00']
+                ['id' => 'ID123', 'sent' => '2024-01-01T00:00:00+00:00']
             ]
         );
 
-        // Call handleHeartbeat and ensure no exception is thrown
-        $method = (new \ReflectionClass($stub))->getMethod('handleHeartbeat');
-        $method->setAccessible(true);
-        $method->invoke($stub, $xml);
+        // references node to simulate missed alerts in a heartbeat
+        $heartbeatXml = file_get_contents(
+            self::XML_TEST_FILE_LOCATION . 'heartbeat-missed-alert.xml'
+        );
+
+        // Call handleResponse and ensure an exception is thrown
+        $this->expectException(Exception::class);
+        $stub->handleResponse($heartbeatXml);
     }
 
-     /**
-     * Tests that the handleHeartbeat method of the NaadSocketClient class
-     * throws an exception when the fetchAlert method of the
-     * NaadRepositoryClient throws a non-500 exception.
+    /**
+     * Tests that the handleResponse method logs an error when the handleHeartbeat
+     * process encounters an Exception with code 502 while fetching an alert.
+     *
+     * This test:
+     * - Mocks the NaadRepositoryClient to throw a 502 Exception on fetchAlert.
+     * - Ensures the Logger receives an error call with a message
+     *   containing 'Error fetching alert'
+     *   and an array containing the 'id' key.
+     * - Mocks findMissedAlerts to simulate a missed alert
+     * referenced in the heartbeat XML.
+     * - Calls handleResponse with a heartbeat XML referencing the missed alert.
+     * - Verifies that no exception is thrown and the error is properly logged.
      *
      * @return void
      */
     #[Test]
-    public function testHandleHeartbeatWhenFetchAlertThrowsNon500Exception()
+    public function testHandleResponseLogsErrorOn502Exception()
     {
         $database = $this->createStub(Database::class);
         $destinationClient = $this->createStub(DestinationClient::class);
-        $logger = $this->createStub(Logger::class);
+        $logger = $this->createMock(Logger::class);
         $repositoryClient = $this->createMock(NaadRepositoryClient::class);
 
-        $client = new NaadSocketClient(
-            $destinationClient,
-            $logger,
-            $database,
-            $repositoryClient
-        );
-
-        // Prepare a missed alert to trigger fetchAlert
-        $reflection = new \ReflectionClass($client);
-        $method = $reflection->getMethod('handleHeartbeat');
-        $method->setAccessible(true);
-
-        // Mock fetchAlert to throw an Exception with code 400
+        // Mock fetchAlert to throw an Exception with code 502
         $repositoryClient
             ->method('fetchAlert')
-            ->willThrowException(new Exception('Bad Request', 400));
+            ->willThrowException(new Exception('Bad Gateway', 502));
 
-        // references node to simulate missed alerts
-        $xml = new SimpleXMLElement(
-            '<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">' .
-            '<references>sender,ID123,2024-01-01T00:00:00+00:00</references>' .
-            '</alert>'
+        // Logger should receive an error call
+        $logger->expects($this->once())
+            ->method('error')
+            ->with(
+                $this->stringContains('Error fetching alert'),
+                $this->arrayHasKey('id')
+            );
+
+        // Patch findMissedAlerts to always return one missed alert
+        $stub = $this->getMockBuilder(NaadSocketClient::class)
+            ->setConstructorArgs(
+                [
+                $destinationClient,
+                $logger,
+                $database,
+                $repositoryClient
+                ]
+            )
+            ->onlyMethods(['findMissedAlerts'])
+            ->getMock();
+
+        $stub->method('findMissedAlerts')->willReturn(
+            [
+                ['id' => 'ID123', 'sent' => '2024-01-01T00:00:00+00:00']
+            ]
         );
 
-        // Call handleHeartbeat and ensure an exception is thrown
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Bad Request');
+        // references node to simulate missed alerts in a heartbeat
+        $heartbeatXml = file_get_contents(
+            self::XML_TEST_FILE_LOCATION . 'heartbeat-missed-alert.xml'
+        );
 
-        // Call the method
-        $method->invoke($client, $xml);
+        // Call handleResponse and ensure no exception is thrown,
+        // error is logged
+        $stub->handleResponse(
+            $heartbeatXml
+        );
     }
-
 }
