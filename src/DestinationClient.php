@@ -123,7 +123,7 @@ class DestinationClient
      * @return void
      */
     private function handleAlertFailure(
-        $alert, ?array $response = null, ?\Exception $e = null
+        $alert, array $response = null, \Exception $e = null
     ): void {
 
         $alert->incrementFailures();
@@ -174,8 +174,8 @@ class DestinationClient
             // log Request and Response headers when the log level is set to 'debug'
             $this->logger->debug(
                 'Request Headers: ',
-                // Use the request options directly as headers.
-                [$options['json']]
+                // TODO: Replace as getConfig() is deprecated.
+                [$this->client->getConfig('headers')]
             );
             $this->logger->debug(
                 'Response Headers: ',
