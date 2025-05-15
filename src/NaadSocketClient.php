@@ -135,6 +135,18 @@ class NaadSocketClient
     /**
      * Handles the heartbeat message received from the NAAD server.
      *
+     * This method performs the following actions:
+     * - Logs the receipt of a heartbeat.
+     * - Updates the heartbeat file timestamp.
+     * - Checks for any missed alerts indicated in the heartbeat XML.
+     * - If missed alerts are found:
+     *   - Logs the number of missed alerts.
+     *   - Attempts to fetch, validate, and process each missed alert
+     * from the NAAD repository.
+     *   - If an error occurs while fetching an alert and the error code is >= 500,
+     * it logs the error and continues with the next alert.
+     *   - If the error code is less than 500, re-throws the exception.
+     *
      * @param SimpleXMLElement $xml The heartbeat XML message received.
      *
      * @throws Exception If an error occurs fetching a missed alert
@@ -142,60 +154,45 @@ class NaadSocketClient
      *
      * @return void
      */
-    protected function handleHeartbeat(SimpleXMLElement $xml): void
+    protected function handleHeartbeat(SimpleXMLElement $xml)
     {
         $this->logger->debug('Heartbeat received.');
         $this->touchHeartbeatFile();
-
         $missedAlerts = $this->findMissedAlerts($xml);
-
-        if (empty($missedAlerts)) {
-            return;
-        }
-
-        $this->logger->info(
-            'Found {count} missing alerts. Fetching from repository.',
-            ['count' => count($missedAlerts)]
-        );
-
-        foreach ($missedAlerts as $alert) {
-            $this->processMissedAlert($alert);
-        }
-    }
-
-    /**
-     * Fetches, validates, and processes a missed alert.
-     *
-     * @param array $alert The alert reference array.
-     *
-     * @throws Exception If an error occurs fetching a missed alert
-     * with an error code less than 500.
-     *
-     * @return void
-     */
-    protected function processMissedAlert(array $alert): void
-    {
-        $this->currentOutput = '';
-        try {
-            $rawXml = $this->repositoryClient->fetchAlert(
-                $alert['id'],
-                $alert['sent']
+        if (count($missedAlerts) > 0) {
+            $this->logger->info(
+                'Found {count} missing alerts in heartbeat. '
+                    . 'Fetching from NAAD repository.',
+                ['count' => count($missedAlerts)]
             );
-            $missedAlertXml = $this->validateResponse($rawXml);
-            if ($missedAlertXml) {
-                $this->processAlert($missedAlertXml);
-            }
-        } catch (Exception $e) {
-            if ((int)$e->getCode() >= 500) {
-                $this->logger->error(
-                    'Error fetching alert',
-                    [
-                        'id' => $alert['id'],
-                        'error' => $e->getMessage(),
-                    ]
-                );
-            } else {
-                throw $e;
+
+            // Fetch, validate, then process missed alerts.
+            foreach ($missedAlerts as $alert) {
+                $this->currentOutput = '';
+                try {
+                    $rawXml = $this->repositoryClient->fetchAlert(
+                        $alert['id'], $alert['sent']
+                    );
+                    $missedAlertXml = $this->validateResponse($rawXml);
+                    if ($missedAlertXml) {
+                        $this->processAlert($missedAlertXml);
+                    }
+                } catch (Exception $e) {
+                    // Only log and continue for HTTP 500 errors, rethrow others
+                    if ((int)$e->getCode() >= 500) {
+                        $this->logger->error(
+                            'Error fetching alert',
+                            [
+                                'id' => $alert['id'],
+                                'error' => $e->getMessage(),
+                            ]
+                        );
+                        // Continue with next missed alert
+                    } else {
+                        // Otherwise, re-throw the exception.
+                        throw $e;
+                    }
+                }
             }
         }
     }
