@@ -1,0 +1,29 @@
+name: Merge
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  # Do not interrupt previous workflows
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  promote:
+    name: Promote image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add 'latest' and 'test' tags to image
+        uses: shrink/actions-docker-registry-tag@v4
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository }}/naad-connector
+          target: dev
+          tags: |
+            test
+            latest

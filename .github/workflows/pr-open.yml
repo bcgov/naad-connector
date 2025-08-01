@@ -52,5 +52,5 @@ jobs:
           keep_versions: 1
           build_context: ./
           tags: |
-            ${{ github.event.number }}
             dev
+            ${{ github.event.number }}
