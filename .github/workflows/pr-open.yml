@@ -50,7 +50,7 @@ jobs:
         with:
           package: naad-connector
           keep_versions: 1
-          build_context: ./
+          build_context: .
           tags: |
             dev
             ${{ github.event.number }}
