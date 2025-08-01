@@ -46,7 +46,7 @@ jobs:
         uses: bcgov/action-builder-ghcr@v4.0.0
         with:
           package: naad-connector
-          keep_versions: 50
+          # keep_versions: 50
           tags: |
             ${{ github.event.number }}
             dev
