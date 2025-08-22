@@ -1,0 +1,59 @@
+name: PR
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  lint-and-tests:
+    name: Linting and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+        
+      - name: Setup PHP with Xdebug
+        uses: shivammathur/setup-php@20529878ed81ef8e78ddf08b480401e6101a850f #v2.35.3
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+          
+      - name: Install dependencies with composer
+        run: composer install --no-ansi --no-interaction --no-progress
+
+      - name: Linting (PHPCS)
+        run: composer run phpcs
+        
+      - name: Run tests with phpunit/phpunit
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+        
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@8c71dc039c2dd71d3821e89a2b58ecc7fee6ced9 #v5.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      ## TODO: Automatically deploy to dev environment
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: bcgov/action-builder-ghcr@fd17bc1cbb16a60514e0df3966d42dff9fc232bc #v4.0.0
+        with:
+          package: naad-connector
+          keep_versions: 1
+          build_context: .
+          tags: |
+            dev
+            ${{ github.event.number }}
