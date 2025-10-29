@@ -4,7 +4,9 @@
 
 ## Oct 28, 2025
 [DESCW-3190](https://citz-gdx.atlassian.net/browse/DESCW-3190)
-- Adds missing configuration lines to sonarcloud config
+- Troubleshoot sonarcloud config
+- fix permissions in sonarcloud admin console
+- update sonarqube action to latest hash for v6.0.0
 
 ## JAN 16, 2025
 
