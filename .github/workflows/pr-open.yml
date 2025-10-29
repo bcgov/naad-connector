@@ -38,7 +38,7 @@ jobs:
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarcloud-scan-action@v6.0.0
+        uses: SonarSource/sonarcube-scan-action@v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       ## TODO: Automatically deploy to dev environment
