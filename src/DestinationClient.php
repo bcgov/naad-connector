@@ -123,7 +123,7 @@ class DestinationClient
      * @return void
      */
     private function handleAlertFailure(
-        $alert, array $response = null, \Exception $e = null
+        $alert, ?array $response = null, ?\Exception $e = null
     ): void {
 
         $alert->incrementFailures();
