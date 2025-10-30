@@ -2,6 +2,12 @@
 
 ## 1.0.0
 
+## Oct 28, 2025
+[DESCW-3190](https://citz-gdx.atlassian.net/browse/DESCW-3190)
+- Troubleshoot sonarcloud config
+- fix permissions in sonarcloud admin console
+- update sonarqube action to latest hash for v6.0.0
+
 ## JAN 16, 2025
 
 [DESCW-2744](https://citz-gdx.atlassian.net/browse/DESCW-2744)
