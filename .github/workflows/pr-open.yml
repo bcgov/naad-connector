@@ -52,7 +52,6 @@ jobs:
         uses: bcgov/action-builder-ghcr@fd17bc1cbb16a60514e0df3966d42dff9fc232bc #v4.0.0
         with:
           package: naad-connector
-          keep_versions: 1
           build_context: .
           tags: |
             dev
