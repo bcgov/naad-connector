@@ -1,7 +1,13 @@
 # Workflows
 
 ## PR Open
-When a pull request is opened or changed, linting and unit testing are performed, then a new image is built and hosted on the [GitHub Container Registry](https://github.com/bcgov/naad-connector/pkgs/container/naad-connector%2Fnaad-connector). Its version will be set to the PR number, eg. if the PR number is #101, a `101` version of the image will be built. It will also be given the `dev` tag. Every time the PR is changed the build is triggered again and the version is overwritten.
+When a pull request is opened or changed, the following steps are performed:
+
+1. **Linting and Unit Testing** – Ensures code quality and correctness.
+1. **Image Build and Hosting** – A new container image is built and pushed to the https://github.com/bcgov/naad-connector/pkgs/container/naad-connector%2Fnaad-connector. The image is tagged with the PR number (e.g., 101 for PR #101) and also with the dev tag.
+1. **Security Scanning with Trivy** – After the image is built, it is scanned using https://github.com/aquasecurity/trivy to detect vulnerabilities. The scan results can be found under the Security tab.
+
+Every time the PR is updated, the workflow is triggered again, rebuilding and rescanning the image. The previously built image with the same PR number tag is overwritten.
 
 ## Merge
 When a pull request is merged into the `main` branch, the current `dev` image is given the `test` and `latest` tags.
