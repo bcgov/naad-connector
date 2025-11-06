@@ -18,3 +18,11 @@ When a pull request is merged into the `main` branch, the current `dev` image is
 When a release is created, the current `latest` tag is given the `prod` and a version tag using the release's version tag, eg. if a v2.1.1 release is created, the `latest` image will also be tagged with `v2.1.1`.
 
 **NOTE:** Ensure that the Merge workflow has fully completed and the correct image has been given the `latest` tag before creating the release or the wrong image could be given the release tag due to timing issues.
+
+## Scheduled Security Scans with Trivy
+
+This project uses https://github.com/aquasecurity/trivy to perform daily vulnerability scans on the container image hosted in GitHub Container Registry (GHCR). You can also manually trigger the scan via the **Actions** tab in GitHub.
+
+### Output
+
+The scan results can be viewed in the **Security** tab in GitHub.
