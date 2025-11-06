@@ -1,0 +1,21 @@
+name: Scheduled Trivy Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 #v0.33.1
+        with:
+          image-ref: 'ghcr.io/bcgov/naad-connector/naad-connector:latest'
+          output: 'trivy-results.sarif'
+          trivy-config: '.github/trivy.yml'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
