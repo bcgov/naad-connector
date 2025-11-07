@@ -17,7 +17,8 @@ jobs:
         with:
           image-ref: 'ghcr.io/bcgov/naad-connector/naad-connector:latest'
           output: 'trivy-results.sarif'
-          trivy-config: '/.github/trivy.yml'
+          format: 'sarif'
+          ignore-unfixed: true
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
