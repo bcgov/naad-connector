@@ -19,6 +19,10 @@ When a release is created, the current `latest` tag is given the `prod` and a ve
 
 **NOTE:** Ensure that the Merge workflow has fully completed and the correct image has been given the `latest` tag before creating the release or the wrong image could be given the release tag due to timing issues.
 
+## Scheduled Code Scans with SonarQube
+
+This project uses https://github.com/SonarSource/sonarqube-scan-action to perform daily code quality scans. You can also manually trigger the scan via the **Actions** tab in GitHub.
+
 ## Scheduled Security Scans with Trivy
 
 This project uses https://github.com/aquasecurity/trivy to perform daily vulnerability scans on the container image hosted in GitHub Container Registry (GHCR). You can also manually trigger the scan via the **Actions** tab in GitHub.

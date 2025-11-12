@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup PHP with Xdebug
-        uses: shivammathur/setup-php@20529878ed81ef8e78ddf08b480401e6101a850f #v2.35.3
+        uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f #v2.35.5
         with:
           php-version: '8.3'
           coverage: xdebug
