@@ -21,7 +21,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: mariadb
-        image: mariadb:11.5.2
+        image: mariadb:12.1.2
         imagePullPolicy: Always
         ports:
         - containerPort: 3306
