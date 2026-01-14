@@ -19,6 +19,8 @@ spec:
           - configMapRef:
               name: database-config
           - secretRef:
+              name: database-secrets
+          - secretRef:
               name: root-database-secrets
           resources:
             requests:
