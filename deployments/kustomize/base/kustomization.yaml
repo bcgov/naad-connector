@@ -25,8 +25,6 @@ secretGenerator:
   type: Opaque
 - name: root-database-secrets
   literals:
-    - MARIADB_SERVICE_USER="root"
-    - MARIADB_SERVICE_PASSWORD="rootpassword"
     - MARIADB_ROOT_PASSWORD="rootpassword"
   type: Opaque
 
