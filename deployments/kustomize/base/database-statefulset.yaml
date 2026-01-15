@@ -1,11 +1,15 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mariadb
   labels:
     app.kubernetes.io/component: database
 spec:
+  serviceName: mariadb
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: database
   template:
     metadata:
       labels:
@@ -14,10 +18,6 @@ spec:
         app.kubernetes.io/instance: naad
         app.kubernetes.io/part-of: naad-connector
     spec:
-      volumes:
-      - name: database-volume
-        persistentVolumeClaim:
-          claimName: mariadb
       automountServiceAccountToken: false
       containers:
       - name: mariadb
@@ -26,8 +26,8 @@ spec:
         ports:
         - containerPort: 3306
         env:
-          - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
-            value: "0"
+        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+          value: "0"
         envFrom:
         - configMapRef:
             name: database-config
@@ -45,3 +45,7 @@ spec:
             ephemeral-storage: "1Gi"
             cpu: 500m
             memory: 1Gi
+      volumes:
+      - name: database-volume
+        persistentVolumeClaim:
+          claimName: mariadb
