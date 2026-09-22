@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 1.0.1
+
+### Sep 22, 2026
+[DSWP-1164](https://citz-gdx.atlassian.net/browse/DSWP-1164)
+
+- Update PHP version in the main Dockerfile to 8.5.
+- Update the `.devcontainer` Dockerfile to `mcr.microsoft.com/devcontainers/php:8.5`.
+
 ## 1.0.0
 
 ## Oct 28, 2025
