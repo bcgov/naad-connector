@@ -1,4 +1,4 @@
-FROM php:8.4
+FROM php:8.5
 
 # Set working directory
 WORKDIR /app
