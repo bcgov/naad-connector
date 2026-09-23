@@ -6,18 +6,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
   security-events: write
-  packages: read
 
 jobs:
   trivy-scan:
     runs-on: ubuntu-latest
     steps:
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 #v0.36.0
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 #v0.33.1
         with:
-          version: 'v0.65.0'
           image-ref: 'ghcr.io/bcgov/naad-connector/naad-connector:latest'
           output: 'trivy-results.sarif'
           format: 'sarif'
