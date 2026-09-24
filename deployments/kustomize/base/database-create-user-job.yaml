@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: create-user
-        image: mariadb:12.1.2
+        image: mariadb:12.3.3
         command: ['sh', '-c']
         args:
           - |
