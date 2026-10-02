@@ -18,9 +18,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup PHP with Xdebug
-        uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f #v2.35.5
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 #v2.37.2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           coverage: xdebug
 
       - name: Install dependencies with composer
@@ -30,6 +30,6 @@ jobs:
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 #v6.0.0
+        uses: SonarSource/sonarqube-scan-action@ba9859eae8dd6bd29e412f25ddbbef3d032000f4 #v8.2.2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
