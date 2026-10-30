@@ -24,7 +24,6 @@ use Dotenv\Dotenv;
  * @link     https://alerts.pelmorex.com/
  */
 #[CoversClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
-#[UsesClass('Bcgov\NaadConnector\Config\DatabaseConfig')]
 final class DatabaseConfigTest extends TestCase
 {
 
