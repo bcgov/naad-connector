@@ -24,7 +24,6 @@ use Monolog\Handler\RotatingFileHandler;
  * @link     https://alerts.pelmorex.com/
  */
 #[CoversClass('Bcgov\NaadConnector\LoggerFactory')]
-#[UsesClass('Bcgov\NaadConnector\LoggerFactory')]
 final class LoggerFactoryTest extends TestCase
 {
 
